@@ -1,0 +1,8 @@
+{
+  "name": "Sovereign Map Explorer",
+  "description": "An interactive world map for geopolitical analysis and sovereign data exploration, powered by Gemini AI and a simulated ORB-SLAM3 Spatial Engine.",
+  "requestFramePermissions": [
+    "geolocation",
+    "camera"
+  ]
+}
