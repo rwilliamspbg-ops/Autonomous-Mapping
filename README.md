@@ -9,6 +9,7 @@
 [![ZK-Proof Ready](https://img.shields.io/badge/Security-ZK--Proof%20Ready-green?logo=linux-foundation&logoColor=white)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping/blob/main/README.md#3-agglayer--zk-proofs)
 [![Spatial Node](https://img.shields.io/badge/Node-Online-brightgreen?style=flat-square&logo=diagram-project)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)
 [![Stars](https://img.shields.io/github/stars/rwilliamspbg-ops/Autonomous-Mapping?style=social)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)
+![Heritage](https://img.shields.io/badge/SGP--001-Protected-brightgreen?logo=unesco)
 
 > **"Reclaiming the world's data layer through Decentralized Spatial Intelligence."**
 
