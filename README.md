@@ -1,11 +1,14 @@
 # 🌍 Sovereign Map Explorer (v2035.1)
+# 🌍 Sovereign Map Explorer (v2035.1)
 
-![Version](https://img.shields.io/badge/version-v2035.1-blue)
-![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
-![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
-![Gemini AI](https://img.shields.io/badge/AI-Gemini-orange?logo=google-gemini)
-![DAO](https://img.shields.io/badge/Governance-DAO--SGP001-blueviolet)
-![Last Commit](https://img.shields.io/github/last-commit/rwilliamspbg-ops/Autonomous-Mapping)
+[![Version](https://img.shields.io/badge/version-v2035.1-blue)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)
+[![Gemini AI](https://img.shields.io/badge/AI-Gemini-orange?logo=google-gemini)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)
+[![DAO](https://img.shields.io/badge/Governance-DAO--SGP001-blueviolet)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping/blob/main/README.md#-governance)
+[![ZK-Proof Ready](https://img.shields.io/badge/Security-ZK--Proof%20Ready-green?logo=linux-foundation&logoColor=white)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping/blob/main/README.md#3-agglayer--zk-proofs)
+[![Spatial Node](https://img.shields.io/badge/Node-Online-brightgreen?style=flat-square&logo=diagram-project)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)
+[![Stars](https://img.shields.io/github/stars/rwilliamspbg-ops/Autonomous-Mapping?style=social)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)
 
 > **"Reclaiming the world's data layer through Decentralized Spatial Intelligence."**
 
