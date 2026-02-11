@@ -1,5 +1,4 @@
 # 🌍 Sovereign Map Explorer (v2035.1)
-# 🌍 Sovereign Map Explorer (v2035.1)
 
 [![Version](https://img.shields.io/badge/version-v2035.1-blue)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)
@@ -67,6 +66,31 @@ Simulated blockchain finality where spatial data is committed as state-roots.
 3. **Anchor Voxels**: Use the scanner to "claim" your local spatial perspective.
 4. **Consult the DAO**: Use the Chat Interface to dive deeper into geopolitical anomalies.
 
+📡 Spatial Node Configuration
+To connect a local sensor array to the Sovereign Map decentralized network, follow these parameters:
+
+1. Connection Protocol
+Nodes must broadcast encrypted telemetry via WebSockets (WSS) to the AggLayer endpoint.
+
+Endpoint: wss://nodes.sovereign-map.io/v1/telemetry
+
+Authentication: Requires a ZK-Signature generated from your local hardware enclave.
+
+2. Telemetry Schema
+Each data packet must be formatted as a Quantized Spatial Bundle (QSB) to ensure 99% compression.
+
+JSON
+{
+  "node_id": "DAO-NODE-XXXX",
+  "spatial_anchor": "VOXEL_ID_REDACTED",
+  "drift_correction": "0.002mm",
+  "zk_proof": "STARK_ROOT_HASH"
+}
+3. Local Hardware Requirements
+Visual Tracking: Monocular or Inertial sensors compatible with ORB-SLAM3.
+
+Inference: NPU capable of running quantized Gemini 1.5/2.0 risk matrices locally for sovereign offline analysis.
+
 ## 📜 Governance
 
 This project operates under the **SGP (Spatial Governance Proposal)** framework. Current active proposal: **SGP-001 (Heritage Sanctuaries)**.
@@ -75,3 +99,26 @@ This project operates under the **SGP (Spatial Governance Proposal)** framework.
 
 *Part of the 2035 Global Spatial DAO Initiative.*
 *Built with ❤️ and ZK-STARKs.*
+🛰️ Configuration Template
+As we discussed, here is the node-config.json template. This will allow users to quickly bootstrap their local Autonomous-Mapping environment.
+
+Path: /config/node-config.json
+
+JSON
+{
+  "network": {
+    "endpoint": "wss://nodes.sovereign-map.io/v1/telemetry",
+    "retry_strategy": "exponential_backoff",
+    "compression": "QSB_V1"
+  },
+  "hardware": {
+    "sensor_type": "monocular_inertial",
+    "npu_enabled": true,
+    "quantization_level": "int8"
+  },
+  "governance": {
+    "dao_member_id": "REPLACE_WITH_YOUR_ID",
+    "sgp_compliance": ["SGP-001"]
+  }
+}
+
