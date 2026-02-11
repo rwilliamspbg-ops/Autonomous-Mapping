@@ -1,5 +1,12 @@
 # 🌍 Sovereign Map Explorer (v2035.1)
 
+![Version](https://img.shields.io/badge/version-v2035.1-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)
+![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Gemini AI](https://img.shields.io/badge/AI-Gemini-orange?logo=google-gemini)
+![DAO](https://img.shields.io/badge/Governance-DAO--SGP001-blueviolet)
+![Last Commit](https://img.shields.io/github/last-commit/rwilliamspbg-ops/Autonomous-Mapping)
+
 > **"Reclaiming the world's data layer through Decentralized Spatial Intelligence."**
 
 Sovereign Map is a high-fidelity spatial operating system and geopolitical analyst dashboard. It reclaims the spatial commons by merging real-time **ORB-SLAM3** visual tracking with **Google Gemini AI** powered geopolitical intelligence, all anchored to the **Polygon AggLayer** for cryptographic finality.
