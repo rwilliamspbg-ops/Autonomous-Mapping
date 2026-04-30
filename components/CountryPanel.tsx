@@ -67,14 +67,13 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
 
   return (
     <div className="fixed top-0 right-0 h-full w-full md:w-[500px] bg-slate-950/98 backdrop-blur-2xl border-l border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] z-40 flex flex-col transition-all duration-500 ease-out border-t border-blue-500/20">
-      {/* Registry Header */}
       <div className="bg-slate-950 p-8 border-b border-white/5 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-10">
           <div className="w-24 h-24 border-r-2 border-t-2 border-blue-500"></div>
         </div>
         <div className="flex justify-between items-start">
           <div>
-            <div className="mono text-[10px] text-blue-500 font-black uppercase tracking-[0.5em] mb-1">Spatial_Registry_Voxel</div>
+            <div className="mono text-[10px] text-blue-500 font-black uppercase tracking-[0.5em] mb-1">Regional_Pilot_Brief</div>
             <h2 className="text-4xl font-black text-white uppercase tracking-tighter leading-none">{country.name}</h2>
             <div className="flex items-center gap-3 mt-3">
               <span className="flex items-center gap-1.5 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded text-[9px] text-blue-400 mono font-bold">
@@ -105,28 +104,26 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
           </div>
         ) : insight ? (
           <>
-            {/* Architectural Status */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-slate-900/60 p-4 rounded-2xl border border-white/5 space-y-1">
-                <div className="text-slate-500 text-[8px] mono uppercase tracking-widest">Splatting Fidelity</div>
+                <div className="text-slate-500 text-[8px] mono uppercase tracking-widest">Readiness</div>
                 <div className="text-white text-xl font-black">99.2%</div>
                 <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
                    <div className="w-[99%] h-full bg-emerald-500"></div>
                 </div>
               </div>
               <div className="bg-slate-900/60 p-4 rounded-2xl border border-white/5 space-y-1">
-                <div className="text-slate-500 text-[8px] mono uppercase tracking-widest">Spatial Governance</div>
-                <div className="text-blue-400 text-sm font-black italic uppercase leading-tight">Heritage Sanctuary</div>
-                <div className="text-[8px] text-slate-600 mono uppercase">SGP-Active</div>
+                <div className="text-slate-500 text-[8px] mono uppercase tracking-widest">Deployment Lens</div>
+                <div className="text-blue-400 text-sm font-black italic uppercase leading-tight">Community Impact</div>
+                <div className="text-[8px] text-slate-600 mono uppercase">Pilot-Ready</div>
               </div>
             </div>
 
-            {/* ZK Section */}
             <div className="bg-slate-900 border border-blue-500/20 rounded-2xl p-5 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/0 via-blue-500/50 to-blue-500/0"></div>
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-white text-[10px] mono font-black uppercase tracking-[0.2em]">Spatial ZK-Proof Generation</h3>
-                <span className="text-emerald-400 text-[8px] mono px-2 py-0.5 border border-emerald-500/20 bg-emerald-500/5 rounded">NON_CUSTODIAL_OK</span>
+                <h3 className="text-white text-[10px] mono font-black uppercase tracking-[0.2em]">Privacy Check & Proof Trail</h3>
+                <span className="text-emerald-400 text-[8px] mono px-2 py-0.5 border border-emerald-500/20 bg-emerald-500/5 rounded">DATA_LOCAL_OK</span>
               </div>
 
               {zkStatus === 'VERIFYING' && (
@@ -157,23 +154,23 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                   'bg-slate-800 border-slate-700 text-slate-500 animate-pulse cursor-wait'
                 }`}
               >
-                {zkStatus === 'IDLE' && '⊕ Commit Spatial State to AggLayer'}
-                {zkStatus === 'GENERATING' && 'Generating SNARK Proof...'}
-                {zkStatus === 'VERIFYING' && 'Verifying Proof...'}
-                {zkStatus === 'COMMITTED' && '✓ State-Root Finalized on Polygon'}
+                {zkStatus === 'IDLE' && '⊕ Verify On-Device Contribution'}
+                {zkStatus === 'GENERATING' && 'Generating Privacy Proof...'}
+                {zkStatus === 'VERIFYING' && 'Verifying Local Contribution...'}
+                {zkStatus === 'COMMITTED' && '✓ Privacy Trail Finalized'}
               </button>
             </div>
 
             <section className="space-y-4">
               <h3 className="text-slate-500 text-[10px] mono font-bold uppercase tracking-[0.4em] flex items-center gap-3">
-                <span className="w-1.5 h-4 bg-blue-600"></span> Executive Summary
+                <span className="w-1.5 h-4 bg-blue-600"></span> Local Deployment Summary
               </h3>
               <p className="text-slate-200 text-base leading-relaxed font-medium">{insight.summary}</p>
             </section>
 
             {/* Risk Distribution */}
             <section className="bg-slate-900/50 p-6 rounded-3xl border border-white/5 relative">
-              <h3 className="text-slate-500 text-[10px] mono font-bold uppercase mb-6 tracking-[0.4em]">Sovereign Risk Matrix</h3>
+              <h3 className="text-slate-500 text-[10px] mono font-bold uppercase mb-6 tracking-[0.4em]">Program Risk Matrix</h3>
               <div className="h-64 relative">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -216,17 +213,17 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
 
             <section className="space-y-4">
               <div className="p-5 bg-slate-900/60 rounded-2xl border border-white/5 group hover:border-blue-500/30 transition-colors">
-                <h4 className="text-blue-500 text-[10px] font-black uppercase mb-3 mono tracking-widest">Political Intelligence</h4>
+                <h4 className="text-blue-500 text-[10px] font-black uppercase mb-3 mono tracking-widest">Community Fit</h4>
                 <p className="text-slate-300 text-sm leading-relaxed">{insight.politicalStatus}</p>
               </div>
               <div className="p-5 bg-slate-900/60 rounded-2xl border border-white/5 group hover:border-emerald-500/30 transition-colors">
-                <h4 className="text-emerald-500 text-[10px] font-black uppercase mb-3 mono tracking-widest">Economic Trajectory</h4>
+                <h4 className="text-emerald-500 text-[10px] font-black uppercase mb-3 mono tracking-widest">Resource Outlook</h4>
                 <p className="text-slate-300 text-sm leading-relaxed">{insight.economicOutlook}</p>
               </div>
             </section>
 
             <section className="pb-12 border-t border-white/5 pt-10">
-              <h3 className="text-slate-500 text-[10px] mono font-bold uppercase mb-4 tracking-[0.4em]">Intelligence Citations</h3>
+              <h3 className="text-slate-500 text-[10px] mono font-bold uppercase mb-4 tracking-[0.4em]">Grounding Sources</h3>
               <div className="flex flex-wrap gap-2">
                 {insight.sources?.map((source, i) => (
                   <a key={i} href={source.uri} target="_blank" rel="noopener noreferrer" className="text-[9px] mono bg-blue-500/10 text-blue-400 px-4 py-1.5 rounded-full border border-blue-500/20 hover:bg-blue-500/20 transition-all font-bold uppercase truncate max-w-[200px]">
@@ -242,7 +239,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
       <div className="p-5 bg-slate-950 border-t border-white/5 text-[9px] text-slate-500 mono flex justify-between items-center shrink-0">
         <span className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-          SPATIAL_SYNC_ENABLED
+          IMPACT_SYNC_ENABLED
         </span>
         <div className="flex items-center gap-4">
           <span className="text-slate-600">v.2035.1</span>

@@ -16,6 +16,24 @@ Sovereign Map is a high-fidelity spatial operating system and geopolitical analy
 
 ![Sovereign Map Header](https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000)
 
+## 🎯 Demo Positioning
+
+This workspace is best used as the browser-first demo shell for [Sovereign_Map_Federated_Learning](https://github.com/rwilliamspbg-ops/Sovereign_Map_Federated_Learning). The goal is to move the conversation from raw scale and formal verification into an impact narrative that non-profit funders can absorb quickly.
+
+### Suggested Demo Story
+
+1. Show the map as a live federated learning network with local data sovereignty.
+2. Open the privacy scanner to prove that a contribution can stay on-device while still helping the global model.
+3. Switch to the country panel and frame the deployment as a health, rights, or climate pilot.
+4. Use the chat assistant to answer funding questions in plain language.
+
+### Demo Claims to Emphasize
+
+- Privacy-preserving training keeps sensitive data local.
+- Verification and attestation make the coordination path auditable.
+- Edge-first participation can reduce cloud transfer and energy waste.
+- The same runtime can be narrated for health, human rights, or climate resilience.
+
 ## 🔭 Vision & Manifesto
 
 In a world where spatial data is increasingly privatized, Sovereign Map proposes a **Global Spatial Commons**. Every "Voxel" scanned and every geopolitical "Insight" generated is a step toward a transparent, verifiable, and decentralized representation of our world.
@@ -27,20 +45,26 @@ In a world where spatial data is increasingly privatized, Sovereign Map proposes
 ## 🛠 Features
 
 ### 1. Simulated ORB-SLAM3 Engine
+
 A high-performance monocular-inertial SLAM simulation that visualizes feature tracking, voxel density, and sub-millimeter drift correction. Access via the **"Initiate Spatial Scan"** interface.
 
 ### 2. Geopolitical Intelligence (Gemini AI)
+
 Deep integration with Google Gemini 1.5/2.0 models to provide:
+
 - **Sovereign Risk Matrices**: Real-time analysis of political, economic, and social stability.
 - **Google Search Grounding**: Every analyst insight is cross-referenced with live web data for maximum accuracy.
 - **Interactive Analyst Chat**: Query a dedicated analyst about any global trend.
 
 ### 3. AggLayer & ZK-Proofs
+
 Simulated blockchain finality where spatial data is committed as state-roots.
+
 - **ZK-SNARKs**: Cryptographic proof generation for voxel anchoring.
 - **QSB (Quantized Spatial Bundles)**: 99% compression for high-speed spatial data streaming.
 
 ### 4. Tactical UX
+
 - **D3.js Dynamic Mapping**: Interactive Mercator projection with sector-level telemetry.
 - **Node Console**: Real-time stream of network blocks, ZK-prover logs, and system health.
 - **Cyberpunk Aesthetics**: A high-contrast, CRT-inspired interface built for elite analysts.
@@ -57,36 +81,44 @@ Simulated blockchain finality where spatial data is committed as state-roots.
 ## 📋 Getting Started
 
 ### Prerequisites
+
 - An API Key for Google Gemini (configured in `process.env.API_KEY`).
 - Browser permissions for **Camera** (for the Spatial Scanner) and **Geolocation** (for Node Telemetry).
 
 ### Usage
-1. **Initialize Node**: Allow the system to complete the boot sequence and sync with the AggLayer.
-2. **Explore the Map**: Click any country to initiate a sovereign risk audit.
-3. **Anchor Voxels**: Use the scanner to "claim" your local spatial perspective.
-4. **Consult the DAO**: Use the Chat Interface to dive deeper into geopolitical anomalies.
 
-📡 Spatial Node Configuration
+1. **Initialize Node**: Allow the system to complete the boot sequence and sync with the AggLayer.
+1. **Explore the Map**: Click any country to initiate a sovereign risk audit.
+1. **Anchor Voxels**: Use the scanner to "claim" your local spatial perspective.
+1. **Consult the DAO**: Use the Chat Interface to dive deeper into geopolitical anomalies.
+
+## 📡 Spatial Node Configuration
+
 To connect a local sensor array to the Sovereign Map decentralized network, follow these parameters:
 
-1. Connection Protocol
+### 1. Connection Protocol
+
 Nodes must broadcast encrypted telemetry via WebSockets (WSS) to the AggLayer endpoint.
 
 Endpoint: wss://nodes.sovereign-map.io/v1/telemetry
 
 Authentication: Requires a ZK-Signature generated from your local hardware enclave.
 
-2. Telemetry Schema
+### 2. Telemetry Schema
+
 Each data packet must be formatted as a Quantized Spatial Bundle (QSB) to ensure 99% compression.
 
-JSON
+```json
 {
   "node_id": "DAO-NODE-XXXX",
   "spatial_anchor": "VOXEL_ID_REDACTED",
   "drift_correction": "0.002mm",
   "zk_proof": "STARK_ROOT_HASH"
 }
-3. Local Hardware Requirements
+```
+
+### 3. Local Hardware Requirements
+
 Visual Tracking: Monocular or Inertial sensors compatible with ORB-SLAM3.
 
 Inference: NPU capable of running quantized Gemini 1.5/2.0 risk matrices locally for sovereign offline analysis.
@@ -99,12 +131,14 @@ This project operates under the **SGP (Spatial Governance Proposal)** framework.
 
 *Part of the 2035 Global Spatial DAO Initiative.*
 *Built with ❤️ and ZK-STARKs.*
-🛰️ Configuration Template
+
+## 🛰️ Configuration Template
+
 As we discussed, here is the node-config.json template. This will allow users to quickly bootstrap their local Autonomous-Mapping environment.
 
 Path: /config/node-config.json
 
-JSON
+```json
 {
   "network": {
     "endpoint": "wss://nodes.sovereign-map.io/v1/telemetry",
@@ -121,4 +155,4 @@ JSON
     "sgp_compliance": ["SGP-001"]
   }
 }
-
+```

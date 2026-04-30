@@ -15,13 +15,13 @@ export interface EnhancedSovereignInsight extends SovereignInsight {
 }
 
 export const getSovereignInsight = async (countryName: string): Promise<EnhancedSovereignInsight> => {
-  // Use Gemini 3 Flash for rapid production-level intelligence
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `PROD_TASK: Analyze sovereign risk for ${countryName}. 
-    CONTEXT: Today is 2025. This data is for the Sovereign Map Mainnet Dashboard.
-    REQUIREMENTS: Focus on real-time political stability, recent economic shifts, and spatial-sovereignty risks.
-    FORMAT: Strict JSON only.`,
+    contents: `TASK: Analyze the best-fit nonprofit deployment story for ${countryName}.
+    CONTEXT: This is a donor-facing demo for privacy-preserving federated learning.
+    REQUIREMENTS: Focus on health access, human-rights reporting, climate resilience, local trust, and why on-device training matters.
+    FORMAT: Strict JSON only.
+    TONE: Concrete, optimistic, and accessible to non-technical funders.`,
     config: {
       tools: [{ googleSearch: {} }],
       responseMimeType: "application/json",
@@ -73,11 +73,10 @@ export const getSovereignInsight = async (countryName: string): Promise<Enhanced
 };
 
 export const chatWithAnalyst = async (history: { role: string, content: string }[], query: string) => {
-  // Production Chat for the Global Spatial DAO Analyst
   const chat = ai.chats.create({
     model: 'gemini-3-flash-preview',
     config: {
-      systemInstruction: 'IDENTITY: Lead Analyst for the Sovereign Map Global Spatial DAO. TASK: Provide technical, objective geopolitical analysis. THEME: Decentralization, spatial sovereignty, and cryptographically verifiable world data. MANDATE: Always use Google Search for up-to-date events.',
+      systemInstruction: 'IDENTITY: Impact analyst for the Sovereign Map federated learning demo. TASK: Explain privacy-preserving AI in plain language for non-profit funders. THEME: Local data stays local, model updates are verified, and global coordination improves access in health, rights, and climate programs. MANDATE: Prefer practical, human-centered explanations.',
       tools: [{ googleSearch: {} }]
     },
   });

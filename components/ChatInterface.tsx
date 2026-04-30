@@ -6,7 +6,7 @@ import { ChatMessage } from '../types';
 const ChatInterface: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'assistant', content: "Hello. I am your Sovereign Analyst. Ask me anything about geopolitical trends, economic data, or sovereign risks.", timestamp: Date.now() }
+    { role: 'assistant', content: "Hello. I am your Impact Analyst. Ask me about privacy-preserving health pilots, human-rights reporting, climate resilience deployments, or the demo economics.", timestamp: Date.now() }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +44,7 @@ const ChatInterface: React.FC = () => {
           <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-              <h3 className="font-semibold text-white">Analyst Chat</h3>
+              <h3 className="font-semibold text-white">Impact Chat</h3>
             </div>
             <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white transition-colors">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -81,7 +81,7 @@ const ChatInterface: React.FC = () => {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask analysis..."
+                placeholder="Ask about a pilot or funding story..."
                 className="w-full bg-slate-800 border-none rounded-xl py-2 pl-4 pr-10 text-white placeholder-slate-500 focus:ring-1 focus:ring-blue-500"
               />
               <button 
