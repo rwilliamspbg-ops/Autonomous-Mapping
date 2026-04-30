@@ -14,6 +14,8 @@
 
 Sovereign Map is a high-fidelity spatial operating system and geopolitical analyst dashboard. It reclaims the spatial commons by merging real-time **ORB-SLAM3** visual tracking with **Google Gemini AI** powered geopolitical intelligence, all anchored to the **Polygon AggLayer** for cryptographic finality.
 
+**Live Demo:** https://rwilliamspbg-ops.github.io/Autonomous-Mapping/
+
 ![Sovereign Map Header](https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000)
 
 ## 🎯 Demo Positioning
