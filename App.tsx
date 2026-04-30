@@ -17,14 +17,36 @@ const App: React.FC = () => {
   const [isManifestoOpen, setIsManifestoOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [bootProgress, setBootProgress] = useState(0);
+  const impactPillars = [
+    {
+      label: 'Global Health',
+      value: 'Privacy-preserving disease surveillance',
+      accent: 'text-emerald-400',
+      border: 'border-emerald-500/20',
+      bg: 'bg-emerald-500/5'
+    },
+    {
+      label: 'Human Rights',
+      value: 'Secure reporting from hostile environments',
+      accent: 'text-rose-400',
+      border: 'border-rose-500/20',
+      bg: 'bg-rose-500/5'
+    },
+    {
+      label: 'Climate Resilience',
+      value: 'Community sensor data stays local',
+      accent: 'text-blue-400',
+      border: 'border-blue-500/20',
+      bg: 'bg-blue-500/5'
+    }
+  ];
 
   useEffect(() => {
-    // Production Sync Sequence
     const syncStages = [
-      { msg: "NODE_INIT: SOVEREIGN_MAP_v1.0_PROD", delay: 0 },
-      { msg: "HARDWARE_CHECK: NPU_ACCELERATION_ACTIVE", delay: 400 },
-      { msg: "NETWORK: AGGLAYER_MAINNET_CONNECTED", delay: 1000 },
-      { msg: "PROTOCOLS: ZK_SGP_ARMED_AND_READY", delay: 1500 }
+      { msg: 'DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD', delay: 0 },
+      { msg: 'USE_CASE: HEALTH_PRIVACY_PILOT_ARMED', delay: 400 },
+      { msg: 'USE_CASE: HUMAN_RIGHTS_SIGNAL_ROUTED', delay: 1000 },
+      { msg: 'USE_CASE: CLIMATE_SENSOR_PIPELINE_READY', delay: 1500 }
     ];
     
     syncStages.forEach((stage, i) => {
@@ -41,9 +63,9 @@ const App: React.FC = () => {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setGeoData({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-          setLogs(prev => [...prev.slice(-5), `GEOSPATIAL: NODE_LOCKED @ ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`]);
+          setLogs(prev => [...prev.slice(-5), `GEOSPATIAL: LOCAL_CONTEXT @ ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`]);
         },
-        () => setLogs(prev => [...prev.slice(-5), "GEOSPATIAL: USING_GENERIC_GENESIS_SEED"])
+        () => setLogs(prev => [...prev.slice(-5), 'GEOSPATIAL: USING_GENERIC_IMPACT_PROFILE'])
       );
     }
   }, []);
@@ -63,7 +85,6 @@ const App: React.FC = () => {
     <div className="h-screen w-screen flex flex-col bg-[#010409] text-slate-50 relative overflow-hidden font-sans">
       <div className="fixed inset-0 pointer-events-none z-50 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] opacity-30"></div>
 
-      {/* Production Header */}
       <header className="h-20 border-b border-white/10 flex items-center justify-between px-8 bg-slate-950/98 backdrop-blur-2xl z-30 shrink-0 shadow-2xl relative">
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-600/60 to-transparent"></div>
         
@@ -74,13 +95,13 @@ const App: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="font-black tracking-tighter text-2xl uppercase leading-none text-white">Sovereign <span className="text-blue-600">Map</span></h1>
-              <span className="px-2.5 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded text-[9px] mono text-emerald-400 font-black tracking-widest">LIVE_MAINNET</span>
+              <h1 className="font-black tracking-tighter text-2xl uppercase leading-none text-white">Sovereign <span className="text-blue-600">Map for Good</span></h1>
+              <span className="px-2.5 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded text-[9px] mono text-emerald-400 font-black tracking-widest">DEMO_MODE</span>
             </div>
             <div className="flex gap-4 text-[10px] text-slate-500 mono uppercase tracking-[0.3em] font-bold mt-1.5">
-              <span className="text-blue-500">PROD_v1.0.4</span>
+              <span className="text-blue-500">IMPACT_DEMO_v2.0</span>
               <span className="opacity-30">|</span>
-              <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> AGGLAYER_ACTIVE</span>
+              <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> LOCAL_FIRST_PRIVACY</span>
             </div>
           </div>
         </div>
@@ -95,7 +116,7 @@ const App: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <span className={`${trackingInfo.color} font-black tracking-[0.25em] leading-none mb-1`}>{trackingInfo.label}</span>
-              <span className="text-[8px] text-slate-600 uppercase tracking-widest font-black">Spatial_Engine_Primary</span>
+              <span className="text-[8px] text-slate-600 uppercase tracking-widest font-black">Impact_Engine_Primary</span>
             </div>
           </div>
 
@@ -107,7 +128,7 @@ const App: React.FC = () => {
           >
             <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-12"></div>
             <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse shadow-[0_0_12px_white]"></div>
-            Anchor_Spatial_Voxel
+            Check_My_Privacy
           </button>
         </nav>
       </header>
@@ -120,12 +141,11 @@ const App: React.FC = () => {
             selectedId={selectedCountry?.id}
           />
           
-          {/* Real-time Telemetry Overlays */}
           <div className="absolute top-10 left-10 pointer-events-none flex flex-col gap-8 w-80">
             <div className="bg-slate-950/90 backdrop-blur-3xl p-6 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto group hover:border-blue-500/30 transition-colors">
               <h4 className="text-[11px] text-blue-500 mono font-black uppercase mb-5 tracking-[0.4em] flex justify-between items-center border-b border-white/5 pb-3">
-                <span>Network_Stream</span>
-                <span className="text-[9px] text-slate-700">STABLE</span>
+                <span>Impact_Stream</span>
+                <span className="text-[9px] text-slate-700">READY</span>
               </h4>
               <div className="space-y-4">
                 {logs.map((log, i) => (
@@ -140,9 +160,21 @@ const App: React.FC = () => {
               </div>
             </div>
 
+            <div className="bg-slate-950/90 backdrop-blur-3xl p-6 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto">
+              <h4 className="text-[11px] text-slate-500 mono uppercase mb-4 tracking-[0.4em] font-black border-b border-white/5 pb-3">Demo_Use_Cases</h4>
+              <div className="space-y-3">
+                {impactPillars.map((pillar) => (
+                  <div key={pillar.label} className={`p-3 rounded-2xl border ${pillar.border} ${pillar.bg}`}>
+                    <div className={`text-[10px] mono font-black uppercase tracking-[0.35em] ${pillar.accent}`}>{pillar.label}</div>
+                    <div className="text-[11px] text-slate-300 leading-snug mt-2">{pillar.value}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {geoData && (
               <div className="bg-slate-950/90 backdrop-blur-3xl p-6 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto">
-                <h4 className="text-[11px] text-slate-500 mono uppercase mb-4 tracking-[0.4em] font-black border-b border-white/5 pb-3">Node_Identity</h4>
+                <h4 className="text-[11px] text-slate-500 mono uppercase mb-4 tracking-[0.4em] font-black border-b border-white/5 pb-3">Local_Context</h4>
                 <div className="grid grid-cols-1 gap-4 mono text-[11px]">
                   <div className="flex justify-between items-center">
                     <span className="text-slate-500">LAT:</span>
@@ -153,8 +185,8 @@ const App: React.FC = () => {
                     <span className="text-emerald-400 font-black tracking-widest">{geoData.lng.toFixed(6)}°</span>
                   </div>
                   <div className="pt-3 border-t border-white/5 flex justify-between items-center">
-                    <span className="text-slate-600 text-[9px]">RES_PRECISION:</span>
-                    <span className="text-blue-500 text-[10px] font-black tracking-tighter">0.000001° [REF]</span>
+                    <span className="text-slate-600 text-[9px]">PRIVACY_POSTURE:</span>
+                    <span className="text-blue-500 text-[10px] font-black tracking-tighter">ON_DEVICE [REF]</span>
                   </div>
                 </div>
               </div>
@@ -176,26 +208,25 @@ const App: React.FC = () => {
       <SpatialScanner 
         isOpen={isScannerOpen} 
         onClose={() => setIsScannerOpen(false)}
-        onScanComplete={(claim) => setLogs(prev => [...prev.slice(-5), `NETWORK_COMMIT: SUCCESS [0x${claim.id.toString(16).toUpperCase()}]`])}
+        onScanComplete={(claim) => setLogs(prev => [...prev.slice(-5), `LOCAL_CONTRIBUTION: VERIFIED [0x${claim.id.toString(16).toUpperCase()}]`])}
       />
 
-      {/* Live Health Footer */}
       <footer className="h-12 bg-slate-950/95 border-t border-white/10 flex items-center justify-between px-10 text-[10px] text-slate-600 mono uppercase tracking-[0.3em] shrink-0 z-30 backdrop-blur-xl">
         <div className="flex gap-10 items-center">
           <div className="flex items-center gap-3">
             <span className={`w-2.5 h-2.5 rounded-sm transition-all duration-500 ${trackingState === TrackingState.OK ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)]' : 'bg-slate-800'}`}></span>
-            <span className="font-black text-slate-400">UPTIME: 100.00%</span>
+            <span className="font-black text-slate-400">DEMO_READY: 100.00%</span>
           </div>
           <div className="w-px h-4 bg-white/10"></div>
           <div className="flex items-center gap-3 text-slate-500">
              <span className="text-emerald-500 font-black animate-pulse">●</span>
-             <span>MAINNET_NODE: PRIMARY_AGGLAYER_RELAY</span>
+             <span>LOCAL_DATA: STAYS_ON_DEVICE</span>
           </div>
         </div>
         <div className="flex items-center gap-10">
           <div className="flex items-center gap-4">
-             <span className="text-slate-600 font-bold">QSB_BANDWIDTH:</span>
-             <span className="text-blue-500 font-black tracking-widest">1.84 MB/s</span>
+             <span className="text-slate-600 font-bold">EDGE_SAVINGS:</span>
+             <span className="text-blue-500 font-black tracking-widest">68% LESS CLOUD ENERGY</span>
           </div>
           <div className="flex gap-2 h-4 items-center">
             {[1,2,3,4,5,6,7,8,9,10].map(i => (

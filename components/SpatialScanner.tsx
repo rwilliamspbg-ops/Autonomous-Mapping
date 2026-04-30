@@ -142,8 +142,8 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
           <div className="space-y-8">
             <div className="bg-slate-950/90 backdrop-blur-2xl p-6 rounded-3xl border border-blue-600/40 w-80 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
               <div className="text-[11px] text-blue-500 font-black uppercase mb-4 tracking-[0.4em] flex justify-between items-center border-b border-white/5 pb-3">
-                <span>CORE_TRACKER_v3</span>
-                <span className="text-emerald-500 animate-pulse">LOCKED</span>
+                <span>PRIVACY_CHECK_v1</span>
+                <span className="text-emerald-500 animate-pulse">LOCAL</span>
               </div>
               <div className="space-y-3 text-[10px] text-slate-300">
                 <div className="flex justify-between border-b border-white/5 pb-1"><span>EULER_YAW:</span> <span className="text-white font-black">{telemetry.pose[0].toFixed(8)}</span></div>
@@ -153,7 +153,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
             </div>
 
             <div className="bg-slate-950/90 backdrop-blur-2xl p-6 rounded-3xl border border-blue-600/40 w-80 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-              <div className="text-[11px] text-blue-500 font-black uppercase mb-4 tracking-[0.4em]">Spatial_Telemetry</div>
+              <div className="text-[11px] text-blue-500 font-black uppercase mb-4 tracking-[0.4em]">Local_Telemetry</div>
               <div className="space-y-3 text-[10px] text-slate-300">
                 <div className="flex justify-between border-b border-white/5 pb-1"><span>ACTIVE_MAP_SIZE:</span> <span className="text-white">{(telemetry.voxels / 1000).toFixed(2)} k-vox</span></div>
                 <div className="flex justify-between border-b border-white/5 pb-1"><span>RECOVERY_STAB:</span> <span className="text-emerald-400 font-black">{telemetry.stability.toFixed(2)}%</span></div>
@@ -167,8 +167,8 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
              </button>
              <div className="bg-slate-950/90 p-6 rounded-3xl border border-emerald-500/40 text-right min-w-[220px] shadow-2xl">
-                <div className="text-[11px] text-emerald-500 font-black uppercase mb-2 tracking-[0.4em]">Mainnet_Sync</div>
-                <div className="text-[10px] text-slate-400 font-bold">STATE: <span className="text-emerald-500">GLOBAL_CONSISTENCY_OK</span></div>
+              <div className="text-[11px] text-emerald-500 font-black uppercase mb-2 tracking-[0.4em]">Impact_Sync</div>
+              <div className="text-[10px] text-slate-400 font-bold">STATE: <span className="text-emerald-500">DATA_STAYS_LOCAL</span></div>
                 <div className="mt-4 flex gap-2 justify-end">
                    {[1,2,3,4,5].map(i => <div key={i} className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]" style={{ animationDelay: `${i*0.15}s` }}></div>)}
                 </div>
@@ -189,7 +189,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
                       </div>
                     ))}
                   </div>
-                  <p className="text-[11px] text-slate-500 uppercase tracking-[0.3em] font-black">Executing ZK-SNARK State-Root Finalization...</p>
+                  <p className="text-[11px] text-slate-500 uppercase tracking-[0.3em] font-black">Executing local privacy proof generation...</p>
                </div>
             </div>
           )}
@@ -198,21 +198,21 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
             <div className="bg-emerald-500/10 border border-emerald-500/60 p-10 rounded-[2.5rem] w-full max-w-xl text-center backdrop-blur-3xl shadow-[0_0_80px_rgba(16,185,129,0.3)] border-2">
               <div className="text-emerald-400 font-black uppercase text-xl tracking-[0.4em] mb-4 flex items-center justify-center gap-4">
                  <div className="w-10 h-10 border-4 border-emerald-400 rounded-full flex items-center justify-center text-lg shadow-[0_0_15px_#10b981]">✓</div>
-                 VOXEL_ANCHORED
+                 CONTRIBUTION_VERIFIED
               </div>
-              <div className="text-[11px] text-slate-400 mono font-black tracking-widest uppercase">Transaction Verified // Block Finality Reached</div>
+              <div className="text-[11px] text-slate-400 mono font-black tracking-widest uppercase">Contribution Verified // Local Data Stayed On Device</div>
             </div>
           )}
 
           {status === 'TRACKING' && (
             <div className="flex flex-col items-center gap-6">
-              <div className="text-[11px] text-blue-500 font-black tracking-[0.5em] animate-pulse mb-2">SYSTEM_LOCKED // MAINNET_READY</div>
+              <div className="text-[11px] text-blue-500 font-black tracking-[0.5em] animate-pulse mb-2">SYSTEM_LOCKED // PRIVACY_READY</div>
               <button 
                 onClick={handleCommit}
                 className="pointer-events-auto group relative px-20 py-8 bg-blue-700 hover:bg-blue-600 text-white rounded-3xl font-black text-lg uppercase tracking-[0.8em] transition-all shadow-[0_20px_60px_rgba(37,99,235,0.5)] border border-blue-400/50 active:scale-95"
               >
                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
-                Commit_Anchor
+                Verify_Privacy
               </button>
             </div>
           )}
