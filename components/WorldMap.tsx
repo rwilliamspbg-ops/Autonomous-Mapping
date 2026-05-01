@@ -6,6 +6,8 @@ import { feature } from 'topojson-client';
 interface WorldMapProps {
   onCountrySelect: (country: { id: string; name: string }) => void;
   selectedId?: string;
+  focusCountryName?: string;
+  demoPulse?: boolean;
 }
 
 const countryCapitals: Record<string, string> = {
@@ -66,7 +68,7 @@ const sanctuaries = [
   { name: "Great Wall", lat: 40.4319, lng: 116.5704, label: "SGP-003" }
 ];
 
-const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId }) => {
+const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusCountryName, demoPulse = false }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [worldData, setWorldData] = useState<any>(null);
   const [coords, setCoords] = useState({ x: 0, y: 0, lat: 0, lng: 0 });
@@ -133,7 +135,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId }) => {
       .attr('class', 'country')
       .attr('d', path as any)
       .attr('class', (d: any) => 
-        `cursor-crosshair transition-all duration-300 fill-slate-900/40 stroke-blue-500/20 stroke-[0.5px] hover:fill-blue-500/30 hover:stroke-blue-400/60 ${d.id === selectedId ? 'fill-blue-600/50 stroke-blue-400 stroke-[1px]' : ''}`
+        `cursor-crosshair transition-all duration-300 fill-slate-900/40 stroke-blue-500/20 stroke-[0.5px] hover:fill-blue-500/30 hover:stroke-blue-400/60 ${d.id === selectedId || d.properties.name === focusCountryName ? 'fill-blue-600/50 stroke-blue-400 stroke-[1px]' : ''}`
       )
       .on('mousemove', (event, d: any) => {
         const [mx, my] = d3.pointer(event, svgRef.current);
@@ -190,11 +192,11 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId }) => {
 
     sanctuaryNodes.append('circle')
       .attr('r', 4)
-      .attr('class', 'fill-blue-500 animate-pulse');
+      .attr('class', demoPulse ? 'fill-blue-400 animate-pulse' : 'fill-blue-500 animate-pulse');
 
     sanctuaryNodes.append('circle')
       .attr('r', 8)
-      .attr('class', 'fill-blue-500/20 stroke-blue-500/40 stroke-[0.5px] animate-ping');
+      .attr('class', demoPulse ? 'fill-blue-400/20 stroke-blue-300/60 stroke-[0.5px] animate-ping' : 'fill-blue-500/20 stroke-blue-500/40 stroke-[0.5px] animate-ping');
 
     sanctuaryNodes.append('text')
       .attr('dy', -10)
@@ -202,7 +204,42 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId }) => {
       .attr('class', 'mono text-[5px] fill-blue-400 font-black uppercase tracking-widest pointer-events-none')
       .text((d: any) => d.label);
 
-  }, [worldData, selectedId, hoveredCountry?.id]);
+    if (focusCountryName) {
+      const focusFeature = (worldData as any).features.find((feature: any) => feature.properties?.name === focusCountryName);
+      if (focusFeature) {
+        const bounds = path.bounds(focusFeature);
+        const dx = bounds[1][0] - bounds[0][0];
+        const dy = bounds[1][1] - bounds[0][1];
+        const x = (bounds[0][0] + bounds[1][0]) / 2;
+        const y = (bounds[0][1] + bounds[1][1]) / 2;
+        const scale = Math.max(1, Math.min(8, 0.8 / Math.max(dx / width, dy / height)));
+
+        const transform = d3.zoomIdentity
+          .translate(width / 2, height / 2)
+          .scale(scale)
+          .translate(-x, -y);
+
+        svg.transition()
+          .duration(1200)
+          .ease(d3.easeCubicInOut)
+          .call(zoom.transform as any, transform);
+
+        const [cx, cy] = path.centroid(focusFeature);
+        const pulse = g.append('g').attr('pointer-events', 'none');
+        pulse.append('circle')
+          .attr('cx', cx)
+          .attr('cy', cy)
+          .attr('r', 12)
+          .attr('class', 'fill-blue-400/20 stroke-blue-300/80 stroke-[1px] animate-ping');
+        pulse.append('circle')
+          .attr('cx', cx)
+          .attr('cy', cy)
+          .attr('r', 30)
+          .attr('class', demoPulse ? 'fill-emerald-400/10 stroke-emerald-300/40 stroke-[1px] animate-pulse' : 'fill-blue-400/10 stroke-blue-300/40 stroke-[1px] animate-pulse');
+      }
+    }
+
+  }, [worldData, selectedId, hoveredCountry?.id, focusCountryName, demoPulse]);
 
   const getRiskLevel = (name: string) => {
     const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);

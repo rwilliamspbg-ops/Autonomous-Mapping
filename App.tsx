@@ -23,6 +23,13 @@ const protocolTracks = [
   { label: 'Climate lane', country: 'South Africa', log: 'PROTOCOL_ROUTE: CLIMATE -> South Africa' },
 ];
 
+type EvidenceEntry = {
+  title: string;
+  detail: string;
+};
+
+const demoDurationMs = 6.5 * 60 * 1000;
+
 const App: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState<{ id: string; name: string } | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
@@ -31,9 +38,15 @@ const App: React.FC = () => {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [isManifestoOpen, setIsManifestoOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [bootProgress, setBootProgress] = useState(0);
   const [protocolPhase, setProtocolPhase] = useState<ProtocolPhase>('IDLE');
+  const [demoElapsedMs, setDemoElapsedMs] = useState(0);
+  const [demoRunning, setDemoRunning] = useState(false);
+  const [evidenceTrail, setEvidenceTrail] = useState<EvidenceEntry[]>([]);
   const protocolTimersRef = useRef<number[]>([]);
+  const demoTickRef = useRef<number | null>(null);
+  const demoStartRef = useRef<number | null>(null);
   const impactPillars = [
     {
       label: 'Global Health',
@@ -62,6 +75,9 @@ const App: React.FC = () => {
     return () => {
       protocolTimersRef.current.forEach(timer => window.clearTimeout(timer));
       protocolTimersRef.current = [];
+      if (demoTickRef.current) {
+        window.clearInterval(demoTickRef.current);
+      }
     };
   }, []);
 
@@ -97,59 +113,128 @@ const App: React.FC = () => {
   const clearProtocolTimers = () => {
     protocolTimersRef.current.forEach(timer => window.clearTimeout(timer));
     protocolTimersRef.current = [];
+    if (demoTickRef.current) {
+      window.clearInterval(demoTickRef.current);
+      demoTickRef.current = null;
+    }
   };
 
   const addProtocolLog = (message: string) => {
     setLogs(prev => [...prev.slice(-5), message]);
   };
 
+  const addEvidence = (title: string, detail: string) => {
+    setEvidenceTrail(prev => [{ title, detail }, ...prev].slice(0, 6));
+  };
+
   const activateTrack = (trackIndex: number) => {
     const track = protocolTracks[trackIndex];
     setProtocolPhase('ROUTING');
-    setSelectedCountry({ id: track.country.toUpperCase(), name: track.country });
+    setSelectedCountry({ id: track.country, name: track.country });
     addProtocolLog(track.log);
+    addEvidence('Lane selected', track.log);
+  };
+
+  const setDemoProgress = (elapsed: number) => {
+    setDemoElapsedMs(elapsed);
+    setBootProgress(Math.min(100, (elapsed / demoDurationMs) * 100));
   };
 
   const runGuidedProtocol = () => {
     clearProtocolTimers();
     setProtocolPhase('ATTESTING');
+    setDemoRunning(true);
+    setDemoProgress(0);
+    demoStartRef.current = Date.now();
+    addEvidence('Demo start', 'Guided protocol walkthrough launched');
     setIsManifestoOpen(true);
     setIsTerminalOpen(false);
     setIsScannerOpen(false);
+    setIsChatOpen(false);
     setTrackingState(TrackingState.NOT_INITIALIZED);
     addProtocolLog('PROTOCOL: guided run initiated');
-    setSelectedCountry({ id: 'KENYA', name: 'Kenya' });
+    setSelectedCountry({ id: 'Kenya', name: 'Kenya' });
 
-    protocolTimersRef.current.push(window.setTimeout(() => {
+    const schedule = (delay: number, action: () => void) => {
+      protocolTimersRef.current.push(window.setTimeout(action, delay));
+    };
+
+    demoTickRef.current = window.setInterval(() => {
+      if (!demoStartRef.current) return;
+      setDemoProgress(Date.now() - demoStartRef.current);
+    }, 1000);
+
+    schedule(45000, () => {
       setProtocolPhase('ROUTING');
+      setSelectedCountry({ id: 'Kenya', name: 'Kenya' });
       addProtocolLog('PROTOCOL: local claim routed to the Health lane');
-      setSelectedCountry({ id: 'BRAZIL', name: 'Brazil' });
-    }, 900));
+      addEvidence('Health lane', 'Kenya selected as the first deployment story');
+    });
 
-    protocolTimersRef.current.push(window.setTimeout(() => {
+    schedule(115000, () => {
+      setIsChatOpen(true);
+      addProtocolLog('PROTOCOL: analyst chat opened for live objections');
+      addEvidence('Analyst chat', 'Funding questions can be answered live');
+    });
+
+    schedule(165000, () => {
+      setSelectedCountry({ id: 'Brazil', name: 'Brazil' });
+      addProtocolLog('PROTOCOL: human-rights lane routed to Brazil');
+      addEvidence('Rights lane', 'Brazil case used to show reporting and trust');
+    });
+
+    schedule(225000, () => {
       setProtocolPhase('BROADCASTING');
       setIsTerminalOpen(true);
       addProtocolLog('PROTOCOL: broadcast evidence stream opened');
-      setSelectedCountry({ id: 'SOUTH_AFRICA', name: 'South Africa' });
-    }, 1900));
+      addEvidence('Broadcast', 'Terminal overlay exposes the proof stream');
+    });
 
-    protocolTimersRef.current.push(window.setTimeout(() => {
+    schedule(285000, () => {
+      setSelectedCountry({ id: 'South Africa', name: 'South Africa' });
+      addProtocolLog('PROTOCOL: climate lane highlighted for South Africa');
+      addEvidence('Climate lane', 'Third mission lens keeps the story moving');
+    });
+
+    schedule(345000, () => {
+      setIsChatOpen(true);
+      addProtocolLog('PROTOCOL: recap prompt opened for audience questions');
+      addEvidence('Audience recap', 'Questions can be answered before close');
+    });
+
+    schedule(390000, () => {
       setProtocolPhase('VERIFIED');
       setTrackingState(TrackingState.OK);
       setBootProgress(100);
       addProtocolLog('PROTOCOL: contribution verified and sealed');
-    }, 3200));
+      addEvidence('Verified', 'Protocol ends with a visible proof state');
+      setDemoRunning(false);
+      demoStartRef.current = null;
+      if (demoTickRef.current) {
+        window.clearInterval(demoTickRef.current);
+        demoTickRef.current = null;
+      }
+      setDemoProgress(demoDurationMs);
+    });
   };
 
   const resetProtocol = () => {
     clearProtocolTimers();
     setProtocolPhase('IDLE');
+    setDemoRunning(false);
+    setDemoElapsedMs(0);
+    setBootProgress(0);
     setSelectedCountry(null);
     setIsTerminalOpen(false);
     setIsManifestoOpen(false);
     setIsScannerOpen(false);
+    setIsChatOpen(false);
+    setEvidenceTrail([]);
+    demoStartRef.current = null;
     addProtocolLog('PROTOCOL: demo reset for next walkthrough');
   };
+
+  const demoClockLabel = `${Math.floor(demoElapsedMs / 60000).toString().padStart(2, '0')}:${Math.floor((demoElapsedMs % 60000) / 1000).toString().padStart(2, '0')} / 06:30`;
 
   const trackingInfo = useMemo(() => {
     switch (trackingState) {
@@ -220,6 +305,8 @@ const App: React.FC = () => {
           <WorldMap 
             onCountrySelect={setSelectedCountry} 
             selectedId={selectedCountry?.id}
+            focusCountryName={selectedCountry?.name ?? undefined}
+            demoPulse={protocolPhase !== 'IDLE' || demoRunning}
           />
           
           <div className="absolute top-10 left-10 pointer-events-none flex flex-col gap-8 w-80">
@@ -273,7 +360,7 @@ const App: React.FC = () => {
                   onClick={runGuidedProtocol}
                   className="flex-1 px-4 py-3 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_24px_rgba(37,99,235,0.35)] active:scale-95"
                 >
-                  Run_Guided_Protocol
+                  Run_6_Min_Demo
                 </button>
                 <button
                   onClick={resetProtocol}
@@ -284,7 +371,29 @@ const App: React.FC = () => {
               </div>
 
               <div className="mt-4 text-[10px] mono text-slate-500 uppercase tracking-[0.3em]">
-                Tap a stage or lane to steer the narrative.
+                <div className="flex items-center justify-between gap-3">
+                  <span>Tap a stage or lane to steer the narrative.</span>
+                  <span className="text-blue-400">{demoClockLabel}</span>
+                </div>
+              </div>
+
+              <div className="mt-4 border-t border-white/5 pt-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-[10px] mono text-slate-500 uppercase tracking-[0.35em] font-black">Evidence_Trail</span>
+                  <span className="text-[9px] mono text-slate-700 uppercase tracking-widest">{evidenceTrail.length} events</span>
+                </div>
+                <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                  {evidenceTrail.length === 0 ? (
+                    <div className="text-[10px] text-slate-600 mono uppercase tracking-[0.25em]">No evidence yet</div>
+                  ) : (
+                    evidenceTrail.map((entry, index) => (
+                      <div key={`${entry.title}-${index}`} className="rounded-2xl border border-white/5 bg-slate-900/40 p-3">
+                        <div className="text-[10px] mono font-black uppercase tracking-[0.3em] text-blue-400">{entry.title}</div>
+                        <div className="text-[10px] text-slate-300 mt-1 leading-snug">{entry.detail}</div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
 
@@ -345,7 +454,7 @@ const App: React.FC = () => {
           onClose={() => setSelectedCountry(null)} 
         />
         
-        <ChatInterface />
+        <ChatInterface isOpen={isChatOpen} onOpenChange={setIsChatOpen} />
       </main>
 
       {/* Production Overlays */}

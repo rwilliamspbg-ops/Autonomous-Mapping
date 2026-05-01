@@ -3,8 +3,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { chatWithAnalyst } from '../services/geminiService';
 import { ChatMessage } from '../types';
 
-const ChatInterface: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface ChatInterfaceProps {
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, onOpenChange }) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = controlledOpen ?? internalOpen;
   const [messages, setMessages] = useState<ChatMessage[]>([
     { role: 'assistant', content: "Hello. I am your Impact Analyst. Ask me about privacy-preserving health pilots, human-rights reporting, climate resilience deployments, or the demo economics.", timestamp: Date.now() }
   ]);
@@ -15,6 +21,19 @@ const ChatInterface: React.FC = () => {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (controlledOpen === undefined) return;
+    setInternalOpen(controlledOpen);
+  }, [controlledOpen]);
+
+  const setOpen = (open: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(open);
+    } else {
+      setInternalOpen(open);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +65,7 @@ const ChatInterface: React.FC = () => {
               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
               <h3 className="font-semibold text-white">Impact Chat</h3>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+            <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-white transition-colors">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
@@ -98,7 +117,7 @@ const ChatInterface: React.FC = () => {
         </div>
       ) : (
         <button 
-          onClick={() => setIsOpen(true)}
+          onClick={() => setOpen(true)}
           className="bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-105 group"
         >
           <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
