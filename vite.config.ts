@@ -6,15 +6,6 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
       base: '/Autonomous-Mapping/',
-      build: {
-        rollupOptions: {
-          output: {
-            entryFileNames: 'assets/app.js',
-            chunkFileNames: 'assets/[name].js',
-            assetFileNames: 'assets/[name][extname]'
-          }
-        }
-      },
       server: {
         port: 3000,
         host: '0.0.0.0',
