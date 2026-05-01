@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import WorldMap from './components/WorldMap';
 import CountryPanel from './components/CountryPanel';
 import ChatInterface from './components/ChatInterface';
@@ -7,6 +7,21 @@ import HardhatTerminal from './components/HardhatTerminal';
 import Manifesto from './components/Manifesto';
 import SpatialScanner from './components/SpatialScanner';
 import { TrackingState } from './types';
+
+type ProtocolPhase = 'IDLE' | 'ATTESTING' | 'ROUTING' | 'BROADCASTING' | 'VERIFIED';
+
+const protocolStages: Array<{ key: ProtocolPhase; label: string; detail: string }> = [
+  { key: 'ATTESTING', label: 'Attest', detail: 'Capture a local claim and narrate it safely.' },
+  { key: 'ROUTING', label: 'Route', detail: 'Move the demo into a live mission lane.' },
+  { key: 'BROADCASTING', label: 'Broadcast', detail: 'Show the protocol handoff and proof trail.' },
+  { key: 'VERIFIED', label: 'Verified', detail: 'Close the loop with a visible final state.' },
+];
+
+const protocolTracks = [
+  { label: 'Health lane', country: 'Kenya', log: 'PROTOCOL_ROUTE: HEALTH -> Kenya' },
+  { label: 'Rights lane', country: 'Brazil', log: 'PROTOCOL_ROUTE: HUMAN_RIGHTS -> Brazil' },
+  { label: 'Climate lane', country: 'South Africa', log: 'PROTOCOL_ROUTE: CLIMATE -> South Africa' },
+];
 
 const App: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState<{ id: string; name: string } | null>(null);
@@ -17,6 +32,8 @@ const App: React.FC = () => {
   const [isManifestoOpen, setIsManifestoOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [bootProgress, setBootProgress] = useState(0);
+  const [protocolPhase, setProtocolPhase] = useState<ProtocolPhase>('IDLE');
+  const protocolTimersRef = useRef<number[]>([]);
   const impactPillars = [
     {
       label: 'Global Health',
@@ -40,6 +57,13 @@ const App: React.FC = () => {
       bg: 'bg-blue-500/5'
     }
   ];
+
+  useEffect(() => {
+    return () => {
+      protocolTimersRef.current.forEach(timer => window.clearTimeout(timer));
+      protocolTimersRef.current = [];
+    };
+  }, []);
 
   useEffect(() => {
     const syncStages = [
@@ -69,6 +93,63 @@ const App: React.FC = () => {
       );
     }
   }, []);
+
+  const clearProtocolTimers = () => {
+    protocolTimersRef.current.forEach(timer => window.clearTimeout(timer));
+    protocolTimersRef.current = [];
+  };
+
+  const addProtocolLog = (message: string) => {
+    setLogs(prev => [...prev.slice(-5), message]);
+  };
+
+  const activateTrack = (trackIndex: number) => {
+    const track = protocolTracks[trackIndex];
+    setProtocolPhase('ROUTING');
+    setSelectedCountry({ id: track.country.toUpperCase(), name: track.country });
+    addProtocolLog(track.log);
+  };
+
+  const runGuidedProtocol = () => {
+    clearProtocolTimers();
+    setProtocolPhase('ATTESTING');
+    setIsManifestoOpen(true);
+    setIsTerminalOpen(false);
+    setIsScannerOpen(false);
+    setTrackingState(TrackingState.NOT_INITIALIZED);
+    addProtocolLog('PROTOCOL: guided run initiated');
+    setSelectedCountry({ id: 'KENYA', name: 'Kenya' });
+
+    protocolTimersRef.current.push(window.setTimeout(() => {
+      setProtocolPhase('ROUTING');
+      addProtocolLog('PROTOCOL: local claim routed to the Health lane');
+      setSelectedCountry({ id: 'BRAZIL', name: 'Brazil' });
+    }, 900));
+
+    protocolTimersRef.current.push(window.setTimeout(() => {
+      setProtocolPhase('BROADCASTING');
+      setIsTerminalOpen(true);
+      addProtocolLog('PROTOCOL: broadcast evidence stream opened');
+      setSelectedCountry({ id: 'SOUTH_AFRICA', name: 'South Africa' });
+    }, 1900));
+
+    protocolTimersRef.current.push(window.setTimeout(() => {
+      setProtocolPhase('VERIFIED');
+      setTrackingState(TrackingState.OK);
+      setBootProgress(100);
+      addProtocolLog('PROTOCOL: contribution verified and sealed');
+    }, 3200));
+  };
+
+  const resetProtocol = () => {
+    clearProtocolTimers();
+    setProtocolPhase('IDLE');
+    setSelectedCountry(null);
+    setIsTerminalOpen(false);
+    setIsManifestoOpen(false);
+    setIsScannerOpen(false);
+    addProtocolLog('PROTOCOL: demo reset for next walkthrough');
+  };
 
   const trackingInfo = useMemo(() => {
     switch (trackingState) {
@@ -142,6 +223,71 @@ const App: React.FC = () => {
           />
           
           <div className="absolute top-10 left-10 pointer-events-none flex flex-col gap-8 w-80">
+            <div className="bg-slate-950/90 backdrop-blur-3xl p-6 rounded-3xl border border-blue-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto group hover:border-blue-400/40 transition-colors">
+              <div className="flex items-center justify-between gap-3 mb-4 border-b border-white/5 pb-3">
+                <h4 className="text-[11px] text-blue-500 mono font-black uppercase tracking-[0.4em]">Protocol_Flow</h4>
+                <span className={`text-[9px] mono font-black uppercase tracking-widest ${protocolPhase === 'VERIFIED' ? 'text-emerald-400' : protocolPhase === 'IDLE' ? 'text-slate-600' : 'text-blue-400'}`}>
+                  {protocolPhase}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                {protocolStages.map((stage) => {
+                  const isActive = stage.key === protocolPhase;
+                  const isComplete = protocolStages.findIndex(item => item.key === stage.key) < protocolStages.findIndex(item => item.key === protocolPhase);
+                  return (
+                    <button
+                      key={stage.key}
+                      onClick={() => setProtocolPhase(stage.key)}
+                      className={`text-left rounded-2xl border p-3 transition-all duration-300 ${
+                        isActive
+                          ? 'border-blue-400 bg-blue-500/10 shadow-[0_0_18px_rgba(59,130,246,0.18)]'
+                          : isComplete
+                            ? 'border-emerald-500/20 bg-emerald-500/5'
+                            : 'border-white/10 bg-slate-900/40 hover:border-white/20'
+                      }`}
+                    >
+                      <div className={`text-[10px] mono font-black uppercase tracking-[0.35em] ${isActive ? 'text-blue-400' : isComplete ? 'text-emerald-400' : 'text-slate-500'}`}>
+                        {stage.label}
+                      </div>
+                      <div className="mt-1 text-[10px] text-slate-300 leading-snug">{stage.detail}</div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                {protocolTracks.map((track, index) => (
+                  <button
+                    key={track.label}
+                    onClick={() => activateTrack(index)}
+                    className="px-3 py-2 rounded-full border border-white/10 bg-slate-900/70 text-[9px] mono uppercase tracking-[0.25em] text-slate-300 hover:border-blue-400/40 hover:text-white transition-colors"
+                  >
+                    {track.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={runGuidedProtocol}
+                  className="flex-1 px-4 py-3 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_24px_rgba(37,99,235,0.35)] active:scale-95"
+                >
+                  Run_Guided_Protocol
+                </button>
+                <button
+                  onClick={resetProtocol}
+                  className="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] border border-white/10 transition-all active:scale-95"
+                >
+                  Reset
+                </button>
+              </div>
+
+              <div className="mt-4 text-[10px] mono text-slate-500 uppercase tracking-[0.3em]">
+                Tap a stage or lane to steer the narrative.
+              </div>
+            </div>
+
             <div className="bg-slate-950/90 backdrop-blur-3xl p-6 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto group hover:border-blue-500/30 transition-colors">
               <h4 className="text-[11px] text-blue-500 mono font-black uppercase mb-5 tracking-[0.4em] flex justify-between items-center border-b border-white/5 pb-3">
                 <span>Impact_Stream</span>
