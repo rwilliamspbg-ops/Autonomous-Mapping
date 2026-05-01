@@ -35,30 +35,9 @@
             background: #475569;
         }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "recharts": "https://esm.sh/recharts@^3.7.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "d3": "https://esm.sh/d3@^7.9.0",
-    "@google/genai": "https://esm.sh/@google/genai@^1.39.0",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4",
-    "topojson-client": "https://esm.sh/topojson-client@^3.1.0"
-  }
-}
-</script>
+    <script type="module" src="/index.tsx"></script>
 </head>
 <body>
     <div id="root"></div>
-    <script type="module">
-        const isLocalDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-
-        if (isLocalDev) {
-            import('/index.tsx');
-        } else {
-            import('./assets/app.js');
-        }
-    </script>
 </body>
 </html>
