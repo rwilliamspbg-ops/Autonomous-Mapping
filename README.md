@@ -1,3 +1,5 @@
+> **DISCLAIMER: This is a simulation/demo. Features like ORB-SLAM3, ZK-SNARKs, and blockchain elements are mocked for illustration purposes.**
+
 # 🌍 Sovereign Map Explorer (v2035.1)
 
 [![Version](https://img.shields.io/badge/version-v2035.1-blue)](https://github.com/rwilliamspbg-ops/Autonomous-Mapping)

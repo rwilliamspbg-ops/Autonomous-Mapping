@@ -1,86 +1,70 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-import { GoogleGenAI, Type } from "@google/genai";
-import { SovereignInsight } from "../types";
-
-// Production Gemini Client initialization
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 export interface GroundingSource {
   title: string;
   uri: string;
 }
 
-export interface EnhancedSovereignInsight extends SovereignInsight {
+export interface EnhancedSovereignInsight {
+  summary: string;
+  riskScore: number;
+  threats: string[];
+  recommendations: string[];
+  politicalStatus?: string;
+  economicOutlook?: string;
+  recentEvents?: string[];
+  keyRisks?: { name: string; severity: number }[];
   sources?: GroundingSource[];
 }
 
-export const getSovereignInsight = async (countryName: string): Promise<EnhancedSovereignInsight> => {
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
-    contents: `TASK: Analyze the best-fit nonprofit deployment story for ${countryName}.
-    CONTEXT: This is a donor-facing demo for privacy-preserving federated learning.
-    REQUIREMENTS: Focus on health access, human-rights reporting, climate resilience, local trust, and why on-device training matters.
-    FORMAT: Strict JSON only.
-    TONE: Concrete, optimistic, and accessible to non-technical funders.`,
-    config: {
-      tools: [{ googleSearch: {} }],
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          summary: { type: Type.STRING },
-          politicalStatus: { type: Type.STRING },
-          economicOutlook: { type: Type.STRING },
-          recentEvents: { 
-            type: Type.ARRAY, 
-            items: { type: Type.STRING }
-          },
-          keyRisks: { 
-            type: Type.ARRAY, 
-            items: { 
-              type: Type.OBJECT,
-              properties: {
-                name: { type: Type.STRING },
-                severity: { type: Type.INTEGER }
-              },
-              required: ["name", "severity"]
-            }
-          }
-        },
-        required: ["summary", "politicalStatus", "economicOutlook", "recentEvents", "keyRisks"]
-      }
-    }
-  });
-
-  const textOutput = response.text || '{}';
-  const insight = JSON.parse(textOutput);
-  
-  // High-fidelity grounding extraction
-  const groundingChunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
-  const sources: GroundingSource[] = [];
-  if (groundingChunks) {
-    groundingChunks.forEach((chunk: any) => {
-      if (chunk.web) {
-        sources.push({
-          title: chunk.web.title || 'Verified Intel Source',
-          uri: chunk.web.uri
-        });
-      }
-    });
+export const getSovereignInsights = async (countryName: string): Promise<EnhancedSovereignInsight> => {
+  if (!genAI) {
+    return {
+      summary: `Strategic analysis for ${countryName}: Localized federated learning deployment focusing on edge privacy and community-led data governance.`,
+      riskScore: 42,
+      threats: ["Data Silos", "Fragmented Connectivity", "Legacy Infrastructure"],
+      recommendations: ["Deploy hardware enclaves", "Implement ZK-rollups for audit logs"]
+    };
   }
 
-  return { ...insight, sources: sources.slice(0, 5) };
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const prompt = `Analyze the best-fit nonprofit deployment story for ${countryName}. Focus on health access, human-rights, and climate resilience. Format: Strict JSON with summary, riskScore (0-100), threats (array), and recommendations (array).`;
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    return JSON.parse(text.replace(/\`\`\`json|\`\`\`/g, ''));
+  } catch (error) {
+    console.error("Gemini Error:", error);
+    return {
+      summary: "Error connecting to analysis engine. Using cached baseline.",
+      riskScore: 0,
+      threats: [],
+      recommendations: []
+    };
+  }
 };
 
-export const chatWithAnalyst = async (history: { role: string, content: string }[], query: string) => {
-  const chat = ai.chats.create({
-    model: 'gemini-3-flash-preview',
-    config: {
-      systemInstruction: 'IDENTITY: Impact analyst for the Sovereign Map federated learning demo. TASK: Explain privacy-preserving AI in plain language for non-profit funders. THEME: Local data stays local, model updates are verified, and global coordination improves access in health, rights, and climate programs. MANDATE: Prefer practical, human-centered explanations.',
-      tools: [{ googleSearch: {} }]
-    },
-  });
+export const chatWithAnalyst = async (history: any[], query: string) => {
+  if (!genAI) {
+    return "This is a demonstration response. In a production environment with a valid API key, I would provide real-time strategic analysis based on your queries about federated learning and global impact.";
+  }
 
-  const response = await chat.sendMessage({ message: query });
-  return response.text;
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const chat = model.startChat({
+      history: history.map(h => ({
+        role: h.role === 'user' ? 'user' : 'model',
+        parts: [{ text: h.content }]
+      })),
+    });
+
+    const result = await chat.sendMessage(query);
+    return result.response.text();
+  } catch (error) {
+    console.error("Chat Error:", error);
+    return "Analysis engine offline. Please check your connection or API configuration.";
+  }
 };

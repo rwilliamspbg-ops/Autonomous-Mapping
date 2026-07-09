@@ -1,4 +1,6 @@
 
+import { generateFeaturePoints, updateTelemetry, TelemetryData } from '../simulators/orbSlamSimulator';
+import { simulateZKHandshake } from '../simulators/zkProofSimulator';
 import React, { useRef, useEffect, useState } from 'react';
 
 interface SpatialScannerProps {

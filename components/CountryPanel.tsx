@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { getSovereignInsight, EnhancedSovereignInsight } from '../services/geminiService';
+import { getSovereignInsights, EnhancedSovereignInsight } from '../services/geminiService';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface CountryPanelProps {
@@ -35,7 +35,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
       setLoading(true);
       setZkStatus('IDLE');
       setVerifyStep(0);
-      getSovereignInsight(country.name)
+      getSovereignInsights(country.name)
         .then(setInsight)
         .catch(console.error)
         .finally(() => setLoading(false));
