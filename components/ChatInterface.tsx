@@ -27,6 +27,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
     setInternalOpen(controlledOpen);
   }, [controlledOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   const setOpen = (open: boolean) => {
     if (onOpenChange) {
       onOpenChange(open);
@@ -65,7 +76,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
               <h3 className="font-semibold text-white">Impact Chat</h3>
             </div>
-            <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Close Chat"
+              className="text-slate-400 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md outline-none"
+            >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
@@ -95,8 +110,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
           </div>
 
           <form onSubmit={handleSubmit} className="p-4 border-t border-slate-800">
+            <label htmlFor="chat-input" className="sr-only">
+              Ask about a pilot or funding story
+            </label>
             <div className="relative">
               <input
+                id="chat-input"
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -106,7 +125,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
               <button 
                 type="submit"
                 disabled={isLoading}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-400 disabled:opacity-50"
+                aria-label="Send message"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-400 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md outline-none"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
@@ -118,7 +138,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
       ) : (
         <button 
           onClick={() => setOpen(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-105 group"
+          aria-label="Open Impact Chat"
+          className="bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-105 group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 outline-none"
         >
           <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
