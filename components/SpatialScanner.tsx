@@ -39,6 +39,17 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   const stopCamera = () => {
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
@@ -165,7 +176,11 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
           </div>
 
           <div className="flex flex-col items-end gap-8">
-             <button onClick={onClose} className="pointer-events-auto p-5 bg-slate-950/90 rounded-2xl border border-white/10 text-white hover:bg-white/20 transition-all shadow-2xl active:scale-90">
+             <button
+               onClick={onClose}
+               aria-label="Close Spatial Scanner"
+               className="pointer-events-auto p-5 bg-slate-950/90 rounded-2xl border border-white/10 text-white hover:bg-white/20 transition-all shadow-2xl active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+             >
                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
              </button>
              <div className="bg-slate-950/90 p-6 rounded-3xl border border-emerald-500/40 text-right min-w-[220px] shadow-2xl">
