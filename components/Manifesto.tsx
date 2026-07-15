@@ -7,18 +7,39 @@ interface ManifestoProps {
 }
 
 const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose }) => {
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md">
-      <div className="w-full max-w-4xl max-h-[90vh] bg-slate-900 border border-blue-500/30 rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.1)] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md cursor-pointer"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-4xl max-h-[90vh] bg-slate-900 border border-blue-500/30 rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.1)] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300 cursor-default"
+      >
         {/* Header */}
         <div className="p-8 border-b border-white/5 flex justify-between items-start bg-slate-950/50">
           <div>
             <div className="mono text-[10px] text-blue-500 font-black uppercase tracking-[0.4em] mb-2">Impact_Demo // v2.0</div>
             <h2 className="text-4xl font-black text-white tracking-tighter uppercase">Sovereign Map <span className="text-blue-500">for Good</span></h2>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400">
+          <button
+            onClick={onClose}
+            aria-label="Close Sovereign Map Manifesto"
+            className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+          >
             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>

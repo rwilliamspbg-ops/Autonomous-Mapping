@@ -55,11 +55,28 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
     }
   }, [output]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-2xl">
-      <div className="w-full max-w-5xl h-[700px] bg-[#0d1117] border border-blue-500/30 rounded-[2.5rem] shadow-[0_0_120px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-500">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-slate-950/95 backdrop-blur-2xl cursor-pointer"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-5xl h-[700px] bg-[#0d1117] border border-blue-500/30 rounded-[2.5rem] shadow-[0_0_120px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-500 cursor-default"
+      >
         <div className="bg-[#161b22] px-10 py-6 border-b border-white/10 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <div className="flex gap-2">
@@ -69,7 +86,11 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
             </div>
             <span className="ml-5 text-[11px] text-slate-400 mono font-black uppercase tracking-[0.5em]">Live_Node_Console // production_access</span>
           </div>
-          <button onClick={onClose} className="text-slate-500 hover:text-white transition-all p-2 hover:bg-white/5 rounded-full">
+          <button
+            onClick={onClose}
+            aria-label="Close Live Node Console"
+            className="text-slate-500 hover:text-white transition-all p-2 hover:bg-white/5 rounded-full focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+          >
             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>

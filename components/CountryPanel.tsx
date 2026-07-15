@@ -44,6 +44,17 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
     }
   }, [country]);
 
+  useEffect(() => {
+    if (!country) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [country, onClose]);
+
   const handleZkExport = () => {
     setZkStatus('GENERATING');
     setTimeout(() => {
@@ -83,7 +94,11 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               <span className="text-[9px] text-slate-500 mono font-bold uppercase tracking-widest">Aggregate Registry Status</span>
             </div>
           </div>
-          <button onClick={onClose} className="hover:bg-white/10 rounded-full p-2 transition-colors">
+          <button
+            onClick={onClose}
+            aria-label="Close Regional Pilot Brief"
+            className="hover:bg-white/10 rounded-full p-2 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+          >
             <svg className="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
