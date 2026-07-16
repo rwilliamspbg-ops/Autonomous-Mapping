@@ -255,10 +255,14 @@ const App: React.FC = () => {
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-600/60 to-transparent"></div>
         
         <div className="flex items-center gap-6">
-          <div className="relative group cursor-pointer" onClick={() => setIsManifestoOpen(true)}>
+          <button
+            onClick={() => setIsManifestoOpen(true)}
+            aria-label="Open Manifesto"
+            className="relative group cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-xl"
+          >
             <div className="absolute inset-0 bg-blue-600 blur-xl opacity-20 group-hover:opacity-60 transition-all duration-500"></div>
             <div className="w-12 h-12 bg-gradient-to-br from-blue-700 to-indigo-950 rounded-xl flex items-center justify-center font-black text-2xl border border-blue-500/50 shadow-2xl text-white transform group-hover:rotate-12 transition-transform">Σ</div>
-          </div>
+          </button>
           <div>
             <div className="flex items-center gap-3">
               <h1 className="font-black tracking-tighter text-2xl uppercase leading-none text-white">Sovereign <span className="text-blue-600">Map for Good</span></h1>
@@ -290,7 +294,7 @@ const App: React.FC = () => {
           
           <button 
             onClick={() => setIsScannerOpen(true)}
-            className="group relative px-8 py-3.5 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_30px_rgba(37,99,235,0.4)] flex items-center gap-4 border border-blue-400/30 overflow-hidden active:scale-95"
+            className="group relative px-8 py-3.5 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_30px_rgba(37,99,235,0.4)] flex items-center gap-4 border border-blue-400/30 overflow-hidden active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-12"></div>
             <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse shadow-[0_0_12px_white]"></div>
@@ -326,7 +330,7 @@ const App: React.FC = () => {
                     <button
                       key={stage.key}
                       onClick={() => setProtocolPhase(stage.key)}
-                      className={`text-left rounded-2xl border p-3 transition-all duration-300 ${
+                      className={`text-left rounded-2xl border p-3 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                         isActive
                           ? 'border-blue-400 bg-blue-500/10 shadow-[0_0_18px_rgba(59,130,246,0.18)]'
                           : isComplete
@@ -348,7 +352,7 @@ const App: React.FC = () => {
                   <button
                     key={track.label}
                     onClick={() => activateTrack(index)}
-                    className="px-3 py-2 rounded-full border border-white/10 bg-slate-900/70 text-[9px] mono uppercase tracking-[0.25em] text-slate-300 hover:border-blue-400/40 hover:text-white transition-colors"
+                    className="px-3 py-2 rounded-full border border-white/10 bg-slate-900/70 text-[9px] mono uppercase tracking-[0.25em] text-slate-300 hover:border-blue-400/40 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
                   >
                     {track.label}
                   </button>
@@ -358,13 +362,13 @@ const App: React.FC = () => {
               <div className="flex gap-2">
                 <button
                   onClick={runGuidedProtocol}
-                  className="flex-1 px-4 py-3 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_24px_rgba(37,99,235,0.35)] active:scale-95"
+                  className="flex-1 px-4 py-3 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_24px_rgba(37,99,235,0.35)] active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
                 >
                   Run_6_Min_Demo
                 </button>
                 <button
                   onClick={resetProtocol}
-                  className="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] border border-white/10 transition-all active:scale-95"
+                  className="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] border border-white/10 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
                 >
                   Reset
                 </button>

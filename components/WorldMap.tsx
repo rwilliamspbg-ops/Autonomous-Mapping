@@ -134,8 +134,11 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
       .append('path')
       .attr('class', 'country')
       .attr('d', path as any)
+      .attr('tabindex', '0')
+      .attr('role', 'button')
+      .attr('aria-label', (d: any) => `${d.properties.name}, view regional pilot brief`)
       .attr('class', (d: any) => 
-        `cursor-crosshair transition-all duration-300 fill-slate-900/40 stroke-blue-500/20 stroke-[0.5px] hover:fill-blue-500/30 hover:stroke-blue-400/60 ${d.id === selectedId || d.properties.name === focusCountryName ? 'fill-blue-600/50 stroke-blue-400 stroke-[1px]' : ''}`
+        `cursor-crosshair transition-all duration-300 fill-slate-900/40 stroke-blue-500/20 stroke-[0.5px] hover:fill-blue-500/30 hover:stroke-blue-400/60 focus:fill-blue-500/40 focus:stroke-blue-400 focus:stroke-[1px] focus:outline-none ${d.id === selectedId || d.properties.name === focusCountryName ? 'fill-blue-600/50 stroke-blue-400 stroke-[1px]' : ''}`
       )
       .on('mousemove', (event, d: any) => {
         const [mx, my] = d3.pointer(event, svgRef.current);
@@ -151,10 +154,55 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
           }, 250);
         }
       })
+      .on('focus', (event, d: any) => {
+        const bounds = path.bounds(d);
+        const x = (bounds[0][0] + bounds[1][0]) / 2;
+        const y = (bounds[0][1] + bounds[1][1]) / 2;
+        const [lng, lat] = projection.invert!([x, y]) || [0, 0];
+        setCoords({ x, y, lat, lng });
+
+        if (hoveredCountry?.id !== d.id) {
+          if (hoverTimeoutRef.current) window.clearTimeout(hoverTimeoutRef.current);
+          setShowTooltip(false);
+          setHoveredCountry({ name: d.properties.name, id: d.id });
+          hoverTimeoutRef.current = window.setTimeout(() => {
+            setShowTooltip(true);
+          }, 250);
+        }
+      })
+      .on('blur', () => {
+        if (hoverTimeoutRef.current) window.clearTimeout(hoverTimeoutRef.current);
+        setShowTooltip(false);
+        setHoveredCountry(null);
+      })
       .on('mouseleave', () => {
         if (hoverTimeoutRef.current) window.clearTimeout(hoverTimeoutRef.current);
         setShowTooltip(false);
         setHoveredCountry(null);
+      })
+      .on('keydown', (event, d: any) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onCountrySelect({ id: d.id, name: d.properties.name });
+
+          const bounds = path.bounds(d);
+          const dx = bounds[1][0] - bounds[0][0];
+          const dy = bounds[1][1] - bounds[0][1];
+          const x = (bounds[0][0] + bounds[1][0]) / 2;
+          const y = (bounds[0][1] + bounds[1][1]) / 2;
+
+          const scale = Math.max(1, Math.min(8, 0.8 / Math.max(dx / width, dy / height)));
+
+          const transform = d3.zoomIdentity
+            .translate(width / 2, height / 2)
+            .scale(scale)
+            .translate(-x, -y);
+
+          svg.transition()
+            .duration(1200)
+            .ease(d3.easeCubicInOut)
+            .call(zoom.transform as any, transform);
+        }
       })
       .on('click', (event, d: any) => {
         event.stopPropagation();
