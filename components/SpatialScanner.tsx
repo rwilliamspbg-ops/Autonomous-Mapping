@@ -226,7 +226,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
               <div className="text-[11px] text-blue-500 font-black tracking-[0.5em] animate-pulse mb-2">SYSTEM_LOCKED // PRIVACY_READY</div>
               <button 
                 onClick={handleCommit}
-                className="pointer-events-auto group relative px-20 py-8 bg-blue-700 hover:bg-blue-600 text-white rounded-3xl font-black text-lg uppercase tracking-[0.8em] transition-all shadow-[0_20px_60px_rgba(37,99,235,0.5)] border border-blue-400/50 active:scale-95"
+                className="pointer-events-auto group relative px-20 py-8 bg-blue-700 hover:bg-blue-600 text-white rounded-3xl font-black text-lg uppercase tracking-[0.8em] transition-all shadow-[0_20px_60px_rgba(37,99,235,0.5)] border border-blue-400/50 active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
               >
                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
                 Verify_Privacy

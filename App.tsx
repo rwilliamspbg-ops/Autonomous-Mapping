@@ -348,23 +348,35 @@ const App: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap gap-2 mb-4">
-                {protocolTracks.map((track, index) => (
-                  <button
-                    key={track.label}
-                    onClick={() => activateTrack(index)}
-                    className="px-3 py-2 rounded-full border border-white/10 bg-slate-900/70 text-[9px] mono uppercase tracking-[0.25em] text-slate-300 hover:border-blue-400/40 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
-                  >
-                    {track.label}
-                  </button>
-                ))}
+                {protocolTracks.map((track, index) => {
+                  const isTrackActive = selectedCountry?.name === track.country;
+                  return (
+                    <button
+                      key={track.label}
+                      onClick={() => activateTrack(index)}
+                      aria-pressed={isTrackActive}
+                      className={`px-3 py-2 rounded-full border text-[9px] mono uppercase tracking-[0.25em] transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
+                        isTrackActive
+                          ? 'border-blue-500 bg-blue-500/15 text-white shadow-[0_0_12px_rgba(59,130,246,0.3)]'
+                          : 'border-white/10 bg-slate-900/70 text-slate-300 hover:border-blue-400/40 hover:text-white'
+                      }`}
+                    >
+                      {track.label}
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="flex gap-2">
                 <button
                   onClick={runGuidedProtocol}
-                  className="flex-1 px-4 py-3 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_24px_rgba(37,99,235,0.35)] active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                  className={`flex-1 px-4 py-3 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
+                    demoRunning
+                      ? 'bg-blue-600/80 border border-blue-400/30 animate-pulse shadow-[0_0_20px_rgba(37,99,235,0.25)]'
+                      : 'bg-blue-700 hover:bg-blue-600 shadow-[0_0_24px_rgba(37,99,235,0.35)]'
+                  }`}
                 >
-                  Run_6_Min_Demo
+                  {demoRunning ? 'Demo_Running...' : 'Run_6_Min_Demo'}
                 </button>
                 <button
                   onClick={resetProtocol}
