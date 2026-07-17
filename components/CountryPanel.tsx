@@ -106,7 +106,13 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
 
       <div className="flex-1 overflow-y-auto p-8 space-y-10 scroll-smooth">
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-full space-y-8 py-20">
+          <div
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+            className="flex flex-col items-center justify-center h-full space-y-8 py-20"
+          >
+            <span className="sr-only">Loading insights for {country.name}...</span>
             <div className="relative">
               <div className="w-20 h-20 border-2 border-blue-500/10 rounded-full"></div>
               <div className="absolute inset-0 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -163,7 +169,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               <button 
                 onClick={handleZkExport}
                 disabled={zkStatus !== 'IDLE'}
-                className={`w-full py-4 rounded-xl border mono text-[10px] font-black uppercase tracking-widest transition-all shadow-lg ${
+                className={`w-full py-4 rounded-xl border mono text-[10px] font-black uppercase tracking-widest transition-all shadow-lg focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                   zkStatus === 'IDLE' ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500 shadow-blue-600/20' :
                   zkStatus === 'COMMITTED' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 cursor-default' :
                   'bg-slate-800 border-slate-700 text-slate-500 animate-pulse cursor-wait'

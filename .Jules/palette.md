@@ -11,3 +11,7 @@
 ## 2025-10-24 - D3 SVG Keyboard Accessibility and Semantic Interactivity
 **Learning:** Interactive D3 SVG map paths are completely invisible to keyboard-only and screen reader users unless tabindex="0", role="button", and accessible labels are explicitly injected. They can be made accessible by attaching 'focus', 'blur', and 'keydown' (Enter/Space) event listeners directly during the D3 selection lifecycle.
 **Action:** Always map hover and click events to focus and keydown handlers in SVG/D3 charts to support keyboard navigation, and apply a focus highlight state using fill and stroke.
+
+## 2026-03-30 - Interactive Live Status Indicators and Multi-state Toggle Feedback
+**Learning:** Dynamic layout controls (like lane switches) must provide explicit semantic state feedback using `aria-pressed` attributes so assistive technologies can instantly perceive toggled state. Additionally, real-time spatial loaders or panel refreshes should implement `role="status"`, `aria-live="polite"`, and `aria-busy="true"` to ensure screen readers announce loading phases without disrupting context flow.
+**Action:** Always complement active visual styles with `aria-pressed` or `aria-selected` attributes and use live region status boundaries for asynchronous fetching states.

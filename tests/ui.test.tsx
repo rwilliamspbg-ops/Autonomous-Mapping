@@ -1,7 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
 import ErrorBoundary from '../components/ErrorBoundary';
+import CountryPanel from '../components/CountryPanel';
+
+vi.mock('../services/geminiService', () => ({
+  getSovereignInsights: vi.fn().mockImplementation(() => new Promise(() => {})),
+  chatWithAnalyst: vi.fn()
+}));
 
 describe('UI Components', () => {
   it('ErrorBoundary should catch errors and show fallback', () => {
@@ -19,5 +25,10 @@ describe('UI Components', () => {
 
     expect(screen.getByText(/System Anomaly Detected/i)).toBeInTheDocument();
     consoleSpy.mockRestore();
+  });
+
+  it('CountryPanel should show accessible loading status when loading', () => {
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+    expect(screen.getByRole('status')).toBeInTheDocument();
   });
 });
