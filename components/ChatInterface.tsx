@@ -78,7 +78,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
             </div>
             <button
               onClick={() => setOpen(false)}
-              aria-label="Close Chat"
+              aria-label="Close Chat (Escape)"
+              title="Close (Escape)"
               className="text-slate-400 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md outline-none"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

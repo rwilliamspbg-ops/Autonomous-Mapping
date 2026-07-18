@@ -330,6 +330,7 @@ const App: React.FC = () => {
                     <button
                       key={stage.key}
                       onClick={() => setProtocolPhase(stage.key)}
+                      aria-pressed={isActive}
                       className={`text-left rounded-2xl border p-3 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                         isActive
                           ? 'border-blue-400 bg-blue-500/10 shadow-[0_0_18px_rgba(59,130,246,0.18)]'

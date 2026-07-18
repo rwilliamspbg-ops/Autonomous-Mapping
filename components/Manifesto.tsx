@@ -37,7 +37,8 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            aria-label="Close Sovereign Map Manifesto"
+            aria-label="Close Sovereign Map Manifesto (Escape)"
+            title="Close (Escape)"
             className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>

@@ -178,7 +178,8 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
           <div className="flex flex-col items-end gap-8">
              <button
                onClick={onClose}
-               aria-label="Close Spatial Scanner"
+               aria-label="Close Spatial Scanner (Escape)"
+               title="Close (Escape)"
                className="pointer-events-auto p-5 bg-slate-950/90 rounded-2xl border border-white/10 text-white hover:bg-white/20 transition-all shadow-2xl active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
              >
                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>

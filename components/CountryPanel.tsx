@@ -96,7 +96,8 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            aria-label="Close Regional Pilot Brief"
+            aria-label="Close Regional Pilot Brief (Escape)"
+            title="Close (Escape)"
             className="hover:bg-white/10 rounded-full p-2 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             <svg className="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -154,14 +155,29 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                     <span className="text-[10px] text-white mono font-bold">{Math.round((verifyStep / 3) * 100)}%</span>
                   </div>
                   <div className="space-y-1.5">
-                    {['ANCHOR_STATE_HASH', 'ZK_SNARK_VALIDATION', 'CROSS_CHAIN_FINALITY'].map((step, idx) => (
-                      <div key={idx} className={`flex items-center gap-3 text-[9px] mono ${verifyStep >= idx + 1 ? 'text-emerald-400' : 'text-slate-600'}`}>
-                        <div className={`w-3 h-3 border rounded-sm flex items-center justify-center ${verifyStep >= idx + 1 ? 'border-emerald-500 bg-emerald-500/20' : 'border-slate-800'}`}>
-                          {verifyStep >= idx + 1 && '✓'}
+                    {['ANCHOR_STATE_HASH', 'ZK_SNARK_VALIDATION', 'CROSS_CHAIN_FINALITY'].map((step, idx) => {
+                      const isCompleted = verifyStep >= idx + 1;
+                      const isActive = verifyStep === idx;
+                      return (
+                        <div key={idx} className={`flex items-center gap-3 text-[9px] mono transition-colors duration-300 ${
+                          isCompleted ? 'text-emerald-400' : isActive ? 'text-blue-400 animate-pulse font-bold' : 'text-slate-600'
+                        }`}>
+                          <div className={`w-3 h-3 border rounded-sm flex items-center justify-center transition-all duration-300 ${
+                            isCompleted ? 'border-emerald-500 bg-emerald-500/20 shadow-[0_0_5px_rgba(16,185,129,0.3)]' :
+                            isActive ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_5px_rgba(59,130,246,0.5)]' : 'border-slate-800'
+                          }`}>
+                            {isCompleted && '✓'}
+                            {!isCompleted && isActive && (
+                              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-ping"></span>
+                            )}
+                          </div>
+                          <span className="tracking-tighter flex items-center gap-1.5">
+                            {step}
+                            {isActive && <span className="text-[7px] text-blue-500 font-bold tracking-widest uppercase animate-pulse">[PROCESSING]</span>}
+                          </span>
                         </div>
-                        <span className="tracking-tighter">{step}</span>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -224,9 +240,12 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 mt-4">
                 {insight.keyRisks.map((risk, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)]" style={{ backgroundColor: COLORS[i % COLORS.length] }}></div>
-                    <span className="text-[10px] text-slate-300 mono truncate font-medium uppercase tracking-tighter">{risk.name}</span>
+                  <div key={i} className="flex items-center justify-between gap-2 border-b border-white/5 pb-1">
+                    <div className="flex items-center gap-2 truncate">
+                      <div className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)] shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }}></div>
+                      <span className="text-[10px] text-slate-300 mono truncate font-medium uppercase tracking-tighter">{risk.name}</span>
+                    </div>
+                    <span className="text-[10px] text-blue-400 mono font-bold shrink-0">{risk.severity}%</span>
                   </div>
                 ))}
               </div>
