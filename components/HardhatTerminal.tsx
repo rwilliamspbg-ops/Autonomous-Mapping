@@ -88,7 +88,8 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            aria-label="Close Live Node Console"
+            aria-label="Close Live Node Console (Escape)"
+            title="Close (Escape)"
             className="text-slate-500 hover:text-white transition-all p-2 hover:bg-white/5 rounded-full focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
