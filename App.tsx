@@ -339,8 +339,14 @@ const App: React.FC = () => {
                             : 'border-white/10 bg-slate-900/40 hover:border-white/20'
                       }`}
                     >
-                      <div className={`text-[10px] mono font-black uppercase tracking-[0.35em] ${isActive ? 'text-blue-400' : isComplete ? 'text-emerald-400' : 'text-slate-500'}`}>
-                        {stage.label}
+                      <div className={`text-[10px] mono font-black uppercase tracking-[0.35em] flex items-center justify-between gap-2 ${isActive ? 'text-blue-400' : isComplete ? 'text-emerald-400' : 'text-slate-500'}`}>
+                        <span>{stage.label}</span>
+                        {isActive && (
+                          <span className={`text-[8px] font-black tracking-widest flex items-center gap-1.5 shrink-0 animate-pulse ${stage.key === 'VERIFIED' ? 'text-emerald-400' : 'text-blue-400'}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full animate-ping ${stage.key === 'VERIFIED' ? 'bg-emerald-400' : 'bg-blue-400'}`}></span>
+                            {stage.key === 'VERIFIED' ? '[VERIFIED]' : '[PROCESSING]'}
+                          </span>
+                        )}
                       </div>
                       <div className="mt-1 text-[10px] text-slate-300 leading-snug">{stage.detail}</div>
                     </button>
