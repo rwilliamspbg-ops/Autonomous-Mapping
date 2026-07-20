@@ -29,18 +29,28 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [zkStatus, setZkStatus] = useState<ZkStatus>('IDLE');
   const [verifyStep, setVerifyStep] = useState(0);
+  const closeButtonRef = React.useRef<HTMLButtonElement>(null);
+  const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (country) {
+      lastActiveElementRef.current = document.activeElement as HTMLElement;
       setLoading(true);
       setZkStatus('IDLE');
       setVerifyStep(0);
       getSovereignInsights(country.name)
         .then(setInsight)
         .catch(console.error)
-        .finally(() => setLoading(false));
+        .finally(() => {
+          setLoading(false);
+          closeButtonRef.current?.focus();
+        });
     } else {
       setInsight(null);
+      if (lastActiveElementRef.current) {
+        lastActiveElementRef.current.focus();
+        lastActiveElementRef.current = null;
+      }
     }
   }, [country]);
 
@@ -95,6 +105,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
             </div>
           </div>
           <button
+            ref={closeButtonRef}
             onClick={onClose}
             aria-label="Close Regional Pilot Brief (Escape)"
             title="Close (Escape)"

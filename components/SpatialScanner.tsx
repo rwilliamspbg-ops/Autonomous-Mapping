@@ -15,10 +15,20 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
   const [status, setStatus] = useState<'IDLE' | 'BOOTING' | 'TRACKING' | 'COMMITTING' | 'FINALIZED'>('IDLE');
   const [points, setPoints] = useState<{ x: number; y: number; life: number; color: string }[]>([]);
   const [telemetry, setTelemetry] = useState({ pose: [0,0,0], keyframes: 0, voxels: 0, stability: 100 });
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const lastActiveElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (isOpen && status === 'IDLE') {
-      startCamera();
+    if (isOpen) {
+      lastActiveElementRef.current = document.activeElement as HTMLElement;
+      if (status === 'IDLE') {
+        startCamera();
+      }
+    } else {
+      if (lastActiveElementRef.current) {
+        lastActiveElementRef.current.focus();
+        lastActiveElementRef.current = null;
+      }
     }
     return () => stopCamera();
   }, [isOpen]);
@@ -41,13 +51,20 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
 
   useEffect(() => {
     if (!isOpen) return;
+    const timer = setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 50);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      clearTimeout(timer);
+    };
   }, [isOpen, onClose]);
 
   const stopCamera = () => {
@@ -177,6 +194,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
 
           <div className="flex flex-col items-end gap-8">
              <button
+               ref={closeButtonRef}
                onClick={onClose}
                aria-label="Close Spatial Scanner (Escape)"
                title="Close (Escape)"

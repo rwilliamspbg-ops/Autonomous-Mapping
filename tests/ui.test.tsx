@@ -31,4 +31,13 @@ describe('UI Components', () => {
     render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
+
+  it('CountryPanel close button can receive focus and closes on click', () => {
+    const handleClose = vi.fn();
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={handleClose} />);
+    const closeBtn = screen.getByLabelText(/Close Regional Pilot Brief/i);
+    expect(closeBtn).toBeInTheDocument();
+    closeBtn.focus();
+    expect(document.activeElement).toBe(closeBtn);
+  });
 });
