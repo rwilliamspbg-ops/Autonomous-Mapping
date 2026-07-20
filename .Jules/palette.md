@@ -19,3 +19,7 @@
 ## 2026-06-15 - Access-by-default Data Legends and Active Processing State Feedback
 **Learning:** Interactive charts (like recharts or D3 circles) that only show detailed metrics (such as severity percentages) on hover or active cursor interaction are completely inaccessible to screen reader and keyboard-only users. Replicating essential metrics directly within flat text legends satisfies the double-A accessibility requirement while keeping cognitive load low. Additionally, multi-stage status checkers are more intuitive when active/processing items pulse dynamically to indicate a working background task.
 **Action:** Always complement graphical data representations with clear textual metrics in their static legends, and use a contrasting pulsing state with screen-reader friendly status text for active steps in sequential workflows.
+
+## 2026-07-20 - Accessible Focus Management (Auto-focus & Focus Restoration) across Overlays
+**Learning:** For overlay components (modals, drawers, sliding panels), keyboard and screen-reader accessibility requires moving focus to the newly opened panel (either onto an input, main body, or close button) upon mount, and cleanly restoring focus back to the triggering element when closed. This keeps keyboard navigation context intact and prevents focus loss.
+**Action:** Implement `lastActiveElementRef` and `closeButtonRef` / `inputRef` patterns using `useEffect` to manage focus transitions whenever a modal opens and closes.

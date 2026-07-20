@@ -30,9 +30,12 @@ const liveLogs = [
 const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   const [output, setOutput] = useState<string[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const lastActiveElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (isOpen) {
+      lastActiveElementRef.current = document.activeElement as HTMLElement;
       setOutput(["> Establishing secure shell connection...", "> Node v1.0.4-PROD online."]);
       let i = 0;
       const interval = setInterval(() => {
@@ -46,6 +49,11 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
         }
       }, 300);
       return () => clearInterval(interval);
+    } else {
+      if (lastActiveElementRef.current) {
+        lastActiveElementRef.current.focus();
+        lastActiveElementRef.current = null;
+      }
     }
   }, [isOpen]);
 
@@ -57,13 +65,20 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (!isOpen) return;
+    const timer = setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 50);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      clearTimeout(timer);
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -87,6 +102,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
             <span className="ml-5 text-[11px] text-slate-400 mono font-black uppercase tracking-[0.5em]">Live_Node_Console // production_access</span>
           </div>
           <button
+            ref={closeButtonRef}
             onClick={onClose}
             aria-label="Close Live Node Console (Escape)"
             title="Close (Escape)"

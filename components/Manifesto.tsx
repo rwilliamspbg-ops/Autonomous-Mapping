@@ -7,15 +7,32 @@ interface ManifestoProps {
 }
 
 const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose }) => {
+  const closeButtonRef = React.useRef<HTMLButtonElement>(null);
+  const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
+
   React.useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      if (lastActiveElementRef.current) {
+        lastActiveElementRef.current.focus();
+        lastActiveElementRef.current = null;
+      }
+      return;
+    }
+    lastActiveElementRef.current = document.activeElement as HTMLElement;
+    const timer = setTimeout(() => {
+      closeButtonRef.current?.focus();
+    }, 50);
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      clearTimeout(timer);
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -36,6 +53,7 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose }) => {
             <h2 className="text-4xl font-black text-white tracking-tighter uppercase">Sovereign Map <span className="text-blue-500">for Good</span></h2>
           </div>
           <button
+            ref={closeButtonRef}
             onClick={onClose}
             aria-label="Close Sovereign Map Manifesto (Escape)"
             title="Close (Escape)"
