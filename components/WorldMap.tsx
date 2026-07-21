@@ -68,6 +68,53 @@ const sanctuaries = [
   { name: "Great Wall", lat: 40.4319, lng: 116.5704, label: "SGP-003" }
 ];
 
+const getRiskLevel = (name: string) => {
+  const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const level = hash % 3;
+  if (level === 0) return {
+    label: 'LOW',
+    color: 'text-emerald-400',
+    borderColor: 'border-emerald-500/30',
+    bgColor: 'bg-emerald-500/10',
+    icon: (
+      <svg className="w-4 h-4 animate-[pulse_3s_infinite]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L4 5V11C4 16.07 7.41 20.74 12 22C16.59 20.74 20 16.07 20 11V5L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    )
+  };
+  if (level === 1) return {
+    label: 'MED',
+    color: 'text-amber-400',
+    borderColor: 'border-amber-500/30',
+    bgColor: 'bg-amber-500/10',
+    icon: (
+      <svg className="w-4 h-4 animate-[bounce_2s_infinite]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 9V14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M12 18H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M10.29 3.86L1.82 18C1.64531 18.3024 1.55299 18.6452 1.55251 18.9939C1.55203 19.3427 1.6434 19.6858 1.81725 19.9883C1.9911 20.2908 2.24121 20.5422 2.54175 20.7164C2.8423 20.8906 3.18241 20.9819 3.528 20.98H20.472C20.8176 20.9819 21.1577 20.8906 21.4582 20.7164C21.7588 20.5422 22.0089 20.2908 22.1827 19.9883C22.3566 19.6858 22.448 19.3427 22.4475 18.9939C22.447 18.6452 22.3547 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15449C12.6817 2.98585 12.3437 2.89746 12 2.89746C11.6563 2.89746 11.3183 2.98585 11.0188 3.15449C10.7193 3.32312 10.4683 3.56611 10.29 3.86V3.86Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+    )
+  };
+  return {
+    label: 'HIGH',
+    color: 'text-rose-500',
+    borderColor: 'border-rose-500/30',
+    bgColor: 'bg-rose-500/10',
+    icon: (
+      <div className="relative">
+        <svg className="w-4 h-4 animate-[spin_4s_linear_infinite]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 12L12 12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M12 8V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M8 12H12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        <div className="absolute inset-0 w-4 h-4 animate-ping bg-rose-500 opacity-20 rounded-full"></div>
+      </div>
+    )
+  };
+};
+
 const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusCountryName, demoPulse = false }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const [worldData, setWorldData] = useState<any>(null);
@@ -136,7 +183,12 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
       .attr('d', path as any)
       .attr('tabindex', '0')
       .attr('role', 'button')
-      .attr('aria-label', (d: any) => `${d.properties.name}, view regional pilot brief`)
+      .attr('aria-label', (d: any) => {
+        const name = d.properties.name;
+        const capital = countryCapitals[name] || 'Unknown';
+        const riskLevel = getRiskLevel(name).label;
+        return `${name} (Capital: ${capital}). Sovereign Risk Level: ${riskLevel}. View regional pilot brief.`;
+      })
       .attr('class', (d: any) => 
         `cursor-crosshair transition-all duration-300 fill-slate-900/40 stroke-blue-500/20 stroke-[0.5px] hover:fill-blue-500/30 hover:stroke-blue-400/60 focus:fill-blue-500/40 focus:stroke-blue-400 focus:stroke-[1px] focus:outline-none ${d.id === selectedId || d.properties.name === focusCountryName ? 'fill-blue-600/50 stroke-blue-400 stroke-[1px]' : ''}`
       )
@@ -288,53 +340,6 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
     }
 
   }, [worldData, selectedId, hoveredCountry?.id, focusCountryName, demoPulse]);
-
-  const getRiskLevel = (name: string) => {
-    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const level = hash % 3;
-    if (level === 0) return { 
-      label: 'LOW', 
-      color: 'text-emerald-400', 
-      borderColor: 'border-emerald-500/30',
-      bgColor: 'bg-emerald-500/10',
-      icon: (
-        <svg className="w-4 h-4 animate-[pulse_3s_infinite]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L4 5V11C4 16.07 7.41 20.74 12 22C16.59 20.74 20 16.07 20 11V5L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M9 12L11 14L15 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
-    };
-    if (level === 1) return { 
-      label: 'MED', 
-      color: 'text-amber-400', 
-      borderColor: 'border-amber-500/30',
-      bgColor: 'bg-amber-500/10',
-      icon: (
-        <svg className="w-4 h-4 animate-[bounce_2s_infinite]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 9V14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M12 18H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M10.29 3.86L1.82 18C1.64531 18.3024 1.55299 18.6452 1.55251 18.9939C1.55203 19.3427 1.6434 19.6858 1.81725 19.9883C1.9911 20.2908 2.24121 20.5422 2.54175 20.7164C2.8423 20.8906 3.18241 20.9819 3.528 20.98H20.472C20.8176 20.9819 21.1577 20.8906 21.4582 20.7164C21.7588 20.5422 22.0089 20.2908 22.1827 19.9883C22.3566 19.6858 22.448 19.3427 22.4475 18.9939C22.447 18.6452 22.3547 18.3024 22.18 18L13.71 3.86C13.5317 3.56611 13.2807 3.32312 12.9812 3.15449C12.6817 2.98585 12.3437 2.89746 12 2.89746C11.6563 2.89746 11.3183 2.98585 11.0188 3.15449C10.7193 3.32312 10.4683 3.56611 10.29 3.86V3.86Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
-    };
-    return { 
-      label: 'HIGH', 
-      color: 'text-rose-500', 
-      borderColor: 'border-rose-500/30',
-      bgColor: 'bg-rose-500/10',
-      icon: (
-        <div className="relative">
-          <svg className="w-4 h-4 animate-[spin_4s_linear_infinite]" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 12L12 12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M12 8V12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M8 12H12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <div className="absolute inset-0 w-4 h-4 animate-ping bg-rose-500 opacity-20 rounded-full"></div>
-        </div>
-      )
-    };
-  };
 
   const risk = hoveredCountry ? getRiskLevel(hoveredCountry.name) : null;
 
