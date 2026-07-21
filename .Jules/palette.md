@@ -23,3 +23,7 @@
 ## 2026-07-20 - Accessible Focus Management (Auto-focus & Focus Restoration) across Overlays
 **Learning:** For overlay components (modals, drawers, sliding panels), keyboard and screen-reader accessibility requires moving focus to the newly opened panel (either onto an input, main body, or close button) upon mount, and cleanly restoring focus back to the triggering element when closed. This keeps keyboard navigation context intact and prevents focus loss.
 **Action:** Implement `lastActiveElementRef` and `closeButtonRef` / `inputRef` patterns using `useEffect` to manage focus transitions whenever a modal opens and closes.
+
+## 2026-08-15 - Synchronized Accessible Dynamic Descriptions for Maps and Interactive Charts
+**Learning:** Screen reader and keyboard-only users navigating map projections or complex data charts often miss visual tooltips entirely. To prevent information asymmetry, dynamic properties (like capitals and calculated risk indices) shown visually on hover must be packed directly into each interactive node's accessible label (such as `aria-label`).
+**Action:** When creating hover/focus-based tooltips, ensure that the corresponding interactive element's `aria-label` dynamically constructs and announces the same structured data (e.g., `<Name> (Capital: <Capital>). Risk Level: <Risk>.`).
