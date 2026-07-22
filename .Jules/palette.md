@@ -27,3 +27,7 @@
 ## 2026-08-15 - Synchronized Accessible Dynamic Descriptions for Maps and Interactive Charts
 **Learning:** Screen reader and keyboard-only users navigating map projections or complex data charts often miss visual tooltips entirely. To prevent information asymmetry, dynamic properties (like capitals and calculated risk indices) shown visually on hover must be packed directly into each interactive node's accessible label (such as `aria-label`).
 **Action:** When creating hover/focus-based tooltips, ensure that the corresponding interactive element's `aria-label` dynamically constructs and announces the same structured data (e.g., `<Name> (Capital: <Capital>). Risk Level: <Risk>.`).
+
+## 2026-09-02 - High-Fidelity Tactical Map Zoom Controls and Keyboard-driven Navigation
+**Learning:** Relying purely on scroll wheel, trackpad, or double click behaviors for map navigation causes severe interaction friction for keyboard-only and screen-reader users, as well as users with motor disabilities. Dedicated map-zoom HUD control panels with high-contrast, glowing cyberpunk-themed button designs and proper semantic markup satisfy visual delight while drastically improving navigation options.
+**Action:** Always complement custom D3 SVG zoom/pan interactions with vertically stacked focus-visible zoom control buttons, complete with explicit 'aria-label', 'title', and active physical transformations.

@@ -117,6 +117,7 @@ const getRiskLevel = (name: string) => {
 
 const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusCountryName, demoPulse = false }) => {
   const svgRef = useRef<SVGSVGElement>(null);
+  const zoomRef = useRef<any>(null);
   const [worldData, setWorldData] = useState<any>(null);
   const [coords, setCoords] = useState({ x: 0, y: 0, lat: 0, lng: 0 });
   const [hoveredCountry, setHoveredCountry] = useState<{ name: string; id: string } | null>(null);
@@ -166,6 +167,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
       .on('zoom', (event) => {
         g.attr('transform', event.transform);
       });
+    zoomRef.current = zoom;
 
     svg.call(zoom as any);
 
@@ -341,11 +343,66 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
 
   }, [worldData, selectedId, hoveredCountry?.id, focusCountryName, demoPulse]);
 
+  const handleZoomIn = () => {
+    if (svgRef.current && zoomRef.current) {
+      d3.select(svgRef.current)
+        .transition()
+        .duration(300)
+        .call(zoomRef.current.scaleBy, 1.3);
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (svgRef.current && zoomRef.current) {
+      d3.select(svgRef.current)
+        .transition()
+        .duration(300)
+        .call(zoomRef.current.scaleBy, 1 / 1.3);
+    }
+  };
+
+  const handleZoomReset = () => {
+    if (svgRef.current && zoomRef.current) {
+      d3.select(svgRef.current)
+        .transition()
+        .duration(400)
+        .call(zoomRef.current.transform, d3.zoomIdentity);
+    }
+  };
+
   const risk = hoveredCountry ? getRiskLevel(hoveredCountry.name) : null;
 
   return (
     <div className="w-full h-full bg-slate-950 overflow-hidden relative group">
       <svg ref={svgRef} className="w-full h-full" />
+
+      {/* Tactical Zoom Controls */}
+      <div className="absolute bottom-[280px] right-8 flex flex-col gap-2 z-10">
+        <button
+          onClick={handleZoomIn}
+          aria-label="Zoom In"
+          title="Zoom In"
+          className="w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg"
+        >
+          ＋
+        </button>
+        <button
+          onClick={handleZoomOut}
+          aria-label="Zoom Out"
+          title="Zoom Out"
+          className="w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg"
+        >
+          －
+        </button>
+        <button
+          onClick={handleZoomReset}
+          aria-label="Reset Zoom"
+          title="Reset Zoom"
+          className="w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center text-xs font-black tracking-tighter transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg mono uppercase"
+        >
+          RST
+        </button>
+      </div>
       
       {/* Tactical Tooltip Overlay */}
       {hoveredCountry && risk && (
