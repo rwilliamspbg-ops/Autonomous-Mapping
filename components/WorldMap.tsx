@@ -370,6 +370,35 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
     }
   };
 
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const activeElement = document.activeElement;
+      if (activeElement) {
+        const tagName = activeElement.tagName.toLowerCase();
+        const isContentEditable = activeElement.getAttribute('contenteditable') === 'true';
+        if (tagName === 'input' || tagName === 'textarea' || isContentEditable) {
+          return;
+        }
+      }
+
+      if (e.key === '+' || e.key === '=') {
+        e.preventDefault();
+        handleZoomIn();
+      } else if (e.key === '-' || e.key === '_') {
+        e.preventDefault();
+        handleZoomOut();
+      } else if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        handleZoomReset();
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, []);
+
   const risk = hoveredCountry ? getRiskLevel(hoveredCountry.name) : null;
 
   return (
@@ -380,24 +409,24 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
       <div className="absolute bottom-[280px] right-8 flex flex-col gap-2 z-10">
         <button
           onClick={handleZoomIn}
-          aria-label="Zoom In"
-          title="Zoom In"
+          aria-label="Zoom In (Press + or =)"
+          title="Zoom In (+)"
           className="w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg"
         >
           ＋
         </button>
         <button
           onClick={handleZoomOut}
-          aria-label="Zoom Out"
-          title="Zoom Out"
+          aria-label="Zoom Out (Press - or _)"
+          title="Zoom Out (-)"
           className="w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg"
         >
           －
         </button>
         <button
           onClick={handleZoomReset}
-          aria-label="Reset Zoom"
-          title="Reset Zoom"
+          aria-label="Reset Zoom (Press r or R)"
+          title="Reset Zoom (R)"
           className="w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center text-xs font-black tracking-tighter transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg mono uppercase"
         >
           RST

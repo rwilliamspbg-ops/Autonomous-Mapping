@@ -31,3 +31,7 @@
 ## 2026-09-02 - High-Fidelity Tactical Map Zoom Controls and Keyboard-driven Navigation
 **Learning:** Relying purely on scroll wheel, trackpad, or double click behaviors for map navigation causes severe interaction friction for keyboard-only and screen-reader users, as well as users with motor disabilities. Dedicated map-zoom HUD control panels with high-contrast, glowing cyberpunk-themed button designs and proper semantic markup satisfy visual delight while drastically improving navigation options.
 **Action:** Always complement custom D3 SVG zoom/pan interactions with vertically stacked focus-visible zoom control buttons, complete with explicit 'aria-label', 'title', and active physical transformations.
+
+## 2026-09-10 - Global Hotkey Integrations and Focusing Safeties
+**Learning:** Adding global keydown keyboard shortcuts (like `+` / `-` / `r` for map zoom levels) provides high-speed efficiency for power-users, but must explicitly skip triggers when inputs, textareas, or contenteditables are focused. This prevents layout operations from conflicting with typing or texting tasks within adjacent chat interfaces or terminals.
+**Action:** When implementing global window listeners for layout-altering keyboard shortcuts, always guard execution by checking `document.activeElement` for editable or input tag names.
