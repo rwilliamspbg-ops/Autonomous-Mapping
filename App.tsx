@@ -82,6 +82,39 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      const activeElement = document.activeElement;
+      if (activeElement) {
+        const tagName = activeElement.tagName.toLowerCase();
+        const isContentEditable = activeElement.getAttribute('contenteditable') === 'true';
+        if (tagName === 'input' || tagName === 'textarea' || isContentEditable) {
+          return;
+        }
+      }
+
+      const key = e.key.toLowerCase();
+      if (key === 'c') {
+        e.preventDefault();
+        setIsChatOpen(prev => !prev);
+      } else if (key === 'm') {
+        e.preventDefault();
+        setIsManifestoOpen(prev => !prev);
+      } else if (key === 's') {
+        e.preventDefault();
+        setIsScannerOpen(prev => !prev);
+      } else if (key === 't') {
+        e.preventDefault();
+        setIsTerminalOpen(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, []);
+
+  useEffect(() => {
     const syncStages = [
       { msg: 'DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD', delay: 0 },
       { msg: 'USE_CASE: HEALTH_PRIVACY_PILOT_ARMED', delay: 400 },
@@ -257,7 +290,8 @@ const App: React.FC = () => {
         <div className="flex items-center gap-6">
           <button
             onClick={() => setIsManifestoOpen(true)}
-            aria-label="Open Manifesto"
+            aria-label="Open Manifesto (Press m or M)"
+            title="Open Manifesto (M)"
             className="relative group cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-xl"
           >
             <div className="absolute inset-0 bg-blue-600 blur-xl opacity-20 group-hover:opacity-60 transition-all duration-500"></div>
@@ -277,23 +311,30 @@ const App: React.FC = () => {
         </div>
         
         <nav className="hidden lg:flex items-center gap-6 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mono">
-          <div className={`flex items-center gap-4 px-6 py-3 rounded-2xl border ${trackingInfo.bg} ${trackingInfo.border} ${trackingInfo.glow} transition-all duration-700 group hover:border-emerald-500/50`}>
+          <button
+            onClick={() => setIsTerminalOpen(prev => !prev)}
+            aria-label="Open Live Node Console (Press t or T)"
+            title="Open Live Node Console (T)"
+            className={`flex items-center gap-4 px-6 py-3 rounded-2xl border ${trackingInfo.bg} ${trackingInfo.border} ${trackingInfo.glow} transition-all duration-700 group hover:border-emerald-500/50 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none`}
+          >
             <div className="relative flex items-center justify-center">
                <span className={`w-3 h-3 rounded-full ${trackingInfo.dot} ${trackingState === TrackingState.OK ? 'animate-pulse' : ''}`}></span>
                {trackingState === TrackingState.OK && (
                  <span className="absolute w-6 h-6 rounded-full border border-emerald-500/40 animate-ping"></span>
                )}
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col text-left">
               <span className={`${trackingInfo.color} font-black tracking-[0.25em] leading-none mb-1`}>{trackingInfo.label}</span>
               <span className="text-[8px] text-slate-600 uppercase tracking-widest font-black">Impact_Engine_Primary</span>
             </div>
-          </div>
+          </button>
 
           <div className="h-10 w-px bg-white/10"></div>
           
           <button 
             onClick={() => setIsScannerOpen(true)}
+            aria-label="Check My Privacy (Press s or S)"
+            title="Check My Privacy (S)"
             className="group relative px-8 py-3.5 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_30px_rgba(37,99,235,0.4)] flex items-center gap-4 border border-blue-400/30 overflow-hidden active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-12"></div>

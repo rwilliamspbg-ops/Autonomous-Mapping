@@ -156,7 +156,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
       ) : (
         <button 
           onClick={() => setOpen(true)}
-          aria-label="Open Impact Chat"
+          aria-label="Open Impact Chat (Press c or C)"
+          title="Open Impact Chat (C)"
           className="bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-105 group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 outline-none"
         >
           <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">

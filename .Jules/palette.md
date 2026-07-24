@@ -35,3 +35,7 @@
 ## 2026-09-10 - Global Hotkey Integrations and Focusing Safeties
 **Learning:** Adding global keydown keyboard shortcuts (like `+` / `-` / `r` for map zoom levels) provides high-speed efficiency for power-users, but must explicitly skip triggers when inputs, textareas, or contenteditables are focused. This prevents layout operations from conflicting with typing or texting tasks within adjacent chat interfaces or terminals.
 **Action:** When implementing global window listeners for layout-altering keyboard shortcuts, always guard execution by checking `document.activeElement` for editable or input tag names.
+
+## 2026-09-15 - Interactive System Status Displays & Keyboard Hotkey Transparency
+**Learning:** Static system headers/indicators (like "LIVE_NODE_SYNC") are excellent candidates for micro-UX conversion. Changing them into interactive `<button>` overlays with clear focus indicators, `title` hotkey hints, and screen-reader friendly `aria-label` descriptions unlocks secret or deep UI layers (such as advanced logging terminals) instantly. This bridges visual satisfaction with keyboard-driven workflow efficiency.
+**Action:** Always complement key panel toggles with dedicated global keys (e.g., 't', 'c', 'm', 's') paired with input-focus guards, and style headers as semantic, focus-visible interactive triggers where appropriate.

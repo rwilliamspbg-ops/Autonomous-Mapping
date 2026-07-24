@@ -4,6 +4,7 @@ import React from 'react';
 import ErrorBoundary from '../components/ErrorBoundary';
 import CountryPanel from '../components/CountryPanel';
 import WorldMap from '../components/WorldMap';
+import App from '../App';
 
 vi.mock('../services/geminiService', () => ({
   getSovereignInsights: vi.fn().mockImplementation(() => new Promise(() => {})),
@@ -75,5 +76,40 @@ describe('UI Components', () => {
 
     // Tests that dispatching these keys works without throwing error
     expect(true).toBe(true);
+  });
+
+  it('App component global hotkeys should trigger correctly', () => {
+    const { container } = render(<App />);
+
+    // Dispatch hotkeys inside act
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    act(() => {
+      const terminalEvent = new KeyboardEvent('keydown', { key: 't' });
+      window.dispatchEvent(terminalEvent);
+    });
+
+    expect(screen.getByText(/Impact Chat/i)).toBeInTheDocument();
+    expect(screen.getByText(/Live_Node_Console/i)).toBeInTheDocument();
+  });
+
+  it('App component global hotkeys should not trigger when typing in inputs', () => {
+    const { container } = render(<App />);
+
+    // Create and focus an input
+    const input = document.createElement('input');
+    document.body.appendChild(input);
+    input.focus();
+
+    const chatEvent = new KeyboardEvent('keydown', { key: 'c', bubbles: true });
+    input.dispatchEvent(chatEvent);
+
+    expect(screen.queryByText(/Impact Chat/i)).not.toBeInTheDocument();
+
+    // Cleanup
+    document.body.removeChild(input);
   });
 });
