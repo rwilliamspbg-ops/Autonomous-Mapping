@@ -105,7 +105,7 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose }) => {
           </div>
           <button 
             onClick={onClose}
-            className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20"
+            className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             Use This Demo
           </button>

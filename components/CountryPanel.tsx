@@ -277,8 +277,16 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               <h3 className="text-slate-500 text-[10px] mono font-bold uppercase mb-4 tracking-[0.4em]">Grounding Sources</h3>
               <div className="flex flex-wrap gap-2">
                 {insight.sources?.map((source, i) => (
-                  <a key={i} href={source.uri} target="_blank" rel="noopener noreferrer" className="text-[9px] mono bg-blue-500/10 text-blue-400 px-4 py-1.5 rounded-full border border-blue-500/20 hover:bg-blue-500/20 transition-all font-bold uppercase truncate max-w-[200px]">
-                    {source.title}
+                  <a
+                    key={i}
+                    href={source.uri}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${source.title} (opens in a new tab)`}
+                    title={source.title}
+                    className="text-[9px] mono bg-blue-500/10 text-blue-400 px-4 py-1.5 rounded-full border border-blue-500/20 hover:bg-blue-500/20 transition-all font-bold uppercase truncate max-w-[200px] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                  >
+                    {source.title} <span aria-hidden="true">↗</span>
                   </a>
                 ))}
               </div>
