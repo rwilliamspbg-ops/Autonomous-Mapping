@@ -296,6 +296,7 @@ const App: React.FC = () => {
           >
             <div className="absolute inset-0 bg-blue-600 blur-xl opacity-20 group-hover:opacity-60 transition-all duration-500"></div>
             <div className="w-12 h-12 bg-gradient-to-br from-blue-700 to-indigo-950 rounded-xl flex items-center justify-center font-black text-2xl border border-blue-500/50 shadow-2xl text-white transform group-hover:rotate-12 transition-transform">Σ</div>
+            <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter">M</kbd>
           </button>
           <div>
             <div className="flex items-center gap-3">
@@ -324,7 +325,10 @@ const App: React.FC = () => {
                )}
             </div>
             <div className="flex flex-col text-left">
-              <span className={`${trackingInfo.color} font-black tracking-[0.25em] leading-none mb-1`}>{trackingInfo.label}</span>
+              <span className={`${trackingInfo.color} font-black tracking-[0.25em] leading-none mb-1 flex items-center gap-2`}>
+                {trackingInfo.label}
+                <kbd aria-hidden="true" className="px-1.5 py-0.5 bg-slate-900 border border-emerald-500/30 rounded text-[8px] text-emerald-400 font-mono tracking-tighter">T</kbd>
+              </span>
               <span className="text-[8px] text-slate-600 uppercase tracking-widest font-black">Impact_Engine_Primary</span>
             </div>
           </button>
@@ -339,7 +343,8 @@ const App: React.FC = () => {
           >
             <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-12"></div>
             <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse shadow-[0_0_12px_white]"></div>
-            Check_My_Privacy
+            <span>Check_My_Privacy</span>
+            <kbd aria-hidden="true" className="px-1.5 py-0.5 bg-blue-900 border border-blue-400/40 rounded text-[8px] text-blue-300 font-mono tracking-tighter">S</kbd>
           </button>
         </nav>
       </header>
