@@ -117,9 +117,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
               </div>
             ))}
             {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-slate-800 text-slate-400 p-3 rounded-2xl rounded-tl-none animate-pulse">
-                  Analyzing data points...
+              <div
+                role="status"
+                aria-live="polite"
+                aria-busy="true"
+                className="flex justify-start"
+              >
+                <span className="sr-only">Analyzing data points...</span>
+                <div className="bg-slate-800 text-slate-300 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-2 border border-slate-700/50 shadow-inner">
+                  <span className="font-mono text-[10px] text-blue-400 uppercase font-black tracking-widest animate-pulse">ANALYZING</span>
+                  <div className="flex gap-1">
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  </div>
                 </div>
               </div>
             )}
@@ -158,11 +169,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
           onClick={() => setOpen(true)}
           aria-label="Open Impact Chat (Press c or C)"
           title="Open Impact Chat (C)"
-          className="bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-105 group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 outline-none"
+          className="relative bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-105 group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 outline-none"
         >
           <svg className="w-6 h-6 group-hover:rotate-12 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
           </svg>
+          <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1.5 py-0.5 bg-slate-900 border border-blue-500/40 rounded text-[8px] text-blue-400 font-mono tracking-tighter shadow-lg">C</kbd>
         </button>
       )}
     </div>
