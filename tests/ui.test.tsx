@@ -112,4 +112,36 @@ describe('UI Components', () => {
     // Cleanup
     document.body.removeChild(input);
   });
+
+  it('ChatInterface should render a dynamic aria-label and loading spinner on submit button during loading state', async () => {
+    // Using import/ESM style for mocking or grabbing the mocked function
+    const { chatWithAnalyst } = await import('../services/geminiService');
+    const mockedChatWithAnalyst = vi.mocked(chatWithAnalyst);
+    mockedChatWithAnalyst.mockImplementation(() => new Promise((resolve) => setTimeout(() => resolve('AI Response'), 100)));
+
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i);
+    const sendButton = screen.getByLabelText('Send message');
+
+    expect(sendButton).toBeInTheDocument();
+
+    // Simulate user typing and submitting
+    fireEvent.change(chatInput, { target: { value: 'Is it local first?' } });
+
+    act(() => {
+      fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    });
+
+    // Check loading state updates
+    expect(screen.getByLabelText('Sending message...')).toBeInTheDocument();
+    expect(screen.getByLabelText('Sending message...').querySelector('.animate-spin')).toBeInTheDocument();
+  });
 });
