@@ -4,6 +4,7 @@ import React from 'react';
 import ErrorBoundary from '../components/ErrorBoundary';
 import CountryPanel from '../components/CountryPanel';
 import WorldMap from '../components/WorldMap';
+import SpatialScanner from '../components/SpatialScanner';
 import App from '../App';
 
 vi.mock('../services/geminiService', () => ({
@@ -143,5 +144,62 @@ describe('UI Components', () => {
     // Check loading state updates
     expect(screen.getByLabelText('Sending message...')).toBeInTheDocument();
     expect(screen.getByLabelText('Sending message...').querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
+  it('SpatialScanner should gracefully handle camera hardware access failure', async () => {
+    const mockGetUserMedia = vi.fn().mockRejectedValue(new Error('Permission denied'));
+
+    // Backup existing mediaDevices if any
+    const originalMediaDevices = navigator.mediaDevices;
+
+    Object.defineProperty(navigator, 'mediaDevices', {
+      writable: true,
+      configurable: true,
+      value: {
+        getUserMedia: mockGetUserMedia
+      }
+    });
+
+    const handleClose = vi.fn();
+    render(<SpatialScanner isOpen={true} onClose={handleClose} onScanComplete={vi.fn()} />);
+
+    // Wait for the async getUserMedia to fail and state to transition to 'ERROR'
+    const errorTitle = await screen.findByText('CAMERA_ERROR');
+    expect(errorTitle).toBeInTheDocument();
+    expect(screen.getByText(/Permission denied/i)).toBeInTheDocument();
+
+    const retryBtn = screen.getByLabelText('Retry camera initialization');
+    const dismissBtn = screen.getByLabelText('Dismiss and close scanner');
+    expect(retryBtn).toBeInTheDocument();
+    expect(dismissBtn).toBeInTheDocument();
+
+    // Click retry should recall getUserMedia
+    await act(async () => {
+      retryBtn.click();
+    });
+
+    // Wait for the second failure and transition back to 'ERROR'
+    const errorTitle2 = await screen.findAllByText('CAMERA_ERROR');
+    expect(errorTitle2[0]).toBeInTheDocument();
+    expect(mockGetUserMedia).toHaveBeenCalledTimes(2);
+
+    // Click dismiss should call onClose
+    const newDismissBtn = screen.getByLabelText('Dismiss and close scanner');
+    await act(async () => {
+      newDismissBtn.click();
+    });
+    expect(handleClose).toHaveBeenCalled();
+
+    // Restore original mediaDevices
+    if (originalMediaDevices) {
+      Object.defineProperty(navigator, 'mediaDevices', {
+        writable: true,
+        configurable: true,
+        value: originalMediaDevices
+      });
+    } else {
+      // @ts-ignore
+      delete navigator.mediaDevices;
+    }
   });
 });

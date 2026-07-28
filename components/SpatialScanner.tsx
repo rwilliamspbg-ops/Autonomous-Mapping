@@ -12,9 +12,10 @@ interface SpatialScannerProps {
 const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScanComplete }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [status, setStatus] = useState<'IDLE' | 'BOOTING' | 'TRACKING' | 'COMMITTING' | 'FINALIZED'>('IDLE');
+  const [status, setStatus] = useState<'IDLE' | 'BOOTING' | 'TRACKING' | 'COMMITTING' | 'FINALIZED' | 'ERROR'>('IDLE');
   const [points, setPoints] = useState<{ x: number; y: number; life: number; color: string }[]>([]);
   const [telemetry, setTelemetry] = useState({ pose: [0,0,0], keyframes: 0, voxels: 0, stability: 100 });
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
 
@@ -35,7 +36,11 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
 
   const startCamera = async () => {
     setStatus('BOOTING');
+    setCameraError(null);
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Camera API not supported in this browser environment.");
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { facingMode: 'environment', width: { ideal: 3840 }, height: { ideal: 2160 } } 
       });
@@ -43,9 +48,10 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
         videoRef.current.srcObject = stream;
         setStatus('TRACKING');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Critical: Camera hardware access denied.", err);
-      onClose();
+      setCameraError(err?.message || "Camera access denied. Please grant camera permissions to utilize the spatial scanner simulation.");
+      setStatus('ERROR');
     }
   };
 
@@ -73,6 +79,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
       stream.getTracks().forEach(track => track.stop());
     }
     setStatus('IDLE');
+    setCameraError(null);
   };
 
   useEffect(() => {
@@ -250,6 +257,34 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
                 Verify_Privacy
               </button>
+            </div>
+          )}
+
+          {status === 'ERROR' && (
+            <div className="bg-slate-950/95 border border-rose-500/50 p-10 rounded-[2.5rem] w-full max-w-xl text-center backdrop-blur-3xl shadow-[0_0_80px_rgba(244,63,94,0.2)] border-2 pointer-events-auto">
+              <div className="text-rose-500 font-black uppercase text-xl tracking-[0.4em] mb-4 flex items-center justify-center gap-4">
+                 <div className="w-10 h-10 border-4 border-rose-500 rounded-full flex items-center justify-center text-lg shadow-[0_0_15px_#f43f5e] font-sans">!</div>
+                 CAMERA_ERROR
+              </div>
+              <p className="text-[11px] text-slate-300 mono font-black tracking-widest uppercase mb-8 leading-relaxed max-w-md mx-auto">
+                {cameraError || "ACCESS_DENIED // HARDWARE_INIT_FAILED"}
+              </p>
+              <div className="flex gap-4 justify-center">
+                <button
+                  onClick={startCamera}
+                  aria-label="Retry camera initialization"
+                  className="px-8 py-3 bg-rose-950/50 hover:bg-rose-900/60 text-rose-400 border border-rose-500/30 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                >
+                  Retry_Sync
+                </button>
+                <button
+                  onClick={onClose}
+                  aria-label="Dismiss and close scanner"
+                  className="px-8 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-white/10 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                >
+                  Dismiss
+                </button>
+              </div>
             </div>
           )}
         </div>

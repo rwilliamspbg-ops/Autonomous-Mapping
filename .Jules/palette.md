@@ -47,3 +47,7 @@
 ## 2026-10-01 - Dynamic Action Button Indicators and Semantic Loading States
 **Learning:** Standard form submissions inside compact floating layouts (like `ChatInterface`) feel unresponsive when loading unless the trigger action itself provides direct visual and semantic cues. Integrating a miniature, high-fidelity spinner inside the send button and dynamically updating its `aria-label` (e.g., to "Sending message...") when `isLoading` is active ensures both visually tracking and screen reader users instantly receive clear, contextual state updates at the exact point of interaction.
 **Action:** Always replace trigger buttons' content with animated loading indicators and update their accessibility labels dynamically during loading states.
+
+## 2026-10-15 - Graceful Degradation & Actionable Error States for Hardware APIs
+**Learning:** Silently failing and closing a complex visual simulation modal when hardware access is denied (like camera permission for ORB-SLAM3 or Geolocation) severely disrupts cognitive flow and leaves users disoriented. Gracefully transitioning to a dedicated themed error screen with actionable options (e.g., Retry and Dismiss) with proper ARIA attributes turns hardware failures into clear, supportive guidance.
+**Action:** Always capture hardware/permission errors inside modals and render accessible error states with direct interactive retry/dismiss options matching the application design system.
