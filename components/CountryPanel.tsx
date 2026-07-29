@@ -159,6 +159,17 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 <span className="text-emerald-400 text-[8px] mono px-2 py-0.5 border border-emerald-500/20 bg-emerald-500/5 rounded">DATA_LOCAL_OK</span>
               </div>
 
+              <div role="status" aria-live="polite" className="sr-only">
+                {zkStatus === 'GENERATING' && 'Generating Privacy Proof...'}
+                {zkStatus === 'VERIFYING' && `Verifying Local Contribution: ${
+                  verifyStep === 0 ? 'Verification starting' :
+                  verifyStep === 1 ? 'Anchor State Hash verified' :
+                  verifyStep === 2 ? 'ZK SNARK Validation verified' :
+                  'Cross Chain Finality verified'
+                }`}
+                {zkStatus === 'COMMITTED' && 'Privacy Trail Finalized and verified successfully.'}
+              </div>
+
               {zkStatus === 'VERIFYING' && (
                 <div className="mb-6 space-y-2 p-4 bg-blue-500/5 rounded-xl border border-blue-500/20">
                   <div className="flex justify-between items-center mb-2">
@@ -196,6 +207,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               <button 
                 onClick={handleZkExport}
                 disabled={zkStatus !== 'IDLE'}
+                aria-busy={zkStatus === 'GENERATING' || zkStatus === 'VERIFYING'}
                 className={`w-full py-4 rounded-xl border mono text-[10px] font-black uppercase tracking-widest transition-all shadow-lg focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                   zkStatus === 'IDLE' ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500 shadow-blue-600/20' :
                   zkStatus === 'COMMITTED' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 cursor-default' :

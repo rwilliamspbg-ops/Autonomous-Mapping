@@ -51,3 +51,7 @@
 ## 2026-10-15 - Graceful Degradation & Actionable Error States for Hardware APIs
 **Learning:** Silently failing and closing a complex visual simulation modal when hardware access is denied (like camera permission for ORB-SLAM3 or Geolocation) severely disrupts cognitive flow and leaves users disoriented. Gracefully transitioning to a dedicated themed error screen with actionable options (e.g., Retry and Dismiss) with proper ARIA attributes turns hardware failures into clear, supportive guidance.
 **Action:** Always capture hardware/permission errors inside modals and render accessible error states with direct interactive retry/dismiss options matching the application design system.
+
+## 2026-10-25 - Live-Region Crypto Statuses & Auto-Focused Error Recovery Actions
+**Learning:** Multi-stage cryptographic proofs or ZK verification workflows are completely silent to screen readers without standard live-region announcements, leaving users guessing when and if verification finishes. Adding standard polite live regions for progress steps and final states ensures everyone tracks progress equally. Furthermore, when hardware failures trigger styled error overlays, auto-focusing the "Retry" action immediately makes recovery instantaneous and fluid for keyboard-only users.
+**Action:** Add polite screen-reader status regions to multi-step proofing panels, and use React refs to dynamically auto-focus primary retry/recovery triggers when error boundaries or screens are entered.

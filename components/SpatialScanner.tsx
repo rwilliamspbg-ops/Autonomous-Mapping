@@ -18,6 +18,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
   const [cameraError, setCameraError] = useState<string | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
+  const retryButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -33,6 +34,15 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
     }
     return () => stopCamera();
   }, [isOpen]);
+
+  useEffect(() => {
+    if (status === 'ERROR') {
+      const timer = setTimeout(() => {
+        retryButtonRef.current?.focus();
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
 
   const startCamera = async () => {
     setStatus('BOOTING');
@@ -271,6 +281,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
               </p>
               <div className="flex gap-4 justify-center">
                 <button
+                  ref={retryButtonRef}
                   onClick={startCamera}
                   aria-label="Retry camera initialization"
                   className="px-8 py-3 bg-rose-950/50 hover:bg-rose-900/60 text-rose-400 border border-rose-500/30 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
