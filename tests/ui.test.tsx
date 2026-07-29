@@ -146,7 +146,7 @@ describe('UI Components', () => {
     expect(screen.getByLabelText('Sending message...').querySelector('.animate-spin')).toBeInTheDocument();
   });
 
-  it('SpatialScanner should gracefully handle camera hardware access failure', async () => {
+  it('SpatialScanner should gracefully handle camera hardware access failure and auto-focus retry button', async () => {
     const mockGetUserMedia = vi.fn().mockRejectedValue(new Error('Permission denied'));
 
     // Backup existing mediaDevices if any
@@ -172,6 +172,14 @@ describe('UI Components', () => {
     const dismissBtn = screen.getByLabelText('Dismiss and close scanner');
     expect(retryBtn).toBeInTheDocument();
     expect(dismissBtn).toBeInTheDocument();
+
+    // Wait for the Retry button to receive focus (due to the 50ms setTimeout)
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 60));
+    });
+
+    // Verify Retry button was automatically focused on ERROR
+    expect(document.activeElement).toBe(retryBtn);
 
     // Click retry should recall getUserMedia
     await act(async () => {
@@ -201,5 +209,12 @@ describe('UI Components', () => {
       // @ts-ignore
       delete navigator.mediaDevices;
     }
+  });
+
+  it('CountryPanel ZK verification section includes a polite live status region', () => {
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+    const liveRegion = screen.getByRole('status', { hidden: true });
+    expect(liveRegion).toBeInTheDocument();
+    expect(liveRegion).toHaveAttribute('aria-live', 'polite');
   });
 });
