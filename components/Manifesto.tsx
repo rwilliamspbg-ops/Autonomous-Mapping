@@ -64,7 +64,11 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-12 space-y-10 scroll-smooth">
+        <div
+          tabIndex={0}
+          aria-label="Sovereign Map Manifesto content"
+          className="flex-1 overflow-y-auto p-12 space-y-10 scroll-smooth focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-b-xl"
+        >
           <section className="space-y-4">
             <h3 className="mono text-blue-400 text-xs font-bold uppercase tracking-widest border-l-2 border-blue-500 pl-4">The Narrative</h3>
             <p className="text-xl text-slate-200 leading-relaxed font-medium">

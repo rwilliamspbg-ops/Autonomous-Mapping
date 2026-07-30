@@ -116,7 +116,11 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-8 space-y-10 scroll-smooth">
+      <div
+        tabIndex={0}
+        aria-label="Regional Pilot Brief content"
+        className="flex-1 overflow-y-auto p-8 space-y-10 scroll-smooth focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-b-xl"
+      >
         {loading ? (
           <div
             role="status"

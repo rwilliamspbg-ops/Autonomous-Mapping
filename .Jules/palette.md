@@ -55,3 +55,7 @@
 ## 2026-10-25 - Live-Region Crypto Statuses & Auto-Focused Error Recovery Actions
 **Learning:** Multi-stage cryptographic proofs or ZK verification workflows are completely silent to screen readers without standard live-region announcements, leaving users guessing when and if verification finishes. Adding standard polite live regions for progress steps and final states ensures everyone tracks progress equally. Furthermore, when hardware failures trigger styled error overlays, auto-focusing the "Retry" action immediately makes recovery instantaneous and fluid for keyboard-only users.
 **Action:** Add polite screen-reader status regions to multi-step proofing panels, and use React refs to dynamically auto-focus primary retry/recovery triggers when error boundaries or screens are entered.
+
+## 2026-11-10 - Keyboard Scrollability and Focus Accessibility for Overflow Containers
+**Learning:** Elements styled with standard `overflow-y-auto` are completely inaccessible to keyboard-only users because they cannot be focused by tab order, rendering them unscrollable without a mouse pointer. Adding `tabIndex={0}`, descriptive `aria-label`s, and custom `focus-visible:ring-2` styling ensures everyone can access, focus, and navigate long content blocks effortlessly using keyboard arrow keys.
+**Action:** Always complement `overflow-y-auto` elements with a logical `tabIndex={0}`, focus rings, and proper descriptive `aria-label` annotations.

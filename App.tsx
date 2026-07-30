@@ -451,7 +451,11 @@ const App: React.FC = () => {
                   <span className="text-[10px] mono text-slate-500 uppercase tracking-[0.35em] font-black">Evidence_Trail</span>
                   <span className="text-[9px] mono text-slate-700 uppercase tracking-widest">{evidenceTrail.length} events</span>
                 </div>
-                <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
+                <div
+                  tabIndex={0}
+                  aria-label="Evidence trail events"
+                  className="space-y-2 max-h-40 overflow-y-auto pr-1 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-xl"
+                >
                   {evidenceTrail.length === 0 ? (
                     <div className="text-[10px] text-slate-600 mono uppercase tracking-[0.25em]">No evidence yet</div>
                   ) : (
