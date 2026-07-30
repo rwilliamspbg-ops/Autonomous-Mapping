@@ -111,7 +111,12 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-12 mono text-[13px] leading-relaxed whitespace-pre font-medium text-slate-400 scroll-smooth bg-[#010409]">
+        <div
+          ref={scrollRef}
+          tabIndex={0}
+          aria-label="Live Node Console logs"
+          className="flex-1 overflow-y-auto p-12 mono text-[13px] leading-relaxed whitespace-pre font-medium text-slate-400 scroll-smooth bg-[#010409] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+        >
           {output.map((line, idx) => {
             let colorClass = "text-slate-500";
             if (line.includes("[BLOCK]")) colorClass = "text-emerald-500 font-black";
