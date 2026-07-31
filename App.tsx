@@ -408,6 +408,7 @@ const App: React.FC = () => {
                       key={track.label}
                       onClick={() => activateTrack(index)}
                       aria-pressed={isTrackActive}
+                      aria-label={`Select ${track.label} (routes to ${track.country})`}
                       className={`px-3 py-2 rounded-full border text-[9px] mono uppercase tracking-[0.25em] transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                         isTrackActive
                           ? 'border-blue-500 bg-blue-500/15 text-white shadow-[0_0_12px_rgba(59,130,246,0.3)]'
@@ -423,6 +424,7 @@ const App: React.FC = () => {
               <div className="flex gap-2">
                 <button
                   onClick={runGuidedProtocol}
+                  aria-label={demoRunning ? "Guided walkthrough demo running" : "Start 6-minute guided walkthrough demo"}
                   className={`flex-1 px-4 py-3 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                     demoRunning
                       ? 'bg-blue-600/80 border border-blue-400/30 animate-pulse shadow-[0_0_20px_rgba(37,99,235,0.25)]'
@@ -433,6 +435,7 @@ const App: React.FC = () => {
                 </button>
                 <button
                   onClick={resetProtocol}
+                  aria-label="Reset walkthrough demo and clear panels"
                   className="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] border border-white/10 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
                 >
                   Reset
@@ -475,6 +478,9 @@ const App: React.FC = () => {
                 <span>Impact_Stream</span>
                 <span className="text-[9px] text-slate-700">READY</span>
               </h4>
+              <div role="status" aria-live="polite" className="sr-only">
+                {logs.length > 0 ? `Latest telemetry update: ${logs[logs.length - 1]}` : 'Telemetry system ready'}
+              </div>
               <div className="space-y-4">
                 {logs.map((log, i) => (
                   <div key={i} className={`text-[10px] mono flex gap-3 transition-all duration-300 ${i === logs.length - 1 ? 'text-blue-400 font-bold' : 'text-slate-500'}`}>
