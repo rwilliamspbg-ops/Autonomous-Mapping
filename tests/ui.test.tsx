@@ -217,4 +217,22 @@ describe('UI Components', () => {
     expect(liveRegion).toBeInTheDocument();
     expect(liveRegion).toHaveAttribute('aria-live', 'polite');
   });
+
+  it('ChatInterface includes a maximum character length input and character counter', () => {
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i);
+    expect(chatInput).toHaveAttribute('maxLength', '200');
+
+    const counter = screen.getByText('0/200');
+    expect(counter).toBeInTheDocument();
+    expect(counter).toHaveAttribute('aria-live', 'polite');
+    expect(chatInput).toHaveAttribute('aria-describedby', 'chat-char-counter');
+  });
 });

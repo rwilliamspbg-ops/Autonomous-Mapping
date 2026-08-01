@@ -59,3 +59,7 @@
 ## 2026-11-10 - Keyboard Scrollability and Focus Accessibility for Overflow Containers
 **Learning:** Elements styled with standard `overflow-y-auto` are completely inaccessible to keyboard-only users because they cannot be focused by tab order, rendering them unscrollable without a mouse pointer. Adding `tabIndex={0}`, descriptive `aria-label`s, and custom `focus-visible:ring-2` styling ensures everyone can access, focus, and navigate long content blocks effortlessly using keyboard arrow keys.
 **Action:** Always complement `overflow-y-auto` elements with a logical `tabIndex={0}`, focus rings, and proper descriptive `aria-label` annotations.
+
+## 2026-12-05 - Character Limits & Dynamic Color-Shifting Accessible Counters on Floating Text Inputs
+**Learning:** Long inputs in compact floating dialogs can disrupt layout bounds or overwhelm backend parsing if left unconstrained. Standard input constraint is most delightful when paired with a dynamic, color-shifting counter (green/slate to orange warning to red critical) aligned nicely within the input padding, and fully bound to assistive technologies using `aria-describedby` and `aria-live` elements to alert screen reader users of approaching constraints.
+**Action:** Always supply inputs in small overlays with a `maxLength` property, a color-shifting inline indicator, and corresponding `aria-describedby` reference.
