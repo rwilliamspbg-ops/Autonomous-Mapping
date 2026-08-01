@@ -83,6 +83,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
     }
   };
 
+  const charLimit = 200;
+  const inputLen = input.length;
+  const counterColorClass =
+    inputLen > 180 ? 'text-rose-500 font-bold' :
+    inputLen > 150 ? 'text-amber-500' :
+    'text-slate-500';
+
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {isOpen ? (
@@ -150,11 +157,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                 ref={inputRef}
                 id="chat-input"
                 type="text"
+                maxLength={charLimit}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask about a pilot or funding story..."
-                className="w-full bg-slate-800 border-none rounded-xl py-2 pl-4 pr-10 text-white placeholder-slate-500 focus:ring-1 focus:ring-blue-500"
+                aria-describedby="chat-char-counter"
+                className="w-full bg-slate-800 border-none rounded-xl py-2 pl-4 pr-24 text-white placeholder-slate-500 focus:ring-1 focus:ring-blue-500"
               />
+              <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center pr-2 pointer-events-none select-none">
+                <span
+                  id="chat-char-counter"
+                  aria-live="polite"
+                  className={`mono text-[9px] uppercase tracking-tighter ${counterColorClass}`}
+                >
+                  {inputLen}/{charLimit}
+                </span>
+              </div>
               <button 
                 type="submit"
                 disabled={isLoading}
