@@ -11,6 +11,7 @@ interface WorldMapProps {
 }
 
 const countryCapitals: Record<string, string> = {
+  "Kenya": "Nairobi",
   "United States of America": "Washington, D.C.",
   "China": "Beijing",
   "India": "New Delhi",
@@ -411,25 +412,28 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
           onClick={handleZoomIn}
           aria-label="Zoom In (Press + or =)"
           title="Zoom In (+)"
-          className="w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg"
+          className="relative w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg"
         >
           ＋
+          <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter">+</kbd>
         </button>
         <button
           onClick={handleZoomOut}
           aria-label="Zoom Out (Press - or _)"
           title="Zoom Out (-)"
-          className="w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg"
+          className="relative w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg"
         >
           －
+          <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter">-</kbd>
         </button>
         <button
           onClick={handleZoomReset}
           aria-label="Reset Zoom (Press r or R)"
           title="Reset Zoom (R)"
-          className="w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center text-xs font-black tracking-tighter transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg mono uppercase"
+          className="relative w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center text-xs font-black tracking-tighter transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg mono uppercase"
         >
           RST
+          <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter">R</kbd>
         </button>
       </div>
       
