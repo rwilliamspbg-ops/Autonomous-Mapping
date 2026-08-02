@@ -175,9 +175,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
               </div>
               <button 
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || !input.trim()}
                 aria-label={isLoading ? "Sending message..." : "Send message"}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-400 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md outline-none flex items-center justify-center w-6 h-6"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-400 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md outline-none flex items-center justify-center w-6 h-6"
               >
                 {isLoading ? (
                   <svg className="animate-spin h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
