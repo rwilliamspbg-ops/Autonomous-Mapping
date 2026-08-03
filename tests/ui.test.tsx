@@ -235,4 +235,73 @@ describe('UI Components', () => {
     expect(counter).toHaveAttribute('aria-live', 'polite');
     expect(chatInput).toHaveAttribute('aria-describedby', 'chat-char-counter');
   });
+
+  it('CountryPanel displays Copy ZK Proof Hash button when proof is COMMITTED and copies on click', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Wait for insights loading to finish
+    await screen.findByText('Kenya local pilot insights.');
+
+    vi.useFakeTimers();
+
+    const verifyBtn = screen.getByText('⊕ Verify On-Device Contribution');
+    expect(verifyBtn).toBeInTheDocument();
+
+    // Trigger ZK flow simulation
+    act(() => {
+      fireEvent.click(verifyBtn);
+    });
+
+    // ZK workflow transitions: IDLE -> GENERATING (2000ms delay) -> VERIFYING (3 steps * 1000ms delay) -> COMMITTED (800ms delay)
+    // Advance timers step-by-step to speed up the simulator safely without hitting infinite loops
+    act(() => {
+      vi.advanceTimersByTime(6500);
+    });
+
+    // Ensure state transitions to COMMITTED (use getByLabelText synchronously since timers already ran)
+    const copyBtn = screen.getByLabelText('Copy ZK Proof Hash to clipboard');
+    expect(copyBtn).toBeInTheDocument();
+    expect(copyBtn).toHaveAttribute('title', 'Copy Proof Hash');
+
+    // Click to copy
+    act(() => {
+      fireEvent.click(copyBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('0xbf31da86c729c19fb7ae4f3bc42f9e4bc11be4f0de318182ba0337b5ba7be01d');
+    expect(screen.getByText('Copied! ✓')).toBeInTheDocument();
+
+    // Fast-forward 2 seconds to reset copied state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(screen.queryByText('Copied! ✓')).not.toBeInTheDocument();
+    expect(screen.getByText('Copy')).toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
 });

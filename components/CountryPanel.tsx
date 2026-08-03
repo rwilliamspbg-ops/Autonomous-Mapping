@@ -29,6 +29,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [zkStatus, setZkStatus] = useState<ZkStatus>('IDLE');
   const [verifyStep, setVerifyStep] = useState(0);
+  const [copied, setCopied] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
 
@@ -38,6 +39,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
       setLoading(true);
       setZkStatus('IDLE');
       setVerifyStep(0);
+      setCopied(false);
       getSovereignInsights(country.name)
         .then(setInsight)
         .catch(console.error)
@@ -214,7 +216,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 aria-busy={zkStatus === 'GENERATING' || zkStatus === 'VERIFYING'}
                 className={`w-full py-4 rounded-xl border mono text-[10px] font-black uppercase tracking-widest transition-all shadow-lg focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                   zkStatus === 'IDLE' ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500 shadow-blue-600/20' :
-                  zkStatus === 'COMMITTED' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 cursor-default' :
+                  zkStatus === 'COMMITTED' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 cursor-default mb-3' :
                   'bg-slate-800 border-slate-700 text-slate-500 animate-pulse cursor-wait'
                 }`}
               >
@@ -223,6 +225,32 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 {zkStatus === 'VERIFYING' && 'Verifying Local Contribution...'}
                 {zkStatus === 'COMMITTED' && '✓ Privacy Trail Finalized'}
               </button>
+
+              {zkStatus === 'COMMITTED' && (
+                <div className="flex flex-col gap-2 p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 mt-3 animate-in fade-in duration-300">
+                  <div className="flex justify-between items-center text-[9px] mono text-emerald-400 uppercase tracking-widest">
+                    <span>ZK_PROOF_HASH</span>
+                    <span className="text-slate-500 font-bold">SHA-256</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3 mt-1">
+                    <span className="font-mono text-[10px] text-white select-all break-all bg-slate-950/50 p-2 rounded border border-white/5 flex-1 tracking-tight">
+                      0xbf31da86c7...4f0de318182b
+                    </span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText('0xbf31da86c729c19fb7ae4f3bc42f9e4bc11be4f0de318182ba0337b5ba7be01d');
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
+                      aria-label="Copy ZK Proof Hash to clipboard"
+                      title="Copy Proof Hash"
+                      className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/30 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                    >
+                      {copied ? 'Copied! ✓' : 'Copy'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <section className="space-y-4">
