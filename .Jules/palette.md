@@ -67,3 +67,7 @@
 ## 2027-01-10 - Copy-to-Clipboard Accessibility & Dynamic State Feedback for Cryptographic Proof Trails
 **Learning:** Adding a custom copy-to-clipboard button for finalized hashes or public keys (like ZK proofs) delivers high interaction satisfaction and reduces human typing error. For maximum accessibility, pair the action button with standard keyboard `focus-visible` ring indicators, clear visual confirmation text ("Copied! ✓") that returns to default after a brief delay, explicit `aria-label` screen reader annotations, and reset copy success flags cleanly whenever the active view context changes to avoid lingering states.
 **Action:** Always bind a 2-second timeout to reset copy-state feedback, supply comprehensive target `aria-label` and `title` tooltips, and reset state flags during country/view unmount or selection transitions.
+
+## 2027-02-15 - Cyberpunk Holographic Loading and Semantic Initialisation Feedback for Async Device APIs
+**Learning:** Initiating asynchronous hardware streams (like WebRTC camera streams) can result in a disorienting, static black screen while waiting for hardware permissions and wakeup. Replacing this empty transition state with a styled, themed loader that utilizes `role="status"` and `aria-live="polite"` prevents cognitive discontinuity and makes the application feel alive and responsive.
+**Action:** Always provide dedicated, high-fidelity loading visual blocks with proper ARIA attributes for asynchronous hardware initialization workflows.
