@@ -304,4 +304,36 @@ describe('UI Components', () => {
 
     vi.useRealTimers();
   });
+
+  it('SpatialScanner should show boot loading state with status role and correct text when camera is initializing', () => {
+    const mockGetUserMedia = vi.fn().mockImplementation(() => new Promise(() => {}));
+
+    const originalMediaDevices = navigator.mediaDevices;
+    Object.defineProperty(navigator, 'mediaDevices', {
+      writable: true,
+      configurable: true,
+      value: {
+        getUserMedia: mockGetUserMedia
+      }
+    });
+
+    render(<SpatialScanner isOpen={true} onClose={() => {}} onScanComplete={() => {}} />);
+
+    // Check that booting state is displayed
+    expect(screen.getByText('BOOTING_SPATIAL_SCANNER')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getByText(/Awaiting camera hardware access/i)).toBeInTheDocument();
+
+    // Restore original mediaDevices
+    if (originalMediaDevices) {
+      Object.defineProperty(navigator, 'mediaDevices', {
+        writable: true,
+        configurable: true,
+        value: originalMediaDevices
+      });
+    } else {
+      // @ts-ignore
+      delete navigator.mediaDevices;
+    }
+  });
 });

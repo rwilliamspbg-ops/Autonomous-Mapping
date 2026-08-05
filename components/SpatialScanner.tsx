@@ -231,6 +231,30 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
 
         {/* Action Interface */}
         <div className="flex flex-col items-center gap-10 relative z-30 mb-10">
+          {status === 'BOOTING' && (
+            <div
+              role="status"
+              aria-live="polite"
+              aria-busy="true"
+              className="bg-slate-950/98 border border-blue-600/60 p-12 rounded-[2.5rem] w-full max-w-xl shadow-[0_0_150px_rgba(37,99,235,0.3)] backdrop-blur-3xl"
+            >
+               <span className="sr-only">Initializing spatial scanner camera stream, please stand by...</span>
+               <div className="text-center space-y-8">
+                  <div className="text-blue-500 text-base font-black uppercase tracking-[0.6em] animate-pulse">BOOTING_SPATIAL_SCANNER</div>
+                  <div className="flex items-center justify-center py-6">
+                    <div className="relative">
+                      <div className="w-16 h-16 border-2 border-blue-500/10 rounded-full"></div>
+                      <div className="absolute inset-0 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                      <div className="absolute inset-3 border border-emerald-500/20 border-b-transparent rounded-full animate-[spin_1.5s_linear_infinite_reverse]"></div>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-500 uppercase tracking-[0.3em] font-black leading-relaxed">
+                    Awaiting camera hardware access and synchronization stream...
+                  </p>
+               </div>
+            </div>
+          )}
+
           {status === 'COMMITTING' && (
             <div className="bg-slate-950/98 border border-blue-600/60 p-12 rounded-[2.5rem] w-full max-w-xl shadow-[0_0_150px_rgba(37,99,235,0.3)] backdrop-blur-3xl">
                <div className="text-center space-y-8">
