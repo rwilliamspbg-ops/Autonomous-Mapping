@@ -90,6 +90,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
     inputLen > 150 ? 'text-amber-500' :
     'text-slate-500';
 
+  const handleClearChat = () => {
+    setMessages([
+      { role: 'assistant', content: "Hello. I am your Impact Analyst. Ask me about privacy-preserving health pilots, human-rights reporting, climate resilience deployments, or the demo economics.", timestamp: Date.now() }
+    ]);
+  };
+
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {isOpen ? (
@@ -99,16 +105,30 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
               <h3 className="font-semibold text-white">Impact Chat</h3>
             </div>
-            <button
-              onClick={() => setOpen(false)}
-              aria-label="Close Chat (Escape)"
-              title="Close (Escape)"
-              className="text-slate-400 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md outline-none"
-            >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+            <div className="flex items-center gap-2">
+              {messages.length > 1 && (
+                <button
+                  onClick={handleClearChat}
+                  aria-label="Clear chat messages"
+                  title="Clear chat messages"
+                  className="text-slate-400 hover:text-rose-400 transition-colors focus-visible:ring-2 focus-visible:ring-rose-500 rounded-md outline-none p-1"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              )}
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Close Chat (Escape)"
+                title="Close (Escape)"
+                className="text-slate-400 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md outline-none p-1"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div

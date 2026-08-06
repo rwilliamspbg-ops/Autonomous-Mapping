@@ -236,6 +236,47 @@ describe('UI Components', () => {
     expect(chatInput).toHaveAttribute('aria-describedby', 'chat-char-counter');
   });
 
+  it('ChatInterface should conditionally display a Clear Chat button that clears custom messages on click', async () => {
+    const { chatWithAnalyst } = await import('../services/geminiService');
+    const mockedChatWithAnalyst = vi.mocked(chatWithAnalyst);
+    mockedChatWithAnalyst.mockResolvedValue('AI Response');
+
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    // Clear chat button should not be displayed when there is only the welcome message
+    expect(screen.queryByLabelText('Clear chat messages')).not.toBeInTheDocument();
+
+    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i);
+    fireEvent.change(chatInput, { target: { value: 'What is our privacy strategy?' } });
+
+    // Submit a message to the chat
+    await act(async () => {
+      fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    });
+
+    // Clear chat button should now be visible since messages.length > 1
+    const clearBtn = screen.getByLabelText('Clear chat messages');
+    expect(clearBtn).toBeInTheDocument();
+    expect(clearBtn).toHaveAttribute('title', 'Clear chat messages');
+
+    // Click the clear button
+    act(() => {
+      fireEvent.click(clearBtn);
+    });
+
+    // Clear button should disappear and chat messages should be reset back to just the welcome message
+    expect(screen.queryByLabelText('Clear chat messages')).not.toBeInTheDocument();
+    expect(screen.getByText(/Hello. I am your Impact Analyst/i)).toBeInTheDocument();
+    expect(screen.queryByText('What is our privacy strategy?')).not.toBeInTheDocument();
+  });
+
   it('CountryPanel displays Copy ZK Proof Hash button when proof is COMMITTED and copies on click', async () => {
     const { getSovereignInsights } = await import('../services/geminiService');
     const mockedGetInsights = vi.mocked(getSovereignInsights);
