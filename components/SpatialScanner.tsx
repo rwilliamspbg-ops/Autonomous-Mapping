@@ -256,7 +256,13 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
           )}
 
           {status === 'COMMITTING' && (
-            <div className="bg-slate-950/98 border border-blue-600/60 p-12 rounded-[2.5rem] w-full max-w-xl shadow-[0_0_150px_rgba(37,99,235,0.3)] backdrop-blur-3xl">
+            <div
+              role="status"
+              aria-live="polite"
+              aria-busy="true"
+              className="bg-slate-950/98 border border-blue-600/60 p-12 rounded-[2.5rem] w-full max-w-xl shadow-[0_0_150px_rgba(37,99,235,0.3)] backdrop-blur-3xl"
+            >
+               <span className="sr-only">Generating on-device privacy proof, please wait...</span>
                <div className="text-center space-y-8">
                   <div className="text-blue-500 text-base font-black uppercase tracking-[0.6em] animate-pulse">AGGLAYER_COMMIT_PENDING</div>
                   <div className="grid grid-cols-12 gap-2 h-10">
@@ -272,7 +278,11 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
           )}
 
           {status === 'FINALIZED' && (
-            <div className="bg-emerald-500/10 border border-emerald-500/60 p-10 rounded-[2.5rem] w-full max-w-xl text-center backdrop-blur-3xl shadow-[0_0_80px_rgba(16,185,129,0.3)] border-2">
+            <div
+              role="status"
+              aria-live="polite"
+              className="bg-emerald-500/10 border border-emerald-500/60 p-10 rounded-[2.5rem] w-full max-w-xl text-center backdrop-blur-3xl shadow-[0_0_80px_rgba(16,185,129,0.3)] border-2"
+            >
               <div className="text-emerald-400 font-black uppercase text-xl tracking-[0.4em] mb-4 flex items-center justify-center gap-4">
                  <div className="w-10 h-10 border-4 border-emerald-400 rounded-full flex items-center justify-center text-lg shadow-[0_0_15px_#10b981]">✓</div>
                  CONTRIBUTION_VERIFIED
@@ -286,6 +296,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
               <div className="text-[11px] text-blue-500 font-black tracking-[0.5em] animate-pulse mb-2">SYSTEM_LOCKED // PRIVACY_READY</div>
               <button 
                 onClick={handleCommit}
+                aria-label="Verify Privacy"
                 className="pointer-events-auto group relative px-20 py-8 bg-blue-700 hover:bg-blue-600 text-white rounded-3xl font-black text-lg uppercase tracking-[0.8em] transition-all shadow-[0_20px_60px_rgba(37,99,235,0.5)] border border-blue-400/50 active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
               >
                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl"></div>
@@ -295,7 +306,11 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
           )}
 
           {status === 'ERROR' && (
-            <div className="bg-slate-950/95 border border-rose-500/50 p-10 rounded-[2.5rem] w-full max-w-xl text-center backdrop-blur-3xl shadow-[0_0_80px_rgba(244,63,94,0.2)] border-2 pointer-events-auto">
+            <div
+              role="status"
+              aria-live="polite"
+              className="bg-slate-950/95 border border-rose-500/50 p-10 rounded-[2.5rem] w-full max-w-xl text-center backdrop-blur-3xl shadow-[0_0_80px_rgba(244,63,94,0.2)] border-2 pointer-events-auto"
+            >
               <div className="text-rose-500 font-black uppercase text-xl tracking-[0.4em] mb-4 flex items-center justify-center gap-4">
                  <div className="w-10 h-10 border-4 border-rose-500 rounded-full flex items-center justify-center text-lg shadow-[0_0_15px_#f43f5e] font-sans">!</div>
                  CAMERA_ERROR
