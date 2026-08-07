@@ -174,6 +174,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                   'Cross Chain Finality verified'
                 }`}
                 {zkStatus === 'COMMITTED' && 'Privacy Trail Finalized and verified successfully.'}
+                {copied && 'Proof Hash copied to clipboard.'}
               </div>
 
               {zkStatus === 'VERIFYING' && (

@@ -71,3 +71,7 @@
 ## 2027-02-15 - Cyberpunk Holographic Loading and Semantic Initialisation Feedback for Async Device APIs
 **Learning:** Initiating asynchronous hardware streams (like WebRTC camera streams) can result in a disorienting, static black screen while waiting for hardware permissions and wakeup. Replacing this empty transition state with a styled, themed loader that utilizes `role="status"` and `aria-live="polite"` prevents cognitive discontinuity and makes the application feel alive and responsive.
 **Action:** Always provide dedicated, high-fidelity loading visual blocks with proper ARIA attributes for asynchronous hardware initialization workflows.
+
+## 2027-02-20 - Multi-Stage Async Telemetry & Live-Region Screen Reader Accessibility
+**Learning:** Multi-stage background operations (such as generating and finalizing ZK proofs or tracking geospatial states) leave assistive technology users in an informational vacuum unless every transition phase (including loading, committing, success, and error states) is backed by dedicated live regions (`role="status"`, `aria-live="polite"`, `aria-busy`). In addition, visual-only interactions like copying a proof hash to the clipboard must be mirrored as textual state announcements within active status containers.
+**Action:** Always map interactive stage transitions to dynamic aria-live regions, ensure buttons have descriptive, clean screen-reader targets, and feed temporary transaction feedback directly into screen-reader announcements.
