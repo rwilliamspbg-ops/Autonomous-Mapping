@@ -292,7 +292,7 @@ const App: React.FC = () => {
             onClick={() => setIsManifestoOpen(true)}
             aria-label="Open Manifesto (Press m or M)"
             title="Open Manifesto (M)"
-            className="relative group cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-xl"
+            className="relative group cursor-pointer active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-xl"
           >
             <div className="absolute inset-0 bg-blue-600 blur-xl opacity-20 group-hover:opacity-60 transition-all duration-500"></div>
             <div className="w-12 h-12 bg-gradient-to-br from-blue-700 to-indigo-950 rounded-xl flex items-center justify-center font-black text-2xl border border-blue-500/50 shadow-2xl text-white transform group-hover:rotate-12 transition-transform">Σ</div>
@@ -316,7 +316,7 @@ const App: React.FC = () => {
             onClick={() => setIsTerminalOpen(prev => !prev)}
             aria-label="Open Live Node Console (Press t or T)"
             title="Open Live Node Console (T)"
-            className={`flex items-center gap-4 px-6 py-3 rounded-2xl border ${trackingInfo.bg} ${trackingInfo.border} ${trackingInfo.glow} transition-all duration-700 group hover:border-emerald-500/50 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none`}
+            className={`flex items-center gap-4 px-6 py-3 rounded-2xl border ${trackingInfo.bg} ${trackingInfo.border} ${trackingInfo.glow} transition-all active:scale-95 duration-700 group hover:border-emerald-500/50 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none`}
           >
             <div className="relative flex items-center justify-center">
                <span className={`w-3 h-3 rounded-full ${trackingInfo.dot} ${trackingState === TrackingState.OK ? 'animate-pulse' : ''}`}></span>
@@ -378,7 +378,7 @@ const App: React.FC = () => {
                       onClick={() => setProtocolPhase(stage.key)}
                       aria-pressed={isActive}
                       aria-label={`${stage.label} stage. ${stage.detail} Status: ${isActive ? 'Active and processing' : isComplete ? 'Complete' : 'Pending'}.`}
-                      className={`text-left rounded-2xl border p-3 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
+                      className={`text-left rounded-2xl border p-3 transition-all active:scale-98 duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                         isActive
                           ? 'border-blue-400 bg-blue-500/10 shadow-[0_0_18px_rgba(59,130,246,0.18)]'
                           : isComplete
