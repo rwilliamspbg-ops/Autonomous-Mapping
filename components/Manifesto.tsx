@@ -57,7 +57,7 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose }) => {
             onClick={onClose}
             aria-label="Close Sovereign Map Manifesto (Escape)"
             title="Close (Escape)"
-            className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+            className="p-2 hover:bg-white/10 rounded-full transition-all active:scale-90 text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
@@ -109,7 +109,7 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose }) => {
           </div>
           <button 
             onClick={onClose}
-            className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+            className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-blue-600/20 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             Use This Demo
           </button>
