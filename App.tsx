@@ -461,7 +461,14 @@ const App: React.FC = () => {
                   className="space-y-2 max-h-40 overflow-y-auto pr-1 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-xl"
                 >
                   {evidenceTrail.length === 0 ? (
-                    <div className="text-[10px] text-slate-600 mono uppercase tracking-[0.25em]">No evidence yet</div>
+                    <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/20 p-4 text-center">
+                      <div className="text-[10px] text-slate-500 mono uppercase tracking-[0.25em] font-black mb-1">
+                        No events recorded
+                      </div>
+                      <p className="text-[9px] text-slate-600 leading-normal font-medium max-w-[240px] mx-auto uppercase tracking-wider">
+                        Click 'Run_6_Min_Demo' or select a pilot lane above to begin streaming telemetry events.
+                      </p>
+                    </div>
                   ) : (
                     evidenceTrail.map((entry, index) => (
                       <div key={`${entry.title}-${index}`} className="rounded-2xl border border-white/5 bg-slate-900/40 p-3">
