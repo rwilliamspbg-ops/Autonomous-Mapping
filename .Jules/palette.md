@@ -75,3 +75,7 @@
 ## 2027-02-20 - Multi-Stage Async Telemetry & Live-Region Screen Reader Accessibility
 **Learning:** Multi-stage background operations (such as generating and finalizing ZK proofs or tracking geospatial states) leave assistive technology users in an informational vacuum unless every transition phase (including loading, committing, success, and error states) is backed by dedicated live regions (`role="status"`, `aria-live="polite"`, `aria-busy`). In addition, visual-only interactions like copying a proof hash to the clipboard must be mirrored as textual state announcements within active status containers.
 **Action:** Always map interactive stage transitions to dynamic aria-live regions, ensure buttons have descriptive, clean screen-reader targets, and feed temporary transaction feedback directly into screen-reader announcements.
+
+## 2027-02-21 - Copy-to-Clipboard for Summaries and Avoiding Text Match Ambiguity in Tests
+**Learning:** Multiple text-based "Copy" or "Copied! ✓" buttons inside the same dashboard panel can trigger ambiguity or matching collisions when writing testing-library unit tests. To avoid text-match errors, use specific `aria-label` or class/attribute properties when querying elements, and assert on target button node text-contents directly.
+**Action:** When adding multiple copy-to-clipboard buttons, always query by unique target labels (e.g., `screen.getByLabelText('<unique_label_for_button>')`) and assert on its individual text content rather than query globally.
