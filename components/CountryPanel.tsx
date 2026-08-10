@@ -30,6 +30,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [zkStatus, setZkStatus] = useState<ZkStatus>('IDLE');
   const [verifyStep, setVerifyStep] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [summaryCopied, setSummaryCopied] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
 
@@ -40,6 +41,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
       setZkStatus('IDLE');
       setVerifyStep(0);
       setCopied(false);
+      setSummaryCopied(false);
       getSovereignInsights(country.name)
         .then(setInsight)
         .catch(console.error)
@@ -175,6 +177,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 }`}
                 {zkStatus === 'COMMITTED' && 'Privacy Trail Finalized and verified successfully.'}
                 {copied && 'Proof Hash copied to clipboard.'}
+                {summaryCopied && 'Local Deployment Summary copied to clipboard.'}
               </div>
 
               {zkStatus === 'VERIFYING' && (
@@ -255,9 +258,23 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
             </div>
 
             <section className="space-y-4">
-              <h3 className="text-slate-500 text-[10px] mono font-bold uppercase tracking-[0.4em] flex items-center gap-3">
-                <span className="w-1.5 h-4 bg-blue-600"></span> Local Deployment Summary
-              </h3>
+              <div className="flex justify-between items-center">
+                <h3 className="text-slate-500 text-[10px] mono font-bold uppercase tracking-[0.4em] flex items-center gap-3">
+                  <span className="w-1.5 h-4 bg-blue-600"></span> Local Deployment Summary
+                </h3>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(insight.summary);
+                    setSummaryCopied(true);
+                    setTimeout(() => setSummaryCopied(false), 2000);
+                  }}
+                  aria-label="Copy Local Deployment Summary to clipboard"
+                  title="Copy Summary"
+                  className="px-2.5 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                >
+                  {summaryCopied ? 'Copied! ✓' : 'Copy'}
+                </button>
+              </div>
               <p className="text-slate-200 text-base leading-relaxed font-medium">{insight.summary}</p>
             </section>
 

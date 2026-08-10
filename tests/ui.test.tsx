@@ -333,15 +333,70 @@ describe('UI Components', () => {
     });
 
     expect(writeTextSpy).toHaveBeenCalledWith('0xbf31da86c729c19fb7ae4f3bc42f9e4bc11be4f0de318182ba0337b5ba7be01d');
-    expect(screen.getByText('Copied! ✓')).toBeInTheDocument();
+    expect(copyBtn.textContent).toContain('Copied! ✓');
 
     // Fast-forward 2 seconds to reset copied state
     act(() => {
       vi.advanceTimersByTime(2100);
     });
 
-    expect(screen.queryByText('Copied! ✓')).not.toBeInTheDocument();
-    expect(screen.getByText('Copy')).toBeInTheDocument();
+    expect(copyBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyBtn.textContent).toContain('Copy');
+
+    vi.useRealTimers();
+  });
+
+  it('CountryPanel displays and interacts with Copy Local Deployment Summary button', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Wait for insights loading to finish
+    await screen.findByText('Kenya local pilot insights.');
+
+    // Start fake timers only after async actions/rendering have settled
+    vi.useFakeTimers();
+
+    const copySummaryBtn = screen.getByLabelText('Copy Local Deployment Summary to clipboard');
+    expect(copySummaryBtn).toBeInTheDocument();
+    expect(copySummaryBtn).toHaveAttribute('title', 'Copy Summary');
+
+    // Click to copy summary
+    act(() => {
+      fireEvent.click(copySummaryBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('Kenya local pilot insights.');
+    expect(copySummaryBtn.textContent).toContain('Copied! ✓');
+
+    // Fast-forward 2 seconds to reset copied state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copySummaryBtn.textContent).not.toContain('Copied! ✓');
+    expect(copySummaryBtn.textContent).toContain('Copy');
 
     vi.useRealTimers();
   });
