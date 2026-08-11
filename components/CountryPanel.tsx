@@ -113,9 +113,10 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
             onClick={onClose}
             aria-label="Close Regional Pilot Brief (Escape)"
             title="Close (Escape)"
-            className="hover:bg-white/10 rounded-full p-2 transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+            className="hover:bg-white/10 rounded-full p-2 transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative group"
           >
             <svg className="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
+            <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
           </button>
         </div>
       </div>
