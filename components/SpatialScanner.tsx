@@ -215,9 +215,10 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
                onClick={onClose}
                aria-label="Close Spatial Scanner (Escape)"
                title="Close (Escape)"
-               className="pointer-events-auto p-5 bg-slate-950/90 rounded-2xl border border-white/10 text-white hover:bg-white/20 transition-all shadow-2xl active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+               className="pointer-events-auto p-5 bg-slate-950/90 rounded-2xl border border-white/10 text-white hover:bg-white/20 transition-all shadow-2xl active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative group"
              >
                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+               <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
              </button>
              <div className="bg-slate-950/90 p-6 rounded-3xl border border-emerald-500/40 text-right min-w-[220px] shadow-2xl">
               <div className="text-[11px] text-emerald-500 font-black uppercase mb-2 tracking-[0.4em]">Impact_Sync</div>

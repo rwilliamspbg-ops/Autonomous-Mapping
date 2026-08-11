@@ -122,11 +122,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                 onClick={() => setOpen(false)}
                 aria-label="Close Chat (Escape)"
                 title="Close (Escape)"
-                className="text-slate-400 hover:text-white transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md outline-none p-1"
+                className="text-slate-400 hover:text-white transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md outline-none p-1 relative group"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
+                <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
               </button>
             </div>
           </div>
