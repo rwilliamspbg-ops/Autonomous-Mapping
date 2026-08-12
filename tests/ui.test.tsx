@@ -1,5 +1,5 @@
 import { render, screen, act } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import React from 'react';
 import ErrorBoundary from '../components/ErrorBoundary';
 import CountryPanel from '../components/CountryPanel';
@@ -13,6 +13,9 @@ vi.mock('../services/geminiService', () => ({
 }));
 
 describe('UI Components', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
   it('ErrorBoundary should catch errors and show fallback', () => {
     const ThrowError = () => {
       throw new Error('Test Error');
@@ -234,6 +237,54 @@ describe('UI Components', () => {
     expect(counter).toBeInTheDocument();
     expect(counter).toHaveAttribute('aria-live', 'polite');
     expect(chatInput).toHaveAttribute('aria-describedby', 'chat-char-counter');
+  });
+
+  it('ChatInterface allows copying chat messages and shows feedback', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    vi.useFakeTimers();
+
+    const copyBtn = screen.getByLabelText(/Copy message from analyst:/i);
+    expect(copyBtn).toBeInTheDocument();
+    expect(copyBtn).toHaveAttribute('title', 'Copy message');
+
+    // Click the copy button
+    act(() => {
+      fireEvent.click(copyBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith(
+      "Hello. I am your Impact Analyst. Ask me about privacy-preserving health pilots, human-rights reporting, climate resilience deployments, or the demo economics."
+    );
+    expect(copyBtn.textContent).toContain('Copied! ✓');
+
+    // Live region status check
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Message copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    // Fast-forward 2 seconds to reset copied state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyBtn.textContent).not.toContain('Copied! ✓');
   });
 
   it('ChatInterface should conditionally display a Clear Chat button that clears custom messages on click', async () => {
