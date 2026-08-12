@@ -79,3 +79,7 @@
 ## 2027-02-21 - Copy-to-Clipboard for Summaries and Avoiding Text Match Ambiguity in Tests
 **Learning:** Multiple text-based "Copy" or "Copied! ✓" buttons inside the same dashboard panel can trigger ambiguity or matching collisions when writing testing-library unit tests. To avoid text-match errors, use specific `aria-label` or class/attribute properties when querying elements, and assert on target button node text-contents directly.
 **Action:** When adding multiple copy-to-clipboard buttons, always query by unique target labels (e.g., `screen.getByLabelText('<unique_label_for_button>')`) and assert on its individual text content rather than query globally.
+
+## 2027-02-22 - Copy-to-Clipboard for Chat Messages and Inline Accessible Interaction Feedback
+**Learning:** Adding a copy-to-clipboard action directly on chat message elements delivers excellent utility but can be easily missed if not keyboard-accessible. Making the copy button focusable (`focus-visible:ring-2`), hover-revealed with opacity transitions, and backed by a screen-reader-only polite live-region (`role="status" aria-live="polite"`) guarantees that both sighted and assistive technology users get immediate feedback.
+**Action:** Pair hover-revealed copy buttons in message groups with clear focus-visible outline indicators, explicit role/aria-label properties, and a shared status live-region to announce success.

@@ -16,6 +16,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [copiedMsgIdx, setCopiedMsgIdx] = useState<number | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
@@ -137,14 +138,38 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
             aria-label="Chat messages list"
             className="flex-1 overflow-y-auto p-4 space-y-4 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
+            <div role="status" aria-live="polite" className="sr-only">
+              {copiedMsgIdx !== null ? "Message copied to clipboard." : ""}
+            </div>
             {messages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] p-3 rounded-2xl text-sm ${
+              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} group relative`}>
+                <div className={`max-w-[85%] p-3 rounded-2xl text-sm relative pr-10 ${
                   msg.role === 'user' 
                     ? 'bg-blue-600 text-white rounded-tr-none' 
                     : 'bg-slate-800 text-slate-200 rounded-tl-none'
                 }`}>
-                  {msg.content}
+                  <div className="break-words">{msg.content}</div>
+
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(msg.content);
+                      setCopiedMsgIdx(idx);
+                      setTimeout(() => setCopiedMsgIdx(null), 2000);
+                    }}
+                    aria-label={`Copy message from ${msg.role === 'user' ? 'you' : 'analyst'}: "${msg.content.substring(0, 30)}..." to clipboard`}
+                    title="Copy message"
+                    className={`absolute right-2 top-2 p-1 rounded-md transition-all active:scale-90 text-slate-400 hover:text-white focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:opacity-100 outline-none opacity-0 group-hover:opacity-100 ${
+                      copiedMsgIdx === idx ? 'opacity-100 text-emerald-400 hover:text-emerald-300' : ''
+                    }`}
+                  >
+                    {copiedMsgIdx === idx ? (
+                      <span className="text-[10px] font-bold mono">Copied! ✓</span>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                      </svg>
+                    )}
+                  </button>
                 </div>
               </div>
             ))}
