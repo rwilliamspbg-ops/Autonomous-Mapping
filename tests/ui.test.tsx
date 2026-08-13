@@ -287,7 +287,7 @@ describe('UI Components', () => {
     expect(copyBtn.textContent).not.toContain('Copied! ✓');
   });
 
-  it('ChatInterface should conditionally display a Clear Chat button that clears custom messages on click', async () => {
+  it('ChatInterface should conditionally display a Clear Chat button that requires confirmation before clearing', async () => {
     const { chatWithAnalyst } = await import('../services/geminiService');
     const mockedChatWithAnalyst = vi.mocked(chatWithAnalyst);
     mockedChatWithAnalyst.mockResolvedValue('AI Response');
@@ -317,15 +317,75 @@ describe('UI Components', () => {
     expect(clearBtn).toBeInTheDocument();
     expect(clearBtn).toHaveAttribute('title', 'Clear chat messages');
 
-    // Click the clear button
+    vi.useFakeTimers();
+
+    // Click the clear button first time -> enters confirmation state
+    act(() => {
+      fireEvent.click(clearBtn);
+    });
+
+    // Button text or aria-label/title should change
+    expect(clearBtn).toHaveAttribute('aria-label', 'Confirm clear chat messages');
+    expect(clearBtn).toHaveAttribute('title', 'Confirm clear?');
+    expect(clearBtn.textContent).toContain('Sure?');
+
+    // Click again to confirm
     act(() => {
       fireEvent.click(clearBtn);
     });
 
     // Clear button should disappear and chat messages should be reset back to just the welcome message
     expect(screen.queryByLabelText('Clear chat messages')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Confirm clear chat messages')).not.toBeInTheDocument();
     expect(screen.getByText(/Hello. I am your Impact Analyst/i)).toBeInTheDocument();
     expect(screen.queryByText('What is our privacy strategy?')).not.toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
+
+  it('ChatInterface Clear Chat button confirmation resets back to default after a timeout', async () => {
+    const { chatWithAnalyst } = await import('../services/geminiService');
+    const mockedChatWithAnalyst = vi.mocked(chatWithAnalyst);
+    mockedChatWithAnalyst.mockResolvedValue('AI Response');
+
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i);
+    fireEvent.change(chatInput, { target: { value: 'What is our privacy strategy?' } });
+
+    // Submit a message to the chat
+    await act(async () => {
+      fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    });
+
+    const clearBtn = screen.getByLabelText('Clear chat messages');
+
+    vi.useFakeTimers();
+
+    // Click to enter confirmation state
+    act(() => {
+      fireEvent.click(clearBtn);
+    });
+
+    expect(clearBtn).toHaveAttribute('aria-label', 'Confirm clear chat messages');
+
+    // Wait 4 seconds for timeout
+    act(() => {
+      vi.advanceTimersByTime(4100);
+    });
+
+    // Should reset back to default
+    expect(clearBtn).toHaveAttribute('aria-label', 'Clear chat messages');
+    expect(clearBtn.textContent).not.toContain('Sure?');
+
+    vi.useRealTimers();
   });
 
   it('CountryPanel displays Copy ZK Proof Hash button when proof is COMMITTED and copies on click', async () => {

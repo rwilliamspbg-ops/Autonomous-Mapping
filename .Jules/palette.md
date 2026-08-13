@@ -83,3 +83,7 @@
 ## 2027-02-22 - Copy-to-Clipboard for Chat Messages and Inline Accessible Interaction Feedback
 **Learning:** Adding a copy-to-clipboard action directly on chat message elements delivers excellent utility but can be easily missed if not keyboard-accessible. Making the copy button focusable (`focus-visible:ring-2`), hover-revealed with opacity transitions, and backed by a screen-reader-only polite live-region (`role="status" aria-live="polite"`) guarantees that both sighted and assistive technology users get immediate feedback.
 **Action:** Pair hover-revealed copy buttons in message groups with clear focus-visible outline indicators, explicit role/aria-label properties, and a shared status live-region to announce success.
+
+## 2027-02-23 - Two-Step Confirmation flow for Destructive Clear Chat Actions
+**Learning:** A simple, single-click "Clear Chat" action inside persistent floating dialogs leads to accidental and frustrating data loss for users when they click close to the button. Adding a two-step confirmation state ("Sure?") with automated timeout auto-reset keeps interface interactions safe and reliable without adding the friction of a full modal popup.
+**Action:** Always build lightweight confirmation transitions directly inside active buttons for destructive or permanent clear triggers, complete with auto-reset timeouts and ARIA title/label dynamic updates.
