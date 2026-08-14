@@ -543,4 +543,55 @@ describe('UI Components', () => {
       delete navigator.mediaDevices;
     }
   });
+
+  it('HardhatTerminal displays and interacts with Copy Logs button', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    // Open terminal using the hotkey
+    act(() => {
+      const terminalEvent = new KeyboardEvent('keydown', { key: 't' });
+      window.dispatchEvent(terminalEvent);
+    });
+
+    expect(screen.getByText(/Live_Node_Console/i)).toBeInTheDocument();
+
+    vi.useFakeTimers();
+
+    const copyLogsBtn = screen.getByLabelText('Copy terminal logs to clipboard');
+    expect(copyLogsBtn).toBeInTheDocument();
+    expect(copyLogsBtn).toHaveAttribute('title', 'Copy Logs');
+
+    // Click to copy
+    act(() => {
+      fireEvent.click(copyLogsBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalled();
+    expect(copyLogsBtn.textContent).toContain('Copied! ✓');
+
+    // Check live region text for logs copied success
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Terminal logs copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    // Fast-forward 2 seconds to reset copied state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyLogsBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyLogsBtn.textContent).toContain('Copy Logs');
+
+    vi.useRealTimers();
+  });
 });

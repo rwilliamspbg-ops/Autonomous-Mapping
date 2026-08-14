@@ -87,3 +87,7 @@
 ## 2027-02-23 - Two-Step Confirmation flow for Destructive Clear Chat Actions
 **Learning:** A simple, single-click "Clear Chat" action inside persistent floating dialogs leads to accidental and frustrating data loss for users when they click close to the button. Adding a two-step confirmation state ("Sure?") with automated timeout auto-reset keeps interface interactions safe and reliable without adding the friction of a full modal popup.
 **Action:** Always build lightweight confirmation transitions directly inside active buttons for destructive or permanent clear triggers, complete with auto-reset timeouts and ARIA title/label dynamic updates.
+
+## 2027-02-24 - Dynamic Copy-to-Clipboard Feature inside Scrollable Terminal Overlays
+**Learning:** Providing copy-to-clipboard functionality directly inside a dense scrolling live node/terminal log view enables rapid diagnostics extraction. To keep cognitive and mechanical friction minimal, the copy trigger should reside in the header space, feature high-contrast keyboard outlines (`focus-visible:ring-blue-500`), tactile transitions (`active:scale-95`), dynamic confirmation visual indicators ("Copied! ✓" resetting back to default in 2 seconds), and be fully accessible via a polite, screen-reader invisible live status announcer.
+**Action:** Always place copy actions in the static header of long scrolling lists/logs, pair them with standard 2-second timeout resets, and announce copies using hidden polite live regions (`role="status" aria-live="polite"`).
