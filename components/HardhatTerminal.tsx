@@ -29,6 +29,7 @@ const liveLogs = [
 
 const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   const [output, setOutput] = useState<string[]>([]);
+  const [copied, setCopied] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
@@ -101,16 +102,33 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
             </div>
             <span className="ml-5 text-[11px] text-slate-400 mono font-black uppercase tracking-[0.5em]">Live_Node_Console // production_access</span>
           </div>
-          <button
-            ref={closeButtonRef}
-            onClick={onClose}
-            aria-label="Close Live Node Console (Escape)"
-            title="Close (Escape)"
-            className="text-slate-500 hover:text-white transition-all active:scale-90 p-2 hover:bg-white/5 rounded-full focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative group"
-          >
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
-            <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
-          </button>
+          <div className="flex items-center gap-4">
+            <div role="status" aria-live="polite" className="sr-only">
+              {copied ? "Terminal logs copied to clipboard." : ""}
+            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(output.join('\n'));
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              aria-label="Copy terminal logs to clipboard"
+              title="Copy Logs"
+              className="px-3 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[10px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+            >
+              {copied ? 'Copied! ✓' : 'Copy Logs'}
+            </button>
+            <button
+              ref={closeButtonRef}
+              onClick={onClose}
+              aria-label="Close Live Node Console (Escape)"
+              title="Close (Escape)"
+              className="text-slate-500 hover:text-white transition-all active:scale-90 p-2 hover:bg-white/5 rounded-full focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative group"
+            >
+              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
+            </button>
+          </div>
         </div>
         <div
           ref={scrollRef}
