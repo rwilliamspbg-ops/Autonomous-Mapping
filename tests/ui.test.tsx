@@ -594,4 +594,70 @@ describe('UI Components', () => {
 
     vi.useRealTimers();
   });
+
+  it('App Evidence Trail displays and interacts with Copy Trail button when events exist', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    // Initially, when evidenceTrail is empty, Copy Trail button should not be present
+    expect(screen.queryByLabelText('Copy Evidence Trail to clipboard')).not.toBeInTheDocument();
+
+    // Select a track lane to trigger an evidence event
+    const healthLaneBtn = screen.getByLabelText(/Select Health lane/i);
+    await act(async () => {
+      fireEvent.click(healthLaneBtn);
+    });
+
+    // Now Copy Trail button should be visible
+    const copyTrailBtn = screen.getByLabelText('Copy Evidence Trail to clipboard');
+    expect(copyTrailBtn).toBeInTheDocument();
+    expect(copyTrailBtn).toHaveAttribute('title', 'Copy Evidence Trail');
+
+    vi.useFakeTimers();
+
+    // Click to copy trail
+    act(() => {
+      fireEvent.click(copyTrailBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('[1] Lane selected: PROTOCOL_ROUTE: HEALTH -> Kenya');
+    expect(copyTrailBtn.textContent).toContain('Copied! ✓');
+
+    // Check polite live region text
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Evidence Trail copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    // Fast-forward 2 seconds to reset copied state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyTrailBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyTrailBtn.textContent).toContain('Copy Trail');
+
+    vi.useRealTimers();
+  });
 });
