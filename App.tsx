@@ -44,6 +44,7 @@ const App: React.FC = () => {
   const [demoElapsedMs, setDemoElapsedMs] = useState(0);
   const [demoRunning, setDemoRunning] = useState(false);
   const [evidenceTrail, setEvidenceTrail] = useState<EvidenceEntry[]>([]);
+  const [trailCopied, setTrailCopied] = useState(false);
   const protocolTimersRef = useRef<number[]>([]);
   const demoTickRef = useRef<number | null>(null);
   const demoStartRef = useRef<number | null>(null);
@@ -263,6 +264,7 @@ const App: React.FC = () => {
     setIsScannerOpen(false);
     setIsChatOpen(false);
     setEvidenceTrail([]);
+    setTrailCopied(false);
     demoStartRef.current = null;
     addProtocolLog('PROTOCOL: demo reset for next walkthrough');
   };
@@ -451,9 +453,29 @@ const App: React.FC = () => {
               </div>
 
               <div className="mt-4 border-t border-white/5 pt-4">
+                <div role="status" aria-live="polite" className="sr-only">
+                  {trailCopied ? "Evidence Trail copied to clipboard." : ""}
+                </div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] mono text-slate-500 uppercase tracking-[0.35em] font-black">Evidence_Trail</span>
-                  <span className="text-[9px] mono text-slate-700 uppercase tracking-widest">{evidenceTrail.length} events</span>
+                  <div className="flex items-center gap-2">
+                    {evidenceTrail.length > 0 && (
+                      <button
+                        onClick={() => {
+                          const formattedTrail = evidenceTrail.map((e, idx) => `[${idx + 1}] ${e.title}: ${e.detail}`).join('\n');
+                          navigator.clipboard.writeText(formattedTrail);
+                          setTrailCopied(true);
+                          setTimeout(() => setTrailCopied(false), 2000);
+                        }}
+                        aria-label="Copy Evidence Trail to clipboard"
+                        title="Copy Evidence Trail"
+                        className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                      >
+                        {trailCopied ? 'Copied! ✓' : 'Copy Trail'}
+                      </button>
+                    )}
+                    <span className="text-[9px] mono text-slate-700 uppercase tracking-widest">{evidenceTrail.length} events</span>
+                  </div>
                 </div>
                 <div
                   tabIndex={0}
