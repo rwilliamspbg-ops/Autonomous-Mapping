@@ -45,6 +45,7 @@ const App: React.FC = () => {
   const [demoRunning, setDemoRunning] = useState(false);
   const [evidenceTrail, setEvidenceTrail] = useState<EvidenceEntry[]>([]);
   const [trailCopied, setTrailCopied] = useState(false);
+  const [streamCopied, setStreamCopied] = useState(false);
   const protocolTimersRef = useRef<number[]>([]);
   const demoTickRef = useRef<number | null>(null);
   const demoStartRef = useRef<number | null>(null);
@@ -265,6 +266,7 @@ const App: React.FC = () => {
     setIsChatOpen(false);
     setEvidenceTrail([]);
     setTrailCopied(false);
+    setStreamCopied(false);
     demoStartRef.current = null;
     addProtocolLog('PROTOCOL: demo reset for next walkthrough');
   };
@@ -506,10 +508,30 @@ const App: React.FC = () => {
             <div className="bg-slate-950/90 backdrop-blur-3xl p-6 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto group hover:border-blue-500/30 transition-colors">
               <h4 className="text-[11px] text-blue-500 mono font-black uppercase mb-5 tracking-[0.4em] flex justify-between items-center border-b border-white/5 pb-3">
                 <span>Impact_Stream</span>
-                <span className="text-[9px] text-slate-700">READY</span>
+                <div className="flex items-center gap-2">
+                  {logs.length > 0 && (
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(logs.join('\n'));
+                        setStreamCopied(true);
+                        setTimeout(() => setStreamCopied(false), 2000);
+                      }}
+                      aria-label="Copy Impact Stream logs to clipboard"
+                      title="Copy Stream Logs"
+                      className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                    >
+                      {streamCopied ? 'Copied! ✓' : 'Copy Stream'}
+                    </button>
+                  )}
+                  <span className="text-[9px] text-slate-700">READY</span>
+                </div>
               </h4>
               <div role="status" aria-live="polite" className="sr-only">
-                {logs.length > 0 ? `Latest telemetry update: ${logs[logs.length - 1]}` : 'Telemetry system ready'}
+                {streamCopied
+                  ? 'Impact stream logs copied to clipboard.'
+                  : logs.length > 0
+                  ? `Latest telemetry update: ${logs[logs.length - 1]}`
+                  : 'Telemetry system ready'}
               </div>
               <div className="space-y-4">
                 {logs.map((log, i) => (

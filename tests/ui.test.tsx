@@ -660,4 +660,48 @@ describe('UI Components', () => {
 
     vi.useRealTimers();
   });
+
+  it('App Impact Stream console displays and interacts with Copy Stream button when logs exist', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    // Wait for initial syncStage log (delay 0ms) to populate logs array
+    const copyStreamBtn = await screen.findByLabelText('Copy Impact Stream logs to clipboard');
+    expect(copyStreamBtn).toBeInTheDocument();
+    expect(copyStreamBtn).toHaveAttribute('title', 'Copy Stream Logs');
+
+    vi.useFakeTimers();
+
+    // Click to copy stream logs
+    act(() => {
+      fireEvent.click(copyStreamBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalled();
+    expect(copyStreamBtn.textContent).toContain('Copied! ✓');
+
+    // Check polite live region text
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Impact stream logs copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    // Fast-forward 2 seconds to reset copied state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyStreamBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyStreamBtn.textContent).toContain('Copy Stream');
+
+    vi.useRealTimers();
+  });
 });
