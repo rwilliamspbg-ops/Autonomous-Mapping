@@ -5,6 +5,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import CountryPanel from '../components/CountryPanel';
 import WorldMap from '../components/WorldMap';
 import SpatialScanner from '../components/SpatialScanner';
+import Manifesto from '../components/Manifesto';
 import App from '../App';
 
 vi.mock('../services/geminiService', () => ({
@@ -659,6 +660,30 @@ describe('UI Components', () => {
     expect(copyTrailBtn.textContent).toContain('Copy Trail');
 
     vi.useRealTimers();
+  });
+
+  it('Manifesto "Use This Demo" CTA button renders with accessible attributes and triggers onStartDemo callback', async () => {
+    const handleStartDemo = vi.fn();
+    const handleClose = vi.fn();
+
+    render(
+      <Manifesto
+        isOpen={true}
+        onClose={handleClose}
+        onStartDemo={handleStartDemo}
+      />
+    );
+
+    const ctaBtn = screen.getByLabelText('Use this demo and start guided walkthrough');
+    expect(ctaBtn).toBeInTheDocument();
+    expect(ctaBtn).toHaveAttribute('title', 'Use This Demo');
+
+    act(() => {
+      ctaBtn.click();
+    });
+
+    expect(handleStartDemo).toHaveBeenCalledTimes(1);
+    expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
   it('App Impact Stream console displays and interacts with Copy Stream button when logs exist', async () => {

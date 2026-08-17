@@ -590,7 +590,11 @@ const App: React.FC = () => {
 
       {/* Production Overlays */}
       <HardhatTerminal isOpen={isTerminalOpen} onClose={() => setIsTerminalOpen(false)} />
-      <Manifesto isOpen={isManifestoOpen} onClose={() => setIsManifestoOpen(false)} />
+      <Manifesto
+        isOpen={isManifestoOpen}
+        onClose={() => setIsManifestoOpen(false)}
+        onStartDemo={runGuidedProtocol}
+      />
       <SpatialScanner 
         isOpen={isScannerOpen} 
         onClose={() => setIsScannerOpen(false)}

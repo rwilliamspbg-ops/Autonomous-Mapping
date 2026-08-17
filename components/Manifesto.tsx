@@ -4,9 +4,10 @@ import React from 'react';
 interface ManifestoProps {
   isOpen: boolean;
   onClose: () => void;
+  onStartDemo?: () => void;
 }
 
-const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose }) => {
+const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo }) => {
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
 
@@ -109,7 +110,12 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose }) => {
             <span className="px-3 py-1 bg-slate-900 border border-white/10 rounded text-[9px] mono text-slate-500 uppercase">Edge Federated Learning</span>
           </div>
           <button 
-            onClick={onClose}
+            onClick={() => {
+              onStartDemo?.();
+              onClose();
+            }}
+            aria-label="Use this demo and start guided walkthrough"
+            title="Use This Demo"
             className="px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-blue-600/20 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             Use This Demo
