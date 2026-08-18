@@ -46,6 +46,7 @@ const App: React.FC = () => {
   const [evidenceTrail, setEvidenceTrail] = useState<EvidenceEntry[]>([]);
   const [trailCopied, setTrailCopied] = useState(false);
   const [streamCopied, setStreamCopied] = useState(false);
+  const [coordsCopied, setCoordsCopied] = useState(false);
   const protocolTimersRef = useRef<number[]>([]);
   const demoTickRef = useRef<number | null>(null);
   const demoStartRef = useRef<number | null>(null);
@@ -267,6 +268,7 @@ const App: React.FC = () => {
     setEvidenceTrail([]);
     setTrailCopied(false);
     setStreamCopied(false);
+    setCoordsCopied(false);
     demoStartRef.current = null;
     addProtocolLog('PROTOCOL: demo reset for next walkthrough');
   };
@@ -560,7 +562,24 @@ const App: React.FC = () => {
 
             {geoData && (
               <div className="bg-slate-950/90 backdrop-blur-3xl p-6 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto">
-                <h4 className="text-[11px] text-slate-500 mono uppercase mb-4 tracking-[0.4em] font-black border-b border-white/5 pb-3">Local_Context</h4>
+                <h4 className="text-[11px] text-slate-500 mono uppercase mb-4 tracking-[0.4em] font-black border-b border-white/5 pb-3 flex justify-between items-center">
+                  <span>Local_Context</span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${geoData.lat.toFixed(6)}°, ${geoData.lng.toFixed(6)}°`);
+                      setCoordsCopied(true);
+                      setTimeout(() => setCoordsCopied(false), 2000);
+                    }}
+                    aria-label="Copy Local Coordinates to clipboard"
+                    title="Copy Coordinates"
+                    className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                  >
+                    {coordsCopied ? 'Copied! ✓' : 'Copy Coords'}
+                  </button>
+                </h4>
+                <div role="status" aria-live="polite" className="sr-only">
+                  {coordsCopied ? 'Local coordinates copied to clipboard.' : ''}
+                </div>
                 <div className="grid grid-cols-1 gap-4 mono text-[11px]">
                   <div className="flex justify-between items-center">
                     <span className="text-slate-500">LAT:</span>

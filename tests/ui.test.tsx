@@ -729,4 +729,70 @@ describe('UI Components', () => {
 
     vi.useRealTimers();
   });
+
+  it('App Local_Context panel displays and interacts with Copy Coordinates button when geoData exists', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    const mockGetCurrentPosition = vi.fn().mockImplementation((success) => {
+      success({
+        coords: {
+          latitude: -1.286389,
+          longitude: 36.817223
+        }
+      });
+    });
+
+    const originalGeolocation = navigator.geolocation;
+    Object.defineProperty(navigator, 'geolocation', {
+      writable: true,
+      configurable: true,
+      value: {
+        getCurrentPosition: mockGetCurrentPosition
+      }
+    });
+
+    render(<App />);
+
+    const copyCoordsBtn = screen.getByLabelText('Copy Local Coordinates to clipboard');
+    expect(copyCoordsBtn).toBeInTheDocument();
+    expect(copyCoordsBtn).toHaveAttribute('title', 'Copy Coordinates');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copyCoordsBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('-1.286389°, 36.817223°');
+    expect(copyCoordsBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Local coordinates copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyCoordsBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyCoordsBtn.textContent).toContain('Copy Coords');
+
+    vi.useRealTimers();
+
+    if (originalGeolocation) {
+      Object.defineProperty(navigator, 'geolocation', {
+        writable: true,
+        configurable: true,
+        value: originalGeolocation
+      });
+    }
+  });
 });
