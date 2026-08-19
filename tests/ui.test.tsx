@@ -795,4 +795,36 @@ describe('UI Components', () => {
       });
     }
   });
+
+  it('App Demo_Use_Cases pillar cards render as interactive buttons and select corresponding protocol tracks on click', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    const healthCard = screen.getByLabelText('Select Global Health use case (Kenya)');
+    const rightsCard = screen.getByLabelText('Select Human Rights use case (Brazil)');
+    const climateCard = screen.getByLabelText('Select Climate Resilience use case (South Africa)');
+
+    expect(healthCard).toBeInTheDocument();
+    expect(rightsCard).toBeInTheDocument();
+    expect(climateCard).toBeInTheDocument();
+
+    expect(healthCard).toHaveAttribute('aria-pressed', 'false');
+
+    // Click Human Rights card to select Brazil
+    await act(async () => {
+      fireEvent.click(rightsCard);
+    });
+
+    expect(rightsCard).toHaveAttribute('aria-pressed', 'true');
+    expect(rightsCard.textContent).toContain('ACTIVE');
+
+    // Click Climate Resilience card to select South Africa
+    await act(async () => {
+      fireEvent.click(climateCard);
+    });
+
+    expect(climateCard).toHaveAttribute('aria-pressed', 'true');
+    expect(rightsCard).toHaveAttribute('aria-pressed', 'false');
+    expect(climateCard.textContent).toContain('ACTIVE');
+  });
 });

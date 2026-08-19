@@ -56,21 +56,27 @@ const App: React.FC = () => {
       value: 'Privacy-preserving disease surveillance',
       accent: 'text-emerald-400',
       border: 'border-emerald-500/20',
-      bg: 'bg-emerald-500/5'
+      bg: 'bg-emerald-500/5',
+      country: 'Kenya',
+      trackIndex: 0
     },
     {
       label: 'Human Rights',
       value: 'Secure reporting from hostile environments',
       accent: 'text-rose-400',
       border: 'border-rose-500/20',
-      bg: 'bg-rose-500/5'
+      bg: 'bg-rose-500/5',
+      country: 'Brazil',
+      trackIndex: 1
     },
     {
       label: 'Climate Resilience',
       value: 'Community sensor data stays local',
       accent: 'text-blue-400',
       border: 'border-blue-500/20',
-      bg: 'bg-blue-500/5'
+      bg: 'bg-blue-500/5',
+      country: 'South Africa',
+      trackIndex: 2
     }
   ];
 
@@ -551,12 +557,32 @@ const App: React.FC = () => {
             <div className="bg-slate-950/90 backdrop-blur-3xl p-6 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto">
               <h4 className="text-[11px] text-slate-500 mono uppercase mb-4 tracking-[0.4em] font-black border-b border-white/5 pb-3">Demo_Use_Cases</h4>
               <div className="space-y-3">
-                {impactPillars.map((pillar) => (
-                  <div key={pillar.label} className={`p-3 rounded-2xl border ${pillar.border} ${pillar.bg}`}>
-                    <div className={`text-[10px] mono font-black uppercase tracking-[0.35em] ${pillar.accent}`}>{pillar.label}</div>
-                    <div className="text-[11px] text-slate-300 leading-snug mt-2">{pillar.value}</div>
-                  </div>
-                ))}
+                {impactPillars.map((pillar) => {
+                  const isTrackActive = selectedCountry?.name === pillar.country;
+                  return (
+                    <button
+                      key={pillar.label}
+                      onClick={() => activateTrack(pillar.trackIndex)}
+                      aria-pressed={isTrackActive}
+                      aria-label={`Select ${pillar.label} use case (${pillar.country})`}
+                      className={`w-full text-left p-3 rounded-2xl border ${pillar.border} ${pillar.bg} transition-all active:scale-98 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none cursor-pointer ${
+                        isTrackActive ? 'ring-1 ring-blue-400/50 shadow-[0_0_12px_rgba(59,130,246,0.2)]' : 'hover:border-white/20'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className={`text-[10px] mono font-black uppercase tracking-[0.35em] ${pillar.accent}`}>
+                          {pillar.label}
+                        </div>
+                        {isTrackActive && (
+                          <span className="text-[8px] mono font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
+                            ACTIVE
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-slate-300 leading-snug mt-2">{pillar.value}</div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
