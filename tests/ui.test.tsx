@@ -344,6 +344,46 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('HardhatTerminal displays Resume Auto-scroll button when user scrolls up and clicking it resets scroll', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open terminal using the hotkey
+    act(() => {
+      const terminalEvent = new KeyboardEvent('keydown', { key: 't' });
+      window.dispatchEvent(terminalEvent);
+    });
+
+    const scrollContainer = screen.getByLabelText('Live Node Console logs');
+    expect(scrollContainer).toBeInTheDocument();
+
+    // Initially when scrolled to bottom, Resume Auto-scroll button should not be present
+    expect(screen.queryByLabelText('Resume auto-scroll to bottom of terminal logs')).not.toBeInTheDocument();
+
+    // Mock scroll dimensions
+    Object.defineProperty(scrollContainer, 'scrollHeight', { value: 1000, configurable: true });
+    Object.defineProperty(scrollContainer, 'clientHeight', { value: 400, configurable: true });
+    Object.defineProperty(scrollContainer, 'scrollTop', { value: 200, writable: true, configurable: true });
+
+    // Simulate user scrolling up
+    act(() => {
+      fireEvent.scroll(scrollContainer);
+    });
+
+    // Now Resume Auto-scroll button should be visible
+    const resumeBtn = screen.getByLabelText('Resume auto-scroll to bottom of terminal logs');
+    expect(resumeBtn).toBeInTheDocument();
+    expect(resumeBtn).toHaveAttribute('title', 'Resume auto-scroll');
+
+    // Click Resume Auto-scroll
+    act(() => {
+      fireEvent.click(resumeBtn);
+    });
+
+    // Resume button should disappear
+    expect(screen.queryByLabelText('Resume auto-scroll to bottom of terminal logs')).not.toBeInTheDocument();
+  });
+
   it('ChatInterface Clear Chat button confirmation resets back to default after a timeout', async () => {
     const { chatWithAnalyst } = await import('../services/geminiService');
     const mockedChatWithAnalyst = vi.mocked(chatWithAnalyst);

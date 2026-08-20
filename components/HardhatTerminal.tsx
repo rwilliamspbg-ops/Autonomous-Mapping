@@ -30,6 +30,7 @@ const liveLogs = [
 const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   const [output, setOutput] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
+  const [isScrolledUp, setIsScrolledUp] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
@@ -37,6 +38,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       lastActiveElementRef.current = document.activeElement as HTMLElement;
+      setIsScrolledUp(false);
       setOutput(["> Establishing secure shell connection...", "> Node v1.0.4-PROD online."]);
       let i = 0;
       const interval = setInterval(() => {
@@ -45,7 +47,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
           i++;
         } else {
           // Loop logs to simulate continuous activity
-          setOutput(prev => [...prev.slice(-20), `[BLOCK] #${18241095 + i} Finalized`]);
+          setOutput(prev => [...prev.slice(-100), `[BLOCK] #${18241095 + i} Finalized`]);
           i++;
         }
       }, 300);
@@ -58,11 +60,19 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    const hasOverflow = scrollHeight > clientHeight + 10;
+    const isAtBottom = !hasOverflow || (scrollHeight - scrollTop - clientHeight < 60);
+    setIsScrolledUp(!isAtBottom);
+  };
+
   useEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && !isScrolledUp) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [output]);
+  }, [output, isScrolledUp]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -91,7 +101,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-5xl h-[700px] bg-[#0d1117] border border-blue-500/30 rounded-[2.5rem] shadow-[0_0_120px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-500 cursor-default"
+        className="w-full max-w-5xl h-[700px] bg-[#0d1117] border border-blue-500/30 rounded-[2.5rem] shadow-[0_0_120px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-500 cursor-default relative"
       >
         <div className="bg-[#161b22] px-10 py-6 border-b border-white/10 flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -132,6 +142,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
         </div>
         <div
           ref={scrollRef}
+          onScroll={handleScroll}
           tabIndex={0}
           aria-label="Live Node Console logs"
           className="flex-1 overflow-y-auto p-12 mono text-[13px] leading-relaxed whitespace-pre font-medium text-slate-400 scroll-smooth bg-[#010409] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
@@ -151,6 +162,22 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
             );
           })}
         </div>
+        {isScrolledUp && (
+          <button
+            onClick={() => {
+              if (scrollRef.current) {
+                scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+                setIsScrolledUp(false);
+              }
+            }}
+            aria-label="Resume auto-scroll to bottom of terminal logs"
+            title="Resume auto-scroll"
+            className="absolute bottom-6 right-12 px-3 py-1.5 bg-blue-600/90 hover:bg-blue-500 text-white font-mono text-[10px] font-bold uppercase tracking-wider rounded-xl border border-blue-400/40 shadow-lg backdrop-blur-md transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200"
+          >
+            <span>Resume Auto-scroll</span>
+            <span className="text-xs" aria-hidden="true">↓</span>
+          </button>
+        )}
       </div>
     </div>
   );
