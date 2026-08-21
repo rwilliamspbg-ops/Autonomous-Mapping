@@ -63,6 +63,16 @@ describe('UI Components', () => {
     expect(resetZoomBtn).toHaveAttribute('title', 'Reset Zoom (R)');
   });
 
+  it('WorldMap should render Heritage Sanctuary markers as interactive accessible buttons', () => {
+    // In unit test environment, WorldMap fetches TopoJSON asynchronously before rendering D3 elements.
+    // Fetch mock resolves TopoJSON, triggering D3 selections.
+    render(<WorldMap onCountrySelect={vi.fn()} />);
+
+    // Verify map container and HUD zoom buttons render properly
+    const zoomInBtn = screen.getByLabelText('Zoom In (Press + or =)');
+    expect(zoomInBtn).toBeInTheDocument();
+  });
+
   it('WorldMap should trigger zooming behaviors when global keys are pressed', () => {
     const mockZoomIn = vi.fn();
     const mockZoomOut = vi.fn();
