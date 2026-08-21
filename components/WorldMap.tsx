@@ -287,10 +287,81 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
       .data(sanctuaries)
       .enter()
       .append('g')
-      .attr('class', 'sanctuary')
+      .attr('class', 'sanctuary cursor-pointer focus:outline-none')
+      .attr('tabindex', '0')
+      .attr('role', 'button')
+      .attr('aria-label', (d: any) => `Heritage Sanctuary ${d.label}: ${d.name}. View location telemetry.`)
       .attr('transform', (d: any) => {
         const p = projection([d.lng, d.lat]);
         return p ? `translate(${p[0]}, ${p[1]})` : null;
+      })
+      .on('mousemove', (event, d: any) => {
+        const [mx, my] = d3.pointer(event, svgRef.current);
+        setCoords({ x: mx, y: my, lat: d.lat, lng: d.lng });
+        if (hoveredCountry?.id !== d.label) {
+          if (hoverTimeoutRef.current) window.clearTimeout(hoverTimeoutRef.current);
+          setShowTooltip(false);
+          setHoveredCountry({ name: d.name, id: d.label });
+          hoverTimeoutRef.current = window.setTimeout(() => {
+            setShowTooltip(true);
+          }, 250);
+        }
+      })
+      .on('focus', (event, d: any) => {
+        const p = projection([d.lng, d.lat]);
+        if (p) {
+          setCoords({ x: p[0], y: p[1], lat: d.lat, lng: d.lng });
+        }
+        if (hoveredCountry?.id !== d.label) {
+          if (hoverTimeoutRef.current) window.clearTimeout(hoverTimeoutRef.current);
+          setShowTooltip(false);
+          setHoveredCountry({ name: d.name, id: d.label });
+          hoverTimeoutRef.current = window.setTimeout(() => {
+            setShowTooltip(true);
+          }, 250);
+        }
+      })
+      .on('blur', () => {
+        if (hoverTimeoutRef.current) window.clearTimeout(hoverTimeoutRef.current);
+        setShowTooltip(false);
+        setHoveredCountry(null);
+      })
+      .on('mouseleave', () => {
+        if (hoverTimeoutRef.current) window.clearTimeout(hoverTimeoutRef.current);
+        setShowTooltip(false);
+        setHoveredCountry(null);
+      })
+      .on('keydown', (event, d: any) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          const p = projection([d.lng, d.lat]);
+          if (p) {
+            const transform = d3.zoomIdentity
+              .translate(width / 2, height / 2)
+              .scale(4)
+              .translate(-p[0], -p[1]);
+
+            svg.transition()
+              .duration(1200)
+              .ease(d3.easeCubicInOut)
+              .call(zoom.transform as any, transform);
+          }
+        }
+      })
+      .on('click', (event, d: any) => {
+        event.stopPropagation();
+        const p = projection([d.lng, d.lat]);
+        if (p) {
+          const transform = d3.zoomIdentity
+            .translate(width / 2, height / 2)
+            .scale(4)
+            .translate(-p[0], -p[1]);
+
+          svg.transition()
+            .duration(1200)
+            .ease(d3.easeCubicInOut)
+            .call(zoom.transform as any, transform);
+        }
       });
 
     sanctuaryNodes.append('circle')
