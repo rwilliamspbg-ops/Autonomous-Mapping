@@ -17,7 +17,7 @@ describe('UI Components', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
-  it('ErrorBoundary should catch errors and show fallback', () => {
+  it('ErrorBoundary should catch errors, render alert role and accessible reload button', () => {
     const ThrowError = () => {
       throw new Error('Test Error');
     };
@@ -30,7 +30,15 @@ describe('UI Components', () => {
       </ErrorBoundary>
     );
 
+    const alertContainer = screen.getByRole('alert');
+    expect(alertContainer).toBeInTheDocument();
+    expect(alertContainer).toHaveAttribute('aria-live', 'assertive');
     expect(screen.getByText(/System Anomaly Detected/i)).toBeInTheDocument();
+
+    const reinitBtn = screen.getByLabelText('Reinitialize core and reload application');
+    expect(reinitBtn).toBeInTheDocument();
+    expect(reinitBtn).toHaveAttribute('title', 'Reinitialize Core (Reload)');
+
     consoleSpy.mockRestore();
   });
 
