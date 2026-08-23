@@ -233,6 +233,47 @@ describe('UI Components', () => {
     }
   });
 
+  it('SpatialScanner should auto-focus the "Verify Privacy" button when camera stream initialization succeeds and status reaches TRACKING', async () => {
+    const mockGetUserMedia = vi.fn().mockResolvedValue({
+      getTracks: () => [{ stop: vi.fn() }]
+    });
+
+    const originalMediaDevices = navigator.mediaDevices;
+    Object.defineProperty(navigator, 'mediaDevices', {
+      writable: true,
+      configurable: true,
+      value: {
+        getUserMedia: mockGetUserMedia
+      }
+    });
+
+    render(<SpatialScanner isOpen={true} onClose={() => {}} onScanComplete={() => {}} />);
+
+    // Wait for async getUserMedia resolution and state transition to TRACKING
+    const verifyBtn = await screen.findByLabelText('Verify Privacy');
+    expect(verifyBtn).toBeInTheDocument();
+    expect(verifyBtn).toHaveAttribute('title', 'Verify Privacy');
+
+    // Wait for the 50ms focus timer to fire
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 60));
+    });
+
+    expect(document.activeElement).toBe(verifyBtn);
+
+    // Restore original mediaDevices
+    if (originalMediaDevices) {
+      Object.defineProperty(navigator, 'mediaDevices', {
+        writable: true,
+        configurable: true,
+        value: originalMediaDevices
+      });
+    } else {
+      // @ts-ignore
+      delete navigator.mediaDevices;
+    }
+  });
+
   it('CountryPanel ZK verification section includes a polite live status region', () => {
     render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
     const liveRegion = screen.getByRole('status', { hidden: true });
