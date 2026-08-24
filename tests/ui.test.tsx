@@ -926,4 +926,53 @@ describe('UI Components', () => {
     expect(rightsCard).toHaveAttribute('aria-pressed', 'false');
     expect(climateCard.textContent).toContain('ACTIVE');
   });
+
+  it('CountryPanel handles insight fetch failure, renders alert role with auto-focused retry button, and allows retrying', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    // Mock rejection on initial call
+    mockedGetInsights.mockRejectedValueOnce(new Error('Network offline'));
+
+    const { fireEvent } = require('@testing-library/react');
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Wait for error state to be rendered
+    const alertBox = await screen.findByRole('alert');
+    expect(alertBox).toBeInTheDocument();
+    expect(alertBox).toHaveAttribute('aria-live', 'assertive');
+    expect(screen.getByText('INSIGHT_SYNC_FAILED')).toBeInTheDocument();
+    expect(screen.getByText(/Failed to fetch regional insights/i)).toBeInTheDocument();
+
+    const retryBtn = screen.getByLabelText('Retry fetching insights for Kenya');
+    expect(retryBtn).toBeInTheDocument();
+
+    // Verify retry button received auto-focus
+    expect(document.activeElement).toBe(retryBtn);
+
+    // Mock successful response on second call (retry)
+    mockedGetInsights.mockResolvedValueOnce({
+      summary: 'Kenya local pilot insights after retry.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    // Click retry
+    await act(async () => {
+      fireEvent.click(retryBtn);
+    });
+
+    // Verify insight summary renders upon successful retry
+    expect(await screen.findByText('Kenya local pilot insights after retry.')).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    consoleSpy.mockRestore();
+  });
 });
