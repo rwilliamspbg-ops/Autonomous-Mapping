@@ -949,6 +949,11 @@ describe('UI Components', () => {
     const retryBtn = screen.getByLabelText('Retry fetching insights for Kenya');
     expect(retryBtn).toBeInTheDocument();
 
+    // Wait for the 50ms focus timer to fire
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 60));
+    });
+
     // Verify retry button received auto-focus
     expect(document.activeElement).toBe(retryBtn);
 

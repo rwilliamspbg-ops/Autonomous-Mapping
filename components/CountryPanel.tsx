@@ -72,11 +72,19 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   }, [country]);
 
   useEffect(() => {
+    let timer: number | null = null;
     if (error) {
-      retryButtonRef.current?.focus();
+      timer = window.setTimeout(() => {
+        retryButtonRef.current?.focus();
+      }, 50);
     } else if (country && !loading && insight) {
-      closeButtonRef.current?.focus();
+      timer = window.setTimeout(() => {
+        closeButtonRef.current?.focus();
+      }, 50);
     }
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
   }, [error, loading, insight, country]);
 
   useEffect(() => {
