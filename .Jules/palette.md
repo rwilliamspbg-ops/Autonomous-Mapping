@@ -95,3 +95,7 @@
 ## 2027-02-25 - Smart Terminal Scroll Retention & "Resume Auto-scroll" Trigger
 **Learning:** Continuously updating live stream logs (such as terminal or telemetry feeds) disrupt user scroll position when reading past logs unless auto-scrolling is conditionally paused when scrolled up. Adding a scroll listener to detect when a user moves away from the bottom preserves scroll context, and pairing it with an accessible, floating "Resume Auto-scroll ↓" button provides a convenient way to snap back to live updates.
 **Action:** Guard automatic `scrollTop` assignments on streaming log views by checking whether the user is scrolled near the bottom, and provide a clear, focus-visible "Resume Auto-scroll" action when scrolled up.
+
+## 2027-03-01 - Graceful Fetch Degradation & Auto-Focused Retry Action in Detail Panels
+**Learning:** Silently logging API errors or leaving detail panels in an empty state when async fetching fails leaves users disoriented and unable to recover. Rendering a prominent cyber-themed alert container with `role="alert"` and `aria-live="assertive"`, and automatically focusing an interactive, focus-visible "Retry_Sync" button ensures screen readers announce the failure immediately and keyboard users can retry without manually hunting for controls.
+**Action:** Always render accessible error containers with `role="alert"` and auto-focused retry buttons when async data fetching fails in detail drawers or modals.

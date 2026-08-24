@@ -27,36 +27,65 @@ type ZkStatus = 'IDLE' | 'GENERATING' | 'VERIFYING' | 'COMMITTED';
 const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [insight, setInsight] = useState<EnhancedSovereignInsight | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [zkStatus, setZkStatus] = useState<ZkStatus>('IDLE');
   const [verifyStep, setVerifyStep] = useState(0);
   const [copied, setCopied] = useState(false);
   const [summaryCopied, setSummaryCopied] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
+  const retryButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  const fetchInsights = (countryName: string) => {
+    setLoading(true);
+    setError(null);
+    setZkStatus('IDLE');
+    setVerifyStep(0);
+    setCopied(false);
+    setSummaryCopied(false);
+    getSovereignInsights(countryName)
+      .then((data) => {
+        setInsight(data);
+        setError(null);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Failed to fetch regional insights. Check network sync.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   useEffect(() => {
     if (country) {
       lastActiveElementRef.current = document.activeElement as HTMLElement;
-      setLoading(true);
-      setZkStatus('IDLE');
-      setVerifyStep(0);
-      setCopied(false);
-      setSummaryCopied(false);
-      getSovereignInsights(country.name)
-        .then(setInsight)
-        .catch(console.error)
-        .finally(() => {
-          setLoading(false);
-          closeButtonRef.current?.focus();
-        });
+      fetchInsights(country.name);
     } else {
       setInsight(null);
+      setError(null);
       if (lastActiveElementRef.current) {
         lastActiveElementRef.current.focus();
         lastActiveElementRef.current = null;
       }
     }
   }, [country]);
+
+  useEffect(() => {
+    let timer: number | null = null;
+    if (error) {
+      timer = window.setTimeout(() => {
+        retryButtonRef.current?.focus();
+      }, 50);
+    } else if (country && !loading && insight) {
+      timer = window.setTimeout(() => {
+        closeButtonRef.current?.focus();
+      }, 50);
+    }
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [error, loading, insight, country]);
 
   useEffect(() => {
     if (!country) return;
@@ -143,6 +172,28 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               <p className="text-blue-400 mono text-xs font-black animate-pulse uppercase tracking-[0.4em] mb-2">Quantizing Spatial Data...</p>
               <p className="text-slate-600 mono text-[9px] uppercase tracking-widest">Decompressing Gaussian Splats (QSB)</p>
             </div>
+          </div>
+        ) : error ? (
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="bg-slate-900/90 border border-rose-500/30 p-8 rounded-3xl text-center backdrop-blur-xl shadow-[0_0_50px_rgba(244,63,94,0.15)] my-12"
+          >
+            <div className="text-rose-500 font-black uppercase text-lg tracking-[0.3em] mb-3 flex items-center justify-center gap-3">
+              <div className="w-8 h-8 border-2 border-rose-500 rounded-full flex items-center justify-center text-sm font-sans font-black shadow-[0_0_12px_#f43f5e]">!</div>
+              INSIGHT_SYNC_FAILED
+            </div>
+            <p className="text-[11px] text-slate-300 mono font-bold tracking-wider uppercase mb-6 leading-relaxed">
+              {error}
+            </p>
+            <button
+              ref={retryButtonRef}
+              onClick={() => fetchInsights(country.name)}
+              aria-label={`Retry fetching insights for ${country.name}`}
+              className="px-6 py-3 bg-rose-950/50 hover:bg-rose-900/60 text-rose-400 border border-rose-500/30 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+            >
+              Retry_Sync
+            </button>
           </div>
         ) : insight ? (
           <>
