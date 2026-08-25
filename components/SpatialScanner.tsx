@@ -74,9 +74,12 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
 
   useEffect(() => {
     if (!isOpen) return;
-    const timer = setTimeout(() => {
-      closeButtonRef.current?.focus();
-    }, 50);
+    let timer: number | null = null;
+    if (status === 'BOOTING' || status === 'IDLE') {
+      timer = window.setTimeout(() => {
+        closeButtonRef.current?.focus();
+      }, 50);
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -86,9 +89,9 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      clearTimeout(timer);
+      if (timer) clearTimeout(timer);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, status]);
 
   const stopCamera = () => {
     if (videoRef.current?.srcObject) {
