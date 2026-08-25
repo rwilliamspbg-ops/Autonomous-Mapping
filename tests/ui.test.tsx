@@ -403,6 +403,40 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('HardhatTerminal displays and interacts with Clear Logs button', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open terminal using the hotkey
+    act(() => {
+      const terminalEvent = new KeyboardEvent('keydown', { key: 't' });
+      window.dispatchEvent(terminalEvent);
+    });
+
+    expect(screen.getByText(/Live_Node_Console/i)).toBeInTheDocument();
+
+    const clearLogsBtn = screen.getByLabelText('Clear terminal logs');
+    expect(clearLogsBtn).toBeInTheDocument();
+    expect(clearLogsBtn).toHaveAttribute('title', 'Clear Logs');
+
+    vi.useFakeTimers();
+
+    // Click clear logs
+    act(() => {
+      fireEvent.click(clearLogsBtn);
+    });
+
+    // Verify logs cleared announcement in live region
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasClearedStatus = statusElements.some(el => el.textContent?.includes('Terminal logs cleared.'));
+    expect(hasClearedStatus).toBe(true);
+
+    // After clearing, the Clear Logs button should disappear as output is empty
+    expect(screen.queryByLabelText('Clear terminal logs')).not.toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
+
   it('HardhatTerminal displays Resume Auto-scroll button when user scrolls up and clicking it resets scroll', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);

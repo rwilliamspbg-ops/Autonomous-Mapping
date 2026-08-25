@@ -30,6 +30,7 @@ const liveLogs = [
 const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   const [output, setOutput] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
+  const [cleared, setCleared] = useState(false);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -114,8 +115,22 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
           </div>
           <div className="flex items-center gap-4">
             <div role="status" aria-live="polite" className="sr-only">
-              {copied ? "Terminal logs copied to clipboard." : ""}
+              {copied ? "Terminal logs copied to clipboard." : cleared ? "Terminal logs cleared." : ""}
             </div>
+            {output.length > 0 && (
+              <button
+                onClick={() => {
+                  setOutput([]);
+                  setCleared(true);
+                  setTimeout(() => setCleared(false), 2000);
+                }}
+                aria-label="Clear terminal logs"
+                title="Clear Logs"
+                className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold mono text-[10px] uppercase tracking-wider rounded-lg border border-rose-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-rose-500 outline-none transition-all active:scale-95 shrink-0"
+              >
+                Clear Logs
+              </button>
+            )}
             <button
               onClick={() => {
                 navigator.clipboard.writeText(output.join('\n'));
