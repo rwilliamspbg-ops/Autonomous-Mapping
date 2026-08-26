@@ -380,6 +380,12 @@ const App: React.FC = () => {
                 </span>
               </div>
 
+              <div role="status" aria-live="polite" className="sr-only">
+                {protocolPhase === 'IDLE'
+                  ? 'Protocol flow reset to IDLE.'
+                  : `Protocol phase updated to ${protocolPhase}. ${protocolStages.find(s => s.key === protocolPhase)?.detail || ''}`}
+              </div>
+
               <div className="grid grid-cols-2 gap-2 mb-4">
                 {protocolStages.map((stage) => {
                   const isActive = stage.key === protocolPhase;

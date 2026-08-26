@@ -1014,4 +1014,20 @@ describe('UI Components', () => {
 
     consoleSpy.mockRestore();
   });
+
+  it('App Protocol_Flow includes an accessible polite status live region announcing phase changes', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    const attestBtn = screen.getByLabelText(/Attest stage/i);
+    expect(attestBtn).toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(attestBtn);
+    });
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasPhaseStatus = statusElements.some(el => el.textContent?.includes('Protocol phase updated to ATTESTING. Capture a local claim and narrate it safely.'));
+    expect(hasPhaseStatus).toBe(true);
+  });
 });
