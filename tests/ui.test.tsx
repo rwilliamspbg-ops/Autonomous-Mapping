@@ -1030,4 +1030,40 @@ describe('UI Components', () => {
     const hasPhaseStatus = statusElements.some(el => el.textContent?.includes('Protocol phase updated to ATTESTING. Capture a local claim and narrate it safely.'));
     expect(hasPhaseStatus).toBe(true);
   });
+
+  it('App Protocol_Flow Reset button displays Reset! ✓ feedback and updates polite live region', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    const resetBtn = screen.getByLabelText('Reset walkthrough demo and clear panels');
+    expect(resetBtn).toBeInTheDocument();
+
+    vi.useFakeTimers();
+
+    // Click Reset button
+    act(() => {
+      fireEvent.click(resetBtn);
+    });
+
+    // Verify button label and text update
+    expect(screen.getByLabelText('Walkthrough demo reset')).toBeInTheDocument();
+    expect(resetBtn.textContent).toContain('Reset! ✓');
+
+    // Verify polite live region announcement
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasResetStatus = statusElements.some(el => el.textContent?.includes('Walkthrough demo and active panels have been reset.'));
+    expect(hasResetStatus).toBe(true);
+
+    // Fast forward 2 seconds
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    // Reverts back to initial Reset text and aria-label
+    expect(resetBtn.textContent).not.toContain('Reset! ✓');
+    expect(resetBtn.textContent).toContain('Reset');
+    expect(screen.getByLabelText('Reset walkthrough demo and clear panels')).toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
 });

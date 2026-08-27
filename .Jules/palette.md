@@ -99,3 +99,7 @@
 ## 2027-03-01 - Graceful Fetch Degradation & Auto-Focused Retry Action in Detail Panels
 **Learning:** Silently logging API errors or leaving detail panels in an empty state when async fetching fails leaves users disoriented and unable to recover. Rendering a prominent cyber-themed alert container with `role="alert"` and `aria-live="assertive"`, and automatically focusing an interactive, focus-visible "Retry_Sync" button ensures screen readers announce the failure immediately and keyboard users can retry without manually hunting for controls.
 **Action:** Always render accessible error containers with `role="alert"` and auto-focused retry buttons when async data fetching fails in detail drawers or modals.
+
+## 2027-03-05 - Tactile Visual Confirmation and Live Region Announcements for Reset Triggers
+**Learning:** Reset actions on interactive dashboards or demo walkthroughs can feel abrupt or uncertain if there is no immediate visual confirmation on the trigger element itself. Displaying temporary tactile feedback ("Reset! ✓") on the button with a 2-second auto-reversion timeout, coupled with a polite screen reader announcement (`role="status" aria-live="polite"`), reassures both sighted and assistive technology users that state clearing was executed successfully.
+**Action:** Always complement reset triggers with temporary visual confirmation feedback ("Reset! ✓") and corresponding polite live region announcements.
