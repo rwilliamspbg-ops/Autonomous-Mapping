@@ -47,6 +47,7 @@ const App: React.FC = () => {
   const [trailCopied, setTrailCopied] = useState(false);
   const [streamCopied, setStreamCopied] = useState(false);
   const [coordsCopied, setCoordsCopied] = useState(false);
+  const [resetDone, setResetDone] = useState(false);
   const protocolTimersRef = useRef<number[]>([]);
   const demoTickRef = useRef<number | null>(null);
   const demoStartRef = useRef<number | null>(null);
@@ -277,6 +278,8 @@ const App: React.FC = () => {
     setCoordsCopied(false);
     demoStartRef.current = null;
     addProtocolLog('PROTOCOL: demo reset for next walkthrough');
+    setResetDone(true);
+    setTimeout(() => setResetDone(false), 2000);
   };
 
   const demoClockLabel = `${Math.floor(demoElapsedMs / 60000).toString().padStart(2, '0')}:${Math.floor((demoElapsedMs % 60000) / 1000).toString().padStart(2, '0')} / 06:30`;
@@ -381,7 +384,9 @@ const App: React.FC = () => {
               </div>
 
               <div role="status" aria-live="polite" className="sr-only">
-                {protocolPhase === 'IDLE'
+                {resetDone
+                  ? 'Walkthrough demo and active panels have been reset.'
+                  : protocolPhase === 'IDLE'
                   ? 'Protocol flow reset to IDLE.'
                   : `Protocol phase updated to ${protocolPhase}. ${protocolStages.find(s => s.key === protocolPhase)?.detail || ''}`}
               </div>
@@ -454,10 +459,14 @@ const App: React.FC = () => {
                 </button>
                 <button
                   onClick={resetProtocol}
-                  aria-label="Reset walkthrough demo and clear panels"
-                  className="px-4 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] border border-white/10 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                  aria-label={resetDone ? "Walkthrough demo reset" : "Reset walkthrough demo and clear panels"}
+                  className={`px-4 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] border transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
+                    resetDone
+                      ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                      : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-white/10'
+                  }`}
                 >
-                  Reset
+                  {resetDone ? 'Reset! ✓' : 'Reset'}
                 </button>
               </div>
 
