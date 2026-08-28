@@ -103,3 +103,7 @@
 ## 2027-03-05 - Tactile Visual Confirmation and Live Region Announcements for Reset Triggers
 **Learning:** Reset actions on interactive dashboards or demo walkthroughs can feel abrupt or uncertain if there is no immediate visual confirmation on the trigger element itself. Displaying temporary tactile feedback ("Reset! ✓") on the button with a 2-second auto-reversion timeout, coupled with a polite screen reader announcement (`role="status" aria-live="polite"`), reassures both sighted and assistive technology users that state clearing was executed successfully.
 **Action:** Always complement reset triggers with temporary visual confirmation feedback ("Reset! ✓") and corresponding polite live region announcements.
+
+## 2027-03-20 - Dual-Axis Viewport Collision Handling for Dynamic Floating Tooltips
+**Learning:** Floating tooltips anchored to interactive nodes or SVG paths (like D3 world map features) can get cut off or overflow off-screen when users hover elements located near viewport boundaries. Calculating both X-axis (`coords.x > window.innerWidth - 240`) and Y-axis (`coords.y > window.innerHeight - 180`) collisions and dynamically inverting transform vectors (`translateX(-110%)` and `translateY(-110%)`) prevents tooltip clipping across all view edges.
+**Action:** When designing absolute-positioned floating tooltips for interactive charts or maps, calculate collision thresholds for both horizontal and vertical viewport bounds and apply dynamic offset translations.

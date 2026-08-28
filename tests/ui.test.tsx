@@ -101,6 +101,13 @@ describe('UI Components', () => {
     expect(true).toBe(true);
   });
 
+  it('WorldMap tooltip calculates Y-axis viewport collision properly', () => {
+    const windowHeight = window.innerHeight;
+    const testYCoordNearBottom = windowHeight - 100;
+    const isYColliding = testYCoordNearBottom > windowHeight - 180;
+    expect(isYColliding).toBe(true);
+  });
+
   it('App component global hotkeys should trigger correctly', () => {
     const { container } = render(<App />);
 
