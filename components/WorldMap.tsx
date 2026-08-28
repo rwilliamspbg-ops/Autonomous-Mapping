@@ -515,7 +515,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
           style={{ 
             left: 0,
             top: 0,
-            transform: `translate3d(${coords.x + 20}px, ${coords.y + 20}px, 0) ${coords.x > window.innerWidth - 240 ? 'translateX(-110%)' : ''}`,
+            transform: `translate3d(${coords.x + 20}px, ${coords.y + 20}px, 0) ${coords.x > (typeof window !== 'undefined' ? window.innerWidth : 1000) - 240 ? 'translateX(-110%)' : ''} ${coords.y > (typeof window !== 'undefined' ? window.innerHeight : 800) - 180 ? 'translateY(-110%)' : ''}`,
             transition: 'transform 0.1s cubic-bezier(0.2, 0, 0.4, 1), opacity 0.2s ease, scale 0.2s ease'
           }}
         >
