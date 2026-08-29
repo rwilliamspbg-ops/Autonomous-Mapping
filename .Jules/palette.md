@@ -107,3 +107,7 @@
 ## 2027-03-20 - Dual-Axis Viewport Collision Handling for Dynamic Floating Tooltips
 **Learning:** Floating tooltips anchored to interactive nodes or SVG paths (like D3 world map features) can get cut off or overflow off-screen when users hover elements located near viewport boundaries. Calculating both X-axis (`coords.x > window.innerWidth - 240`) and Y-axis (`coords.y > window.innerHeight - 180`) collisions and dynamically inverting transform vectors (`translateX(-110%)` and `translateY(-110%)`) prevents tooltip clipping across all view edges.
 **Action:** When designing absolute-positioned floating tooltips for interactive charts or maps, calculate collision thresholds for both horizontal and vertical viewport bounds and apply dynamic offset translations.
+
+## 2027-03-29 - Quick Prompt Suggestions for Conversational Analyst Widgets
+**Learning:** Sighted and keyboard users opening an interactive chat interface often experience typing cold-starts or uncertainty on what topics can be queried. Displaying interactive, cyber-styled suggested prompt chips inside the initial welcome message lowers cognitive barrier, instantly populates the input field, and auto-focuses the input element for immediate editing or sending.
+**Action:** Always render keyboard-accessible, focus-visible prompt suggestion chips for initial welcome messages in chat panels to guide user interaction smoothly.
