@@ -288,6 +288,32 @@ describe('UI Components', () => {
     expect(liveRegion).toHaveAttribute('aria-live', 'polite');
   });
 
+  it('ChatInterface displays suggested quick prompt chips when initial message is shown, and clicking populates input field', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const promptBtn = screen.getByLabelText('Use prompt: Health pilot privacy');
+    expect(promptBtn).toBeInTheDocument();
+    expect(promptBtn).toHaveAttribute('title', 'Use prompt: Health pilot privacy');
+
+    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i) as HTMLInputElement;
+    expect(chatInput.value).toBe('');
+
+    // Click prompt chip
+    act(() => {
+      fireEvent.click(promptBtn);
+    });
+
+    expect(chatInput.value).toBe('Health pilot privacy');
+    expect(document.activeElement).toBe(chatInput);
+  });
+
   it('ChatInterface includes a maximum character length input and character counter', () => {
     render(<App />);
 

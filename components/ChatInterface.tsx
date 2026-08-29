@@ -8,6 +8,13 @@ interface ChatInterfaceProps {
   onOpenChange?: (open: boolean) => void;
 }
 
+const QUICK_PROMPTS = [
+  "Health pilot privacy",
+  "Human rights reporting",
+  "Climate sensor data",
+  "Demo economics"
+];
+
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, onOpenChange }) => {
   const [internalOpen, setInternalOpen] = useState(false);
   const isOpen = controlledOpen ?? internalOpen;
@@ -185,6 +192,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                     : 'bg-slate-800 text-slate-200 rounded-tl-none'
                 }`}>
                   <div className="break-words">{msg.content}</div>
+
+                  {idx === 0 && messages.length === 1 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2.5 pt-2.5 border-t border-slate-700/50">
+                      <div className="w-full text-[9px] mono uppercase text-slate-400 font-bold tracking-wider mb-0.5">Suggested Prompts:</div>
+                      {QUICK_PROMPTS.map((prompt) => (
+                        <button
+                          key={prompt}
+                          onClick={() => {
+                            setInput(prompt);
+                            inputRef.current?.focus();
+                          }}
+                          aria-label={`Use prompt: ${prompt}`}
+                          title={`Use prompt: ${prompt}`}
+                          className="text-[10px] mono bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-2 py-1 rounded-lg border border-blue-500/20 transition-all font-semibold active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                        >
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
                   <button
                     onClick={() => {
