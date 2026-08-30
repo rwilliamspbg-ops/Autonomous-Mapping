@@ -270,6 +270,11 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 onClick={handleZkExport}
                 disabled={zkStatus !== 'IDLE'}
                 aria-busy={zkStatus === 'GENERATING' || zkStatus === 'VERIFYING'}
+                title={
+                  zkStatus === 'IDLE' ? 'Verify on-device contribution proof' :
+                  zkStatus === 'COMMITTED' ? 'Privacy trail finalized and committed' :
+                  'Generating and verifying proof...'
+                }
                 className={`w-full py-4 rounded-xl border mono text-[10px] font-black uppercase tracking-widest transition-all shadow-lg focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                   zkStatus === 'IDLE' ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500 shadow-blue-600/20' :
                   zkStatus === 'COMMITTED' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 cursor-default mb-3' :
