@@ -286,6 +286,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                 type="submit"
                 disabled={isLoading || !input.trim()}
                 aria-label={isLoading ? "Sending message..." : "Send message"}
+                title={isLoading ? "Sending message..." : !input.trim() ? "Type a message to send" : "Send message"}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-500 hover:text-blue-400 disabled:opacity-30 disabled:cursor-not-allowed focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md outline-none flex items-center justify-center w-6 h-6"
               >
                 {isLoading ? (

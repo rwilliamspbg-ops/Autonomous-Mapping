@@ -281,11 +281,40 @@ describe('UI Components', () => {
     }
   });
 
-  it('CountryPanel ZK verification section includes a polite live status region', () => {
+  it('CountryPanel ZK verification section includes a polite live status region and dynamic title attribute', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
     render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
     const liveRegion = screen.getByRole('status', { hidden: true });
     expect(liveRegion).toBeInTheDocument();
     expect(liveRegion).toHaveAttribute('aria-live', 'polite');
+
+    const verifyBtn = await screen.findByText('⊕ Verify On-Device Contribution');
+    expect(verifyBtn).toHaveAttribute('title', 'Verify on-device contribution proof');
+  });
+
+  it('ChatInterface send button displays descriptive title attributes reflecting active and disabled states', () => {
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const sendButton = screen.getByLabelText('Send message');
+    expect(sendButton).toHaveAttribute('title', 'Type a message to send');
   });
 
   it('ChatInterface displays suggested quick prompt chips when initial message is shown, and clicking populates input field', async () => {
