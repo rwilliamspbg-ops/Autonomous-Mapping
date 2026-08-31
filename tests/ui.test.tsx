@@ -56,8 +56,9 @@ describe('UI Components', () => {
     expect(document.activeElement).toBe(closeBtn);
   });
 
-  it('WorldMap should render tactical zoom controls with correct ARIA labels', () => {
-    const { container } = render(<WorldMap onCountrySelect={vi.fn()} />);
+  it('WorldMap should render tactical zoom controls and update visual feedback and status region on click', () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<WorldMap onCountrySelect={vi.fn()} />);
     const zoomInBtn = screen.getByLabelText('Zoom In (Press + or =)');
     const zoomOutBtn = screen.getByLabelText('Zoom Out (Press - or _)');
     const resetZoomBtn = screen.getByLabelText('Reset Zoom (Press r or R)');
@@ -69,6 +70,55 @@ describe('UI Components', () => {
     expect(zoomInBtn).toHaveAttribute('title', 'Zoom In (+)');
     expect(zoomOutBtn).toHaveAttribute('title', 'Zoom Out (-)');
     expect(resetZoomBtn).toHaveAttribute('title', 'Reset Zoom (R)');
+
+    vi.useFakeTimers();
+
+    // Click Zoom In
+    act(() => {
+      fireEvent.click(zoomInBtn);
+    });
+
+    expect(screen.getByLabelText('Map zoom increased')).toBeInTheDocument();
+    expect(zoomInBtn).toHaveAttribute('title', 'Zoomed In! ✓');
+
+    const statusElements1 = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements1.some(el => el.textContent?.includes('Map zoom increased.'))).toBe(true);
+
+    // Fast-forward 1.5s timer
+    act(() => {
+      vi.advanceTimersByTime(1600);
+    });
+
+    expect(zoomInBtn).toHaveAttribute('title', 'Zoom In (+)');
+
+    // Click Zoom Out
+    act(() => {
+      fireEvent.click(zoomOutBtn);
+    });
+
+    expect(screen.getByLabelText('Map zoom decreased')).toBeInTheDocument();
+    expect(zoomOutBtn).toHaveAttribute('title', 'Zoomed Out! ✓');
+
+    const statusElements2 = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements2.some(el => el.textContent?.includes('Map zoom decreased.'))).toBe(true);
+
+    // Fast-forward 1.5s timer
+    act(() => {
+      vi.advanceTimersByTime(1600);
+    });
+
+    // Click Reset Zoom
+    act(() => {
+      fireEvent.click(resetZoomBtn);
+    });
+
+    expect(screen.getByLabelText('Map zoom reset')).toBeInTheDocument();
+    expect(resetZoomBtn).toHaveAttribute('title', 'Zoom Reset! ✓');
+
+    const statusElements3 = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements3.some(el => el.textContent?.includes('Map zoom reset to default.'))).toBe(true);
+
+    vi.useRealTimers();
   });
 
   it('WorldMap should render Heritage Sanctuary markers as interactive accessible buttons', () => {
