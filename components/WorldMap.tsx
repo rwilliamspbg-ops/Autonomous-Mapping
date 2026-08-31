@@ -415,7 +415,29 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
 
   }, [worldData, selectedId, hoveredCountry?.id, focusCountryName, demoPulse]);
 
+  const [zoomFeedback, setZoomFeedback] = useState<'IN' | 'OUT' | 'RESET' | null>(null);
+  const zoomFeedbackTimerRef = useRef<number | null>(null);
+
+  const triggerZoomFeedback = (type: 'IN' | 'OUT' | 'RESET') => {
+    setZoomFeedback(type);
+    if (zoomFeedbackTimerRef.current) {
+      window.clearTimeout(zoomFeedbackTimerRef.current);
+    }
+    zoomFeedbackTimerRef.current = window.setTimeout(() => {
+      setZoomFeedback(null);
+    }, 1500);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (zoomFeedbackTimerRef.current) {
+        window.clearTimeout(zoomFeedbackTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleZoomIn = () => {
+    triggerZoomFeedback('IN');
     if (svgRef.current && zoomRef.current) {
       d3.select(svgRef.current)
         .transition()
@@ -425,6 +447,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
   };
 
   const handleZoomOut = () => {
+    triggerZoomFeedback('OUT');
     if (svgRef.current && zoomRef.current) {
       d3.select(svgRef.current)
         .transition()
@@ -434,6 +457,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
   };
 
   const handleZoomReset = () => {
+    triggerZoomFeedback('RESET');
     if (svgRef.current && zoomRef.current) {
       d3.select(svgRef.current)
         .transition()
@@ -477,33 +501,55 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
     <div className="w-full h-full bg-slate-950 overflow-hidden relative group">
       <svg ref={svgRef} className="w-full h-full" />
 
+      <div role="status" aria-live="polite" className="sr-only">
+        {zoomFeedback === 'IN'
+          ? 'Map zoom increased.'
+          : zoomFeedback === 'OUT'
+          ? 'Map zoom decreased.'
+          : zoomFeedback === 'RESET'
+          ? 'Map zoom reset to default.'
+          : ''}
+      </div>
+
       {/* Tactical Zoom Controls */}
       <div className="absolute bottom-[280px] right-8 flex flex-col gap-2 z-10">
         <button
           onClick={handleZoomIn}
-          aria-label="Zoom In (Press + or =)"
-          title="Zoom In (+)"
-          className="relative w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg"
+          aria-label={zoomFeedback === 'IN' ? 'Map zoom increased' : 'Zoom In (Press + or =)'}
+          title={zoomFeedback === 'IN' ? 'Zoomed In! ✓' : 'Zoom In (+)'}
+          className={`relative w-11 h-11 backdrop-blur-md border transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg rounded-xl flex items-center justify-center font-bold text-lg ${
+            zoomFeedback === 'IN'
+              ? 'bg-blue-600/30 border-blue-400 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]'
+              : 'bg-slate-900/80 border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300'
+          }`}
         >
-          ＋
+          {zoomFeedback === 'IN' ? '＋✓' : '＋'}
           <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter">+</kbd>
         </button>
         <button
           onClick={handleZoomOut}
-          aria-label="Zoom Out (Press - or _)"
-          title="Zoom Out (-)"
-          className="relative w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center font-bold text-lg transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg"
+          aria-label={zoomFeedback === 'OUT' ? 'Map zoom decreased' : 'Zoom Out (Press - or _)'}
+          title={zoomFeedback === 'OUT' ? 'Zoomed Out! ✓' : 'Zoom Out (-)'}
+          className={`relative w-11 h-11 backdrop-blur-md border transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg rounded-xl flex items-center justify-center font-bold text-lg ${
+            zoomFeedback === 'OUT'
+              ? 'bg-blue-600/30 border-blue-400 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]'
+              : 'bg-slate-900/80 border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300'
+          }`}
         >
-          －
+          {zoomFeedback === 'OUT' ? '－✓' : '－'}
           <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter">-</kbd>
         </button>
         <button
           onClick={handleZoomReset}
-          aria-label="Reset Zoom (Press r or R)"
-          title="Reset Zoom (R)"
-          className="relative w-11 h-11 bg-slate-900/80 backdrop-blur-md border border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300 rounded-xl flex items-center justify-center text-xs font-black tracking-tighter transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg mono uppercase"
+          aria-label={zoomFeedback === 'RESET' ? 'Map zoom reset' : 'Reset Zoom (Press r or R)'}
+          title={zoomFeedback === 'RESET' ? 'Zoom Reset! ✓' : 'Reset Zoom (R)'}
+          className={`relative w-11 h-11 backdrop-blur-md border transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shadow-lg rounded-xl flex items-center justify-center text-xs font-black tracking-tighter mono uppercase ${
+            zoomFeedback === 'RESET'
+              ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+              : 'bg-slate-900/80 border-white/10 hover:border-blue-500/50 hover:text-blue-400 text-slate-300'
+          }`}
         >
-          RST
+          {zoomFeedback === 'RESET' ? 'RST✓' : 'RST'}
           <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter">R</kbd>
         </button>
       </div>
