@@ -25,6 +25,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
   const [isLoading, setIsLoading] = useState(false);
   const [copiedMsgIdx, setCopiedMsgIdx] = useState<number | null>(null);
   const [confirmClear, setConfirmClear] = useState(false);
+  const [lastAnnouncedMsg, setLastAnnouncedMsg] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
@@ -83,11 +84,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
 
     try {
       const response = await chatWithAnalyst(messages.map(m => ({ role: m.role, content: m.content })), input);
-      const aiMsg: ChatMessage = { role: 'assistant', content: response || "I'm sorry, I couldn't process that request.", timestamp: Date.now() };
+      const textResponse = response || "I'm sorry, I couldn't process that request.";
+      const aiMsg: ChatMessage = { role: 'assistant', content: textResponse, timestamp: Date.now() };
       setMessages(prev => [...prev, aiMsg]);
+      setLastAnnouncedMsg(`New message from Impact Analyst: ${textResponse}`);
     } catch (error) {
       console.error(error);
-      setMessages(prev => [...prev, { role: 'assistant', content: "Connection to intelligence servers lost. Please try again.", timestamp: Date.now() }]);
+      const errorText = "Connection to intelligence servers lost. Please try again.";
+      setMessages(prev => [...prev, { role: 'assistant', content: errorText, timestamp: Date.now() }]);
+      setLastAnnouncedMsg(`New message from Impact Analyst: ${errorText}`);
     } finally {
       setIsLoading(false);
     }
@@ -182,7 +187,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
             className="flex-1 overflow-y-auto p-4 space-y-4 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             <div role="status" aria-live="polite" className="sr-only">
-              {copiedMsgIdx !== null ? "Message copied to clipboard." : ""}
+              {copiedMsgIdx !== null ? "Message copied to clipboard." : lastAnnouncedMsg || ""}
             </div>
             {messages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} group relative`}>
@@ -273,11 +278,27 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                 aria-describedby="chat-char-counter"
                 className="w-full bg-slate-800 border-none rounded-xl py-2 pl-4 pr-24 text-white placeholder-slate-500 focus:ring-1 focus:ring-blue-500"
               />
-              <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center pr-2 pointer-events-none select-none">
+              <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-2 pr-1 select-none">
+                {input.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInput('');
+                      inputRef.current?.focus();
+                    }}
+                    aria-label="Clear text input"
+                    title="Clear text"
+                    className="p-0.5 text-slate-400 hover:text-white transition-all rounded focus-visible:ring-2 focus-visible:ring-blue-500 outline-none cursor-pointer active:scale-90"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
                 <span
                   id="chat-char-counter"
                   aria-live="polite"
-                  className={`mono text-[9px] uppercase tracking-tighter ${counterColorClass}`}
+                  className={`mono text-[9px] uppercase tracking-tighter pointer-events-none ${counterColorClass}`}
                 >
                   {inputLen}/{charLimit}
                 </span>

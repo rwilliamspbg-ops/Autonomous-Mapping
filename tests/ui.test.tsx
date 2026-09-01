@@ -589,6 +589,64 @@ describe('UI Components', () => {
     expect(screen.queryByLabelText('Resume auto-scroll to bottom of terminal logs')).not.toBeInTheDocument();
   });
 
+  it('ChatInterface renders clear text button when typing in input, and clicking it clears text and focuses input', () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i) as HTMLInputElement;
+    expect(screen.queryByLabelText('Clear text input')).not.toBeInTheDocument();
+
+    // Type text into input
+    fireEvent.change(chatInput, { target: { value: 'Testing clear button' } });
+
+    const clearInputBtn = screen.getByLabelText('Clear text input');
+    expect(clearInputBtn).toBeInTheDocument();
+    expect(clearInputBtn).toHaveAttribute('title', 'Clear text');
+
+    // Click clear text button
+    act(() => {
+      fireEvent.click(clearInputBtn);
+    });
+
+    expect(chatInput.value).toBe('');
+    expect(document.activeElement).toBe(chatInput);
+    expect(screen.queryByLabelText('Clear text input')).not.toBeInTheDocument();
+  });
+
+  it('ChatInterface announces newly received AI analyst responses in polite live region', async () => {
+    const { chatWithAnalyst } = await import('../services/geminiService');
+    const mockedChatWithAnalyst = vi.mocked(chatWithAnalyst);
+    mockedChatWithAnalyst.mockResolvedValue('Here is the privacy breakdown for the pilot.');
+
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i);
+    fireEvent.change(chatInput, { target: { value: 'Explain health pilot privacy.' } });
+
+    await act(async () => {
+      fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    });
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasAIAnnouncement = statusElements.some(el =>
+      el.textContent?.includes('New message from Impact Analyst: Here is the privacy breakdown for the pilot.')
+    );
+    expect(hasAIAnnouncement).toBe(true);
+  });
+
   it('ChatInterface Clear Chat button confirmation resets back to default after a timeout', async () => {
     const { chatWithAnalyst } = await import('../services/geminiService');
     const mockedChatWithAnalyst = vi.mocked(chatWithAnalyst);
