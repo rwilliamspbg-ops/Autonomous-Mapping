@@ -111,3 +111,7 @@
 ## 2027-03-29 - Quick Prompt Suggestions for Conversational Analyst Widgets
 **Learning:** Sighted and keyboard users opening an interactive chat interface often experience typing cold-starts or uncertainty on what topics can be queried. Displaying interactive, cyber-styled suggested prompt chips inside the initial welcome message lowers cognitive barrier, instantly populates the input field, and auto-focuses the input element for immediate editing or sending.
 **Action:** Always render keyboard-accessible, focus-visible prompt suggestion chips for initial welcome messages in chat panels to guide user interaction smoothly.
+
+## 2027-04-05 - Clear Text Input Triggers and Live Region Response Announcements
+**Learning:** Text inputs with tight constraints or prompt pre-fills require repetitive backspacing unless paired with an inline, focusable clear text button (`×`) that resets the string and retains input focus in a single action. Additionally, streaming or asynchronous assistant messages inside chat panels are missed by screen readers unless newly generated responses explicitly update a polite live region (`role="status" aria-live="polite"`).
+**Action:** Always complement populated input fields with an accessible clear button that refocuses the input, and route incoming assistant responses to polite live regions for screen readers.
