@@ -115,3 +115,7 @@
 ## 2027-04-05 - Clear Text Input Triggers and Live Region Response Announcements
 **Learning:** Text inputs with tight constraints or prompt pre-fills require repetitive backspacing unless paired with an inline, focusable clear text button (`×`) that resets the string and retains input focus in a single action. Additionally, streaming or asynchronous assistant messages inside chat panels are missed by screen readers unless newly generated responses explicitly update a polite live region (`role="status" aria-live="polite"`).
 **Action:** Always complement populated input fields with an accessible clear button that refocuses the input, and route incoming assistant responses to polite live regions for screen readers.
+
+## 2027-04-18 - Skip-to-Content Bypass Link for Dense Application Headers
+**Learning:** Applications with top header navigation buttons (like global panel triggers and hotkey indicators) force keyboard-only and screen reader users to tab through repetitive header controls on every page load before reaching main content. Providing a "Skip to main content" anchor (`sr-only focus:not-sr-only`) as the first focusable element targeting `<main id="main-content" tabIndex={-1}>` satisfies WCAG 2.4.1 Bypass Blocks without impacting visual layout when unfocused.
+**Action:** Always include a focus-revealed skip-to-content link targeting the primary `<main>` element in application shell components.
