@@ -297,6 +297,12 @@ const App: React.FC = () => {
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[#010409] text-slate-50 relative overflow-hidden font-sans">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-mono text-xs font-bold uppercase tracking-wider rounded-xl shadow-2xl border border-blue-400 focus-visible:ring-2 focus-visible:ring-white outline-none transition-all"
+      >
+        Skip to main content
+      </a>
       <div className="fixed inset-0 pointer-events-none z-50 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.4)_100%)] opacity-30"></div>
 
       <header className="h-20 border-b border-white/10 flex items-center justify-between px-8 bg-slate-950/98 backdrop-blur-2xl z-30 shrink-0 shadow-2xl relative">
@@ -365,7 +371,7 @@ const App: React.FC = () => {
       </header>
 
       {/* Production Workspace */}
-      <main className="flex-1 relative flex overflow-hidden">
+      <main id="main-content" tabIndex={-1} className="flex-1 relative flex overflow-hidden focus:outline-none">
         <div className="flex-1 relative">
           <WorldMap 
             onCountrySelect={setSelectedCountry} 

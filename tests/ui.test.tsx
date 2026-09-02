@@ -1201,6 +1201,19 @@ describe('UI Components', () => {
     expect(hasPhaseStatus).toBe(true);
   });
 
+  it('App renders accessible Skip to main content link targeting main container', () => {
+    render(<App />);
+
+    const skipLink = screen.getByText('Skip to main content');
+    expect(skipLink).toBeInTheDocument();
+    expect(skipLink.tagName.toLowerCase()).toBe('a');
+    expect(skipLink).toHaveAttribute('href', '#main-content');
+
+    const mainContainer = document.getElementById('main-content');
+    expect(mainContainer).toBeInTheDocument();
+    expect(mainContainer).toHaveAttribute('tabIndex', '-1');
+  });
+
   it('App Protocol_Flow Reset button displays Reset! ✓ feedback and updates polite live region', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);
