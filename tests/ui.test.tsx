@@ -989,6 +989,49 @@ describe('UI Components', () => {
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
+  it('Manifesto displays Copy Manifesto button and copies formatted text to clipboard with tactile feedback', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<Manifesto isOpen={true} onClose={() => {}} />);
+
+    const copyBtn = screen.getByLabelText('Copy Sovereign Map Manifesto to clipboard');
+    expect(copyBtn).toBeInTheDocument();
+    expect(copyBtn).toHaveAttribute('title', 'Copy Manifesto');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copyBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalled();
+    const writtenText = writeTextSpy.mock.calls[0][0];
+    expect(writtenText).toContain('SOVEREIGN MAP FOR GOOD - MANIFESTO');
+    expect(writtenText).toContain('THE NARRATIVE:');
+    expect(copyBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Manifesto text copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyBtn.textContent).toContain('Copy Manifesto');
+
+    vi.useRealTimers();
+  });
+
   it('App Impact Stream console displays and interacts with Copy Stream button when logs exist', async () => {
     const { fireEvent } = require('@testing-library/react');
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
