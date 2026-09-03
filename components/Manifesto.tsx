@@ -8,8 +8,31 @@ interface ManifestoProps {
 }
 
 const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo }) => {
+  const [copied, setCopied] = React.useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
+
+  const handleCopyManifesto = () => {
+    const manifestoText = [
+      "SOVEREIGN MAP FOR GOOD - MANIFESTO",
+      "====================================",
+      "THE NARRATIVE:",
+      "Non-profit funders need more than a technical proof-of-concept. They need a story about how privacy-preserving AI helps people, protects local data, and reduces wasted infrastructure. Sovereign Map turns that story into a live demo.",
+      "",
+      "PRIVACY & TRUST:",
+      "The core promise is simple: data stays local, updates are verified, and only safe summaries move outward. That is the practical value of federated learning, ZK proofs, and TPM-backed attestation.",
+      "",
+      "CARBON & SCALE:",
+      "Edge training reduces unnecessary cloud transfer, lowers energy use, and gives local institutions a stronger privacy posture. The demo keeps those tradeoffs visible instead of hiding them behind abstraction.",
+      "",
+      "PILOT LANES:",
+      "Global Health, Human Rights, and Climate Resilience are the three demo lanes. Each shows the same runtime through a mission lens that funders can understand immediately."
+    ].join('\n');
+
+    navigator.clipboard.writeText(manifestoText);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -53,9 +76,21 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo }) =
             <div className="mono text-[10px] text-blue-500 font-black uppercase tracking-[0.4em] mb-2">Impact_Demo // v2.0</div>
             <h2 className="text-4xl font-black text-white tracking-tighter uppercase">Sovereign Map <span className="text-blue-500">for Good</span></h2>
           </div>
-          <button
-            ref={closeButtonRef}
-            onClick={onClose}
+          <div className="flex items-center gap-3">
+            <div role="status" aria-live="polite" className="sr-only">
+              {copied ? "Manifesto text copied to clipboard." : ""}
+            </div>
+            <button
+              onClick={handleCopyManifesto}
+              aria-label="Copy Sovereign Map Manifesto to clipboard"
+              title="Copy Manifesto"
+              className="px-3 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[10px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+            >
+              {copied ? 'Copied! ✓' : 'Copy Manifesto'}
+            </button>
+            <button
+              ref={closeButtonRef}
+              onClick={onClose}
             aria-label="Close Sovereign Map Manifesto (Escape)"
             title="Close (Escape)"
             className="p-2 hover:bg-white/10 rounded-full transition-all active:scale-90 text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative group"
@@ -63,6 +98,7 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo }) =
             <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
             <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
           </button>
+          </div>
         </div>
 
         {/* Content */}
