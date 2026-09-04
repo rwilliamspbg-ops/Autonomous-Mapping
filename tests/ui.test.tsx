@@ -512,7 +512,27 @@ describe('UI Components', () => {
     expect(screen.getByText(/Hello. I am your Impact Analyst/i)).toBeInTheDocument();
     expect(screen.queryByText('What is our privacy strategy?')).not.toBeInTheDocument();
 
+    // Verify polite live region announcement upon clearing chat
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasClearedAnnouncement = statusElements.some(el => el.textContent?.includes('Chat history cleared.'));
+    expect(hasClearedAnnouncement).toBe(true);
+
     vi.useRealTimers();
+  });
+
+  it('ChatInterface displays formatted timestamp on chat bubbles', () => {
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    // The initial assistant message timestamp should be formatted (e.g., match regex for time pattern like 12:34 PM or 02:02 AM)
+    const timeRegexp = /\d{1,2}:\d{2}\s?(AM|PM)?/i;
+    const timeElements = screen.getAllByText(timeRegexp);
+    expect(timeElements.length).toBeGreaterThan(0);
   });
 
   it('HardhatTerminal displays and interacts with Clear Logs button', async () => {

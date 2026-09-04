@@ -116,6 +116,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
       setMessages([
         { role: 'assistant', content: "Hello. I am your Impact Analyst. Ask me about privacy-preserving health pilots, human-rights reporting, climate resilience deployments, or the demo economics.", timestamp: Date.now() }
       ]);
+      setLastAnnouncedMsg('Chat history cleared.');
       setConfirmClear(false);
       if (confirmTimerRef.current) {
         clearTimeout(confirmTimerRef.current);
@@ -189,58 +190,65 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
             <div role="status" aria-live="polite" className="sr-only">
               {copiedMsgIdx !== null ? "Message copied to clipboard." : lastAnnouncedMsg || ""}
             </div>
-            {messages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} group relative`}>
-                <div className={`max-w-[85%] p-3 rounded-2xl text-sm relative pr-10 ${
-                  msg.role === 'user' 
-                    ? 'bg-blue-600 text-white rounded-tr-none' 
-                    : 'bg-slate-800 text-slate-200 rounded-tl-none'
-                }`}>
-                  <div className="break-words">{msg.content}</div>
+            {messages.map((msg, idx) => {
+              const formattedTime = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              return (
+                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} group relative`}>
+                  <div className={`max-w-[85%] p-3 rounded-2xl text-sm relative pr-10 ${
+                    msg.role === 'user'
+                      ? 'bg-blue-600 text-white rounded-tr-none'
+                      : 'bg-slate-800 text-slate-200 rounded-tl-none'
+                  }`}>
+                    <div className="break-words">{msg.content}</div>
 
-                  {idx === 0 && messages.length === 1 && (
-                    <div className="flex flex-wrap gap-1.5 mt-2.5 pt-2.5 border-t border-slate-700/50">
-                      <div className="w-full text-[9px] mono uppercase text-slate-400 font-bold tracking-wider mb-0.5">Suggested Prompts:</div>
-                      {QUICK_PROMPTS.map((prompt) => (
-                        <button
-                          key={prompt}
-                          onClick={() => {
-                            setInput(prompt);
-                            inputRef.current?.focus();
-                          }}
-                          aria-label={`Use prompt: ${prompt}`}
-                          title={`Use prompt: ${prompt}`}
-                          className="text-[10px] mono bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-2 py-1 rounded-lg border border-blue-500/20 transition-all font-semibold active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
-                        >
-                          {prompt}
-                        </button>
-                      ))}
+                    <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-slate-700/30 text-[9px] mono font-medium text-slate-400">
+                      <span className="opacity-80">{formattedTime}</span>
                     </div>
-                  )}
 
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(msg.content);
-                      setCopiedMsgIdx(idx);
-                      setTimeout(() => setCopiedMsgIdx(null), 2000);
-                    }}
-                    aria-label={`Copy message from ${msg.role === 'user' ? 'you' : 'analyst'}: "${msg.content.substring(0, 30)}..." to clipboard`}
-                    title="Copy message"
-                    className={`absolute right-2 top-2 p-1 rounded-md transition-all active:scale-90 text-slate-400 hover:text-white focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:opacity-100 outline-none opacity-0 group-hover:opacity-100 ${
-                      copiedMsgIdx === idx ? 'opacity-100 text-emerald-400 hover:text-emerald-300' : ''
-                    }`}
-                  >
-                    {copiedMsgIdx === idx ? (
-                      <span className="text-[10px] font-bold mono">Copied! ✓</span>
-                    ) : (
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                      </svg>
+                    {idx === 0 && messages.length === 1 && (
+                      <div className="flex flex-wrap gap-1.5 mt-2.5 pt-2.5 border-t border-slate-700/50">
+                        <div className="w-full text-[9px] mono uppercase text-slate-400 font-bold tracking-wider mb-0.5">Suggested Prompts:</div>
+                        {QUICK_PROMPTS.map((prompt) => (
+                          <button
+                            key={prompt}
+                            onClick={() => {
+                              setInput(prompt);
+                              inputRef.current?.focus();
+                            }}
+                            aria-label={`Use prompt: ${prompt}`}
+                            title={`Use prompt: ${prompt}`}
+                            className="text-[10px] mono bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-2 py-1 rounded-lg border border-blue-500/20 transition-all font-semibold active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                          >
+                            {prompt}
+                          </button>
+                        ))}
+                      </div>
                     )}
-                  </button>
+
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(msg.content);
+                        setCopiedMsgIdx(idx);
+                        setTimeout(() => setCopiedMsgIdx(null), 2000);
+                      }}
+                      aria-label={`Copy message from ${msg.role === 'user' ? 'you' : 'analyst'}: "${msg.content.substring(0, 30)}..." to clipboard`}
+                      title="Copy message"
+                      className={`absolute right-2 top-2 p-1 rounded-md transition-all active:scale-90 text-slate-400 hover:text-white focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:opacity-100 outline-none opacity-0 group-hover:opacity-100 ${
+                        copiedMsgIdx === idx ? 'opacity-100 text-emerald-400 hover:text-emerald-300' : ''
+                      }`}
+                    >
+                      {copiedMsgIdx === idx ? (
+                        <span className="text-[10px] font-bold mono">Copied! ✓</span>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {isLoading && (
               <div
                 role="status"
