@@ -121,6 +121,51 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('App Evidence Trail displays and interacts with Clear Trail button requiring confirmation', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Initially when empty, Clear Trail button is not present
+    expect(screen.queryByLabelText('Clear evidence trail events')).not.toBeInTheDocument();
+
+    // Select a track lane to record an evidence event
+    const healthLaneBtn = screen.getByLabelText(/Select Health lane/i);
+    await act(async () => {
+      fireEvent.click(healthLaneBtn);
+    });
+
+    const clearTrailBtn = screen.getByLabelText('Clear evidence trail events');
+    expect(clearTrailBtn).toBeInTheDocument();
+    expect(clearTrailBtn).toHaveAttribute('title', 'Clear evidence trail events');
+
+    vi.useFakeTimers();
+
+    // Click Clear Trail once to enter confirmation state
+    act(() => {
+      fireEvent.click(clearTrailBtn);
+    });
+
+    expect(clearTrailBtn).toHaveAttribute('aria-label', 'Confirm clear evidence trail events');
+    expect(clearTrailBtn).toHaveAttribute('title', 'Confirm clear evidence trail?');
+    expect(clearTrailBtn.textContent).toContain('Sure?');
+
+    // Click again to confirm clear
+    act(() => {
+      fireEvent.click(clearTrailBtn);
+    });
+
+    // Trail events cleared, button disappears
+    expect(screen.queryByLabelText('Clear evidence trail events')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Confirm clear evidence trail events')).not.toBeInTheDocument();
+
+    // Check polite live region announcement
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasClearedStatus = statusElements.some(el => el.textContent?.includes('Evidence trail cleared.'));
+    expect(hasClearedStatus).toBe(true);
+
+    vi.useRealTimers();
+  });
+
   it('WorldMap should render Heritage Sanctuary markers as interactive accessible buttons', () => {
     // In unit test environment, WorldMap fetches TopoJSON asynchronously before rendering D3 elements.
     // Fetch mock resolves TopoJSON, triggering D3 selections.
