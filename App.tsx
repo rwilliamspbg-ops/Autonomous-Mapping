@@ -45,10 +45,13 @@ const App: React.FC = () => {
   const [demoRunning, setDemoRunning] = useState(false);
   const [evidenceTrail, setEvidenceTrail] = useState<EvidenceEntry[]>([]);
   const [trailCopied, setTrailCopied] = useState(false);
+  const [confirmClearTrail, setConfirmClearTrail] = useState(false);
+  const [lastAnnouncedTrailStatus, setLastAnnouncedTrailStatus] = useState<string | null>(null);
   const [streamCopied, setStreamCopied] = useState(false);
   const [coordsCopied, setCoordsCopied] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const protocolTimersRef = useRef<number[]>([]);
+  const clearTrailTimerRef = useRef<number | null>(null);
   const demoTickRef = useRef<number | null>(null);
   const demoStartRef = useRef<number | null>(null);
   const impactPillars = [
@@ -87,6 +90,9 @@ const App: React.FC = () => {
       protocolTimersRef.current = [];
       if (demoTickRef.current) {
         window.clearInterval(demoTickRef.current);
+      }
+      if (clearTrailTimerRef.current) {
+        window.clearTimeout(clearTrailTimerRef.current);
       }
     };
   }, []);
@@ -261,6 +267,24 @@ const App: React.FC = () => {
     });
   };
 
+  const handleClearTrail = () => {
+    if (!confirmClearTrail) {
+      setConfirmClearTrail(true);
+      if (clearTrailTimerRef.current) clearTimeout(clearTrailTimerRef.current);
+      clearTrailTimerRef.current = window.setTimeout(() => {
+        setConfirmClearTrail(false);
+      }, 4000);
+    } else {
+      setEvidenceTrail([]);
+      setLastAnnouncedTrailStatus('Evidence trail cleared.');
+      setConfirmClearTrail(false);
+      if (clearTrailTimerRef.current) {
+        clearTimeout(clearTrailTimerRef.current);
+        clearTrailTimerRef.current = null;
+      }
+    }
+  };
+
   const resetProtocol = () => {
     clearProtocolTimers();
     setProtocolPhase('IDLE');
@@ -274,6 +298,8 @@ const App: React.FC = () => {
     setIsChatOpen(false);
     setEvidenceTrail([]);
     setTrailCopied(false);
+    setConfirmClearTrail(false);
+    setLastAnnouncedTrailStatus(null);
     setStreamCopied(false);
     setCoordsCopied(false);
     demoStartRef.current = null;
@@ -485,25 +511,39 @@ const App: React.FC = () => {
 
               <div className="mt-4 border-t border-white/5 pt-4">
                 <div role="status" aria-live="polite" className="sr-only">
-                  {trailCopied ? "Evidence Trail copied to clipboard." : ""}
+                  {trailCopied ? "Evidence Trail copied to clipboard." : lastAnnouncedTrailStatus || ""}
                 </div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] mono text-slate-500 uppercase tracking-[0.35em] font-black">Evidence_Trail</span>
                   <div className="flex items-center gap-2">
                     {evidenceTrail.length > 0 && (
-                      <button
-                        onClick={() => {
-                          const formattedTrail = evidenceTrail.map((e, idx) => `[${idx + 1}] ${e.title}: ${e.detail}`).join('\n');
-                          navigator.clipboard.writeText(formattedTrail);
-                          setTrailCopied(true);
-                          setTimeout(() => setTrailCopied(false), 2000);
-                        }}
-                        aria-label="Copy Evidence Trail to clipboard"
-                        title="Copy Evidence Trail"
-                        className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
-                      >
-                        {trailCopied ? 'Copied! ✓' : 'Copy Trail'}
-                      </button>
+                      <>
+                        <button
+                          onClick={() => {
+                            const formattedTrail = evidenceTrail.map((e, idx) => `[${idx + 1}] ${e.title}: ${e.detail}`).join('\n');
+                            navigator.clipboard.writeText(formattedTrail);
+                            setTrailCopied(true);
+                            setTimeout(() => setTrailCopied(false), 2000);
+                          }}
+                          aria-label="Copy Evidence Trail to clipboard"
+                          title="Copy Evidence Trail"
+                          className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                        >
+                          {trailCopied ? 'Copied! ✓' : 'Copy Trail'}
+                        </button>
+                        <button
+                          onClick={handleClearTrail}
+                          aria-label={confirmClearTrail ? "Confirm clear evidence trail events" : "Clear evidence trail events"}
+                          title={confirmClearTrail ? "Confirm clear evidence trail?" : "Clear evidence trail events"}
+                          className={`px-2 py-1 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border shadow-md focus-visible:ring-2 outline-none transition-all active:scale-95 shrink-0 ${
+                            confirmClearTrail
+                              ? 'bg-rose-500/20 border-rose-500 text-rose-400 hover:bg-rose-500 hover:text-white focus-visible:ring-rose-500'
+                              : 'bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-rose-400 border-white/10 focus-visible:ring-blue-500'
+                          }`}
+                        >
+                          {confirmClearTrail ? 'Sure?' : 'Clear Trail'}
+                        </button>
+                      </>
                     )}
                     <span className="text-[9px] mono text-slate-700 uppercase tracking-widest">{evidenceTrail.length} events</span>
                   </div>
