@@ -119,3 +119,7 @@
 ## 2027-04-18 - Skip-to-Content Bypass Link for Dense Application Headers
 **Learning:** Applications with top header navigation buttons (like global panel triggers and hotkey indicators) force keyboard-only and screen reader users to tab through repetitive header controls on every page load before reaching main content. Providing a "Skip to main content" anchor (`sr-only focus:not-sr-only`) as the first focusable element targeting `<main id="main-content" tabIndex={-1}>` satisfies WCAG 2.4.1 Bypass Blocks without impacting visual layout when unfocused.
 **Action:** Always include a focus-revealed skip-to-content link targeting the primary `<main>` element in application shell components.
+
+## 2027-04-25 - Explicit Completion Status Badges in Multi-stage Protocol Workflows
+**Learning:** Multi-stage sequential workflow cards (such as protocol stages) that only highlight the currently active step leave completed past stages looking plain or ambiguous relative to pending steps. Adding an explicit completion badge (`✓ [DONE]`) in emerald styling for completed stages establishes immediate visual hierarchy and reassures users at a glance of progression history.
+**Action:** Always complement active/processing badges in sequential workflow cards with explicit completion indicators for past steps.

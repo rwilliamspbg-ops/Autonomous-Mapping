@@ -449,6 +449,12 @@ const App: React.FC = () => {
                             {stage.key === 'VERIFIED' ? '[VERIFIED]' : '[PROCESSING]'}
                           </span>
                         )}
+                        {isComplete && (
+                          <span className="text-[8px] font-black tracking-widest text-emerald-400 flex items-center gap-1 shrink-0">
+                            <span>✓</span>
+                            <span>[DONE]</span>
+                          </span>
+                        )}
                       </div>
                       <div className="mt-1 text-[10px] text-slate-300 leading-snug">{stage.detail}</div>
                     </button>

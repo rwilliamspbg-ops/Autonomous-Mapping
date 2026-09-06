@@ -1357,4 +1357,31 @@ describe('UI Components', () => {
 
     vi.useRealTimers();
   });
+
+  it('App Protocol_Flow displays [DONE] completion badges for completed stages', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Initially at IDLE, no stage is completed yet
+    expect(screen.queryByText('[DONE]')).not.toBeInTheDocument();
+
+    // Select Route stage (stage 2)
+    const routeBtn = screen.getByLabelText(/Route stage/i);
+    await act(async () => {
+      fireEvent.click(routeBtn);
+    });
+
+    // Stage 1 (Attest) is now completed and displays the [DONE] badge
+    expect(screen.getByText('[DONE]')).toBeInTheDocument();
+
+    // Select Verified stage (stage 4)
+    const verifiedBtn = screen.getByLabelText(/Verified stage/i);
+    await act(async () => {
+      fireEvent.click(verifiedBtn);
+    });
+
+    // Stages 1, 2, and 3 (Attest, Route, Broadcast) are now completed
+    const doneBadges = screen.getAllByText('[DONE]');
+    expect(doneBadges.length).toBe(3);
+  });
 });
