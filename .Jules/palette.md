@@ -123,3 +123,7 @@
 ## 2027-04-25 - Explicit Completion Status Badges in Multi-stage Protocol Workflows
 **Learning:** Multi-stage sequential workflow cards (such as protocol stages) that only highlight the currently active step leave completed past stages looking plain or ambiguous relative to pending steps. Adding an explicit completion badge (`✓ [DONE]`) in emerald styling for completed stages establishes immediate visual hierarchy and reassures users at a glance of progression history.
 **Action:** Always complement active/processing badges in sequential workflow cards with explicit completion indicators for past steps.
+
+## 2027-05-02 - Discoverable Keyboard Shortcuts Modal & Accessible Hotkey Legend
+**Learning:** Dense web dashboards with global keyboard shortcuts (e.g. `C`, `M`, `S`, `T`, `+`, `-`, `R`) leave keyboard users searching through tooltips or guessing controls unless a central, accessible shortcut legend is discoverable. Adding a global `?` key listener paired with a top navigation "Shortcuts [?]" button and an accessible modal overlay (`role="dialog"`, `aria-modal="true"`, focus restoration, and Escape key listener) maximizes hotkey discoverability without cluttering the UI.
+**Action:** Always complement global hotkey systems with a `?` key shortcut legend modal and an explicit, focus-visible navigation header trigger.

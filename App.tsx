@@ -39,6 +39,9 @@ const App: React.FC = () => {
   const [isManifestoOpen, setIsManifestoOpen] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const shortcutsCloseRef = useRef<HTMLButtonElement>(null);
+  const shortcutsLastActiveRef = useRef<HTMLElement | null>(null);
   const [bootProgress, setBootProgress] = useState(0);
   const [protocolPhase, setProtocolPhase] = useState<ProtocolPhase>('IDLE');
   const [demoElapsedMs, setDemoElapsedMs] = useState(0);
@@ -109,7 +112,10 @@ const App: React.FC = () => {
       }
 
       const key = e.key.toLowerCase();
-      if (key === 'c') {
+      if (e.key === '?' || (e.key === '/' && e.shiftKey)) {
+        e.preventDefault();
+        setIsShortcutsOpen(prev => !prev);
+      } else if (key === 'c') {
         e.preventDefault();
         setIsChatOpen(prev => !prev);
       } else if (key === 'm') {
@@ -129,6 +135,31 @@ const App: React.FC = () => {
       window.removeEventListener('keydown', handleGlobalKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isShortcutsOpen) {
+      if (shortcutsLastActiveRef.current) {
+        shortcutsLastActiveRef.current.focus();
+        shortcutsLastActiveRef.current = null;
+      }
+      return;
+    }
+    shortcutsLastActiveRef.current = document.activeElement as HTMLElement;
+    const timer = setTimeout(() => {
+      shortcutsCloseRef.current?.focus();
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsShortcutsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      clearTimeout(timer);
+    };
+  }, [isShortcutsOpen]);
 
   useEffect(() => {
     const syncStages = [
@@ -392,6 +423,16 @@ const App: React.FC = () => {
             <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse shadow-[0_0_12px_white]"></div>
             <span>Check_My_Privacy</span>
             <kbd aria-hidden="true" className="px-1.5 py-0.5 bg-blue-900 border border-blue-400/40 rounded text-[8px] text-blue-300 font-mono tracking-tighter">S</kbd>
+          </button>
+
+          <button
+            onClick={() => setIsShortcutsOpen(true)}
+            aria-label="Keyboard Shortcuts (Press ?)"
+            title="Keyboard Shortcuts (?)"
+            className="px-4 py-3.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.25em] border border-white/10 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center gap-2"
+          >
+            <span>Shortcuts</span>
+            <kbd aria-hidden="true" className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-[8px] text-blue-400 font-mono tracking-tighter">?</kbd>
           </button>
         </nav>
       </header>
@@ -712,6 +753,70 @@ const App: React.FC = () => {
         onClose={() => setIsScannerOpen(false)}
         onScanComplete={(claim) => setLogs(prev => [...prev.slice(-5), `LOCAL_CONTRIBUTION: VERIFIED [0x${claim.id.toString(16).toUpperCase()}]`])}
       />
+
+      {/* Keyboard Shortcuts Overlay Modal */}
+      {isShortcutsOpen && (
+        <div
+          onClick={() => setIsShortcutsOpen(false)}
+          className="fixed inset-0 z-[80] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Keyboard Shortcuts"
+            className="w-full max-w-lg bg-slate-900 border border-blue-500/30 rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.15)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 cursor-default"
+          >
+            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-slate-950/60">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
+                <h3 className="font-mono text-sm font-black text-white uppercase tracking-[0.3em]">Keyboard_Shortcuts</h3>
+              </div>
+              <button
+                ref={shortcutsCloseRef}
+                onClick={() => setIsShortcutsOpen(false)}
+                aria-label="Close Keyboard Shortcuts (Escape)"
+                title="Close (Escape)"
+                className="p-2 hover:bg-white/10 rounded-full transition-all active:scale-90 text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative group"
+              >
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
+              </button>
+            </div>
+
+            <div
+              tabIndex={0}
+              aria-label="List of available keyboard shortcuts"
+              className="p-6 space-y-3 font-mono text-xs overflow-y-auto max-h-[60vh] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-b-2xl"
+            >
+              {[
+                { key: 'M', desc: 'Toggle Manifesto & Narrative Modal' },
+                { key: 'T', desc: 'Toggle Live Node Console (Terminal)' },
+                { key: 'S', desc: 'Toggle Spatial Privacy Scanner' },
+                { key: 'C', desc: 'Toggle Impact Analyst Chat' },
+                { key: '+ / =', desc: 'Tactile World Map Zoom In' },
+                { key: '- / _', desc: 'Tactile World Map Zoom Out' },
+                { key: 'R', desc: 'Reset World Map Zoom Level' },
+                { key: '?', desc: 'Show / Hide Keyboard Shortcuts Modal' },
+                { key: 'ESC', desc: 'Close Any Active Panel or Modal' },
+              ].map((item) => (
+                <div key={item.key} className="flex items-center justify-between p-3 rounded-xl bg-slate-950/60 border border-white/5 hover:border-blue-500/20 transition-colors">
+                  <span className="text-slate-300 font-medium">{item.desc}</span>
+                  <kbd className="px-2.5 py-1 bg-slate-800 border border-blue-500/40 rounded-lg text-blue-400 font-black text-[11px] shadow-sm tracking-widest shrink-0">
+                    {item.key}
+                  </kbd>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-4 bg-slate-950/80 border-t border-white/5 text-[9px] font-mono text-slate-500 uppercase tracking-widest text-center">
+              Global shortcuts are disabled while typing in text inputs.
+            </div>
+          </div>
+        </div>
+      )}
 
       <footer className="h-12 bg-slate-950/95 border-t border-white/10 flex items-center justify-between px-10 text-[10px] text-slate-600 mono uppercase tracking-[0.3em] shrink-0 z-30 backdrop-blur-xl">
         <div className="flex gap-10 items-center">

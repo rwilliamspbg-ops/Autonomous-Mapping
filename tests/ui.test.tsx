@@ -221,6 +221,53 @@ describe('UI Components', () => {
     expect(screen.getByText(/Live_Node_Console/i)).toBeInTheDocument();
   });
 
+  it('App Keyboard Shortcuts modal opens via ? key and header trigger button, manages focus, and closes via Escape key', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    const shortcutsTriggerBtn = screen.getByLabelText('Keyboard Shortcuts (Press ?)');
+    expect(shortcutsTriggerBtn).toBeInTheDocument();
+    expect(shortcutsTriggerBtn).toHaveAttribute('title', 'Keyboard Shortcuts (?)');
+
+    // Focus and click trigger button to open modal
+    shortcutsTriggerBtn.focus();
+    await act(async () => {
+      fireEvent.click(shortcutsTriggerBtn);
+    });
+
+    const dialog = screen.getByRole('dialog', { name: 'Keyboard Shortcuts' });
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
+    expect(screen.getByText('Keyboard_Shortcuts')).toBeInTheDocument();
+    expect(screen.getByText('Toggle Manifesto & Narrative Modal')).toBeInTheDocument();
+
+    const closeBtn = screen.getByLabelText('Close Keyboard Shortcuts (Escape)');
+    expect(closeBtn).toBeInTheDocument();
+
+    // Wait for the 50ms focus timer to set focus to close button
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 60));
+    });
+    expect(document.activeElement).toBe(closeBtn);
+
+    // Press Escape to close modal
+    act(() => {
+      const escEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+      window.dispatchEvent(escEvent);
+    });
+
+    expect(screen.queryByRole('dialog', { name: 'Keyboard Shortcuts' })).not.toBeInTheDocument();
+    expect(document.activeElement).toBe(shortcutsTriggerBtn);
+
+    // Press ? on window to open modal
+    act(() => {
+      const questionEvent = new KeyboardEvent('keydown', { key: '?' });
+      window.dispatchEvent(questionEvent);
+    });
+
+    expect(screen.getByRole('dialog', { name: 'Keyboard Shortcuts' })).toBeInTheDocument();
+  });
+
   it('App component global hotkeys should not trigger when typing in inputs', () => {
     const { container } = render(<App />);
 
