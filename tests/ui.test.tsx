@@ -612,6 +612,75 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('ChatInterface displays and interacts with Copy Chat transcript export button', async () => {
+    const { chatWithAnalyst } = await import('../services/geminiService');
+    const mockedChatWithAnalyst = vi.mocked(chatWithAnalyst);
+    mockedChatWithAnalyst.mockResolvedValue('AI Response');
+
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    // Copy Chat button is not present when messages.length === 1
+    expect(screen.queryByLabelText('Copy Chat transcript to clipboard')).not.toBeInTheDocument();
+
+    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i);
+    fireEvent.change(chatInput, { target: { value: 'Export chat transcript test' } });
+
+    // Submit message
+    await act(async () => {
+      fireEvent.submit(screen.getByRole('textbox').closest('form')!);
+    });
+
+    // Copy Chat button is now present
+    const copyChatBtn = screen.getByLabelText('Copy Chat transcript to clipboard');
+    expect(copyChatBtn).toBeInTheDocument();
+    expect(copyChatBtn).toHaveAttribute('title', 'Copy Chat transcript');
+
+    vi.useFakeTimers();
+
+    // Click to copy transcript
+    act(() => {
+      fireEvent.click(copyChatBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalled();
+    const transcriptText = writeTextSpy.mock.calls[0][0];
+    expect(transcriptText).toContain('Impact Analyst: Hello. I am your Impact Analyst.');
+    expect(transcriptText).toContain('User: Export chat transcript test');
+    expect(transcriptText).toContain('Impact Analyst: AI Response');
+    expect(copyChatBtn.textContent).toContain('Copied! ✓');
+
+    // Check live region
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Chat transcript copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    // Fast-forward 2 seconds to reset copied state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyChatBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyChatBtn.textContent).toContain('Copy Chat');
+
+    vi.useRealTimers();
+  });
+
   it('ChatInterface displays formatted timestamp on chat bubbles', () => {
     render(<App />);
 
