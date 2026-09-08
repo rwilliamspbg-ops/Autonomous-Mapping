@@ -24,7 +24,13 @@ vi.mock('d3', () => ({
     clipExtent: vi.fn().mockReturnThis(),
     invert: vi.fn(() => [0,0]),
   })),
-  geoPath: vi.fn(() => vi.fn()),
+  geoPath: vi.fn(() => {
+    const fn: any = vi.fn();
+    fn.projection = vi.fn().mockReturnThis();
+    fn.bounds = vi.fn(() => [[0, 0], [10, 10]]);
+    fn.centroid = vi.fn(() => [5, 5]);
+    return fn;
+  }),
   geoGraticule: vi.fn(() => ({
     outline: vi.fn(),
   })),
