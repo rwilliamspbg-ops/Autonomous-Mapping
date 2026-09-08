@@ -24,6 +24,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedMsgIdx, setCopiedMsgIdx] = useState<number | null>(null);
+  const [chatCopied, setChatCopied] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
   const [lastAnnouncedMsg, setLastAnnouncedMsg] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -105,6 +106,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
     inputLen > 150 ? 'text-amber-500' :
     'text-slate-500';
 
+  const handleCopyChatTranscript = () => {
+    const transcript = messages.map(msg => {
+      const formattedTime = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const sender = msg.role === 'user' ? 'User' : 'Impact Analyst';
+      return `[${formattedTime}] ${sender}: ${msg.content}`;
+    }).join('\n');
+
+    navigator.clipboard.writeText(transcript);
+    setChatCopied(true);
+    setLastAnnouncedMsg('Chat transcript copied to clipboard.');
+    setTimeout(() => setChatCopied(false), 2000);
+  };
+
   const handleClearChat = () => {
     if (!confirmClear) {
       setConfirmClear(true);
@@ -144,8 +158,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
             </div>
             <div className="flex items-center gap-2">
               {messages.length > 1 && (
-                <button
-                  onClick={handleClearChat}
+                <>
+                  <button
+                    onClick={handleCopyChatTranscript}
+                    aria-label="Copy Chat transcript to clipboard"
+                    title="Copy Chat transcript"
+                    className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-md border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                  >
+                    {chatCopied ? 'Copied! ✓' : 'Copy Chat'}
+                  </button>
+                  <button
+                    onClick={handleClearChat}
                   aria-label={confirmClear ? "Confirm clear chat messages" : "Clear chat messages"}
                   title={confirmClear ? "Confirm clear?" : "Clear chat messages"}
                   className={`transition-all duration-300 rounded-md outline-none px-2 py-1 text-xs font-bold mono uppercase flex items-center gap-1 active:scale-95 ${
@@ -167,6 +190,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                     </svg>
                   )}
                 </button>
+                </>
               )}
               <button
                 onClick={() => setOpen(false)}
@@ -188,7 +212,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
             className="flex-1 overflow-y-auto p-4 space-y-4 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
           >
             <div role="status" aria-live="polite" className="sr-only">
-              {copiedMsgIdx !== null ? "Message copied to clipboard." : lastAnnouncedMsg || ""}
+              {copiedMsgIdx !== null ? "Message copied to clipboard." : chatCopied ? "Chat transcript copied to clipboard." : lastAnnouncedMsg || ""}
             </div>
             {messages.map((msg, idx) => {
               const formattedTime = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
