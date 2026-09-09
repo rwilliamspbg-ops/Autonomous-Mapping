@@ -696,6 +696,46 @@ describe('UI Components', () => {
     expect(timeElements.length).toBeGreaterThan(0);
   });
 
+  it('ChatInterface displays Scroll to bottom button when user scrolls up and clicking it resets scroll', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const scrollContainer = screen.getByLabelText('Chat messages list');
+    expect(scrollContainer).toBeInTheDocument();
+
+    // Initially when scrolled to bottom, Scroll to bottom button should not be present
+    expect(screen.queryByLabelText('Scroll to bottom of chat messages')).not.toBeInTheDocument();
+
+    // Mock scroll dimensions
+    Object.defineProperty(scrollContainer, 'scrollHeight', { value: 1000, configurable: true });
+    Object.defineProperty(scrollContainer, 'clientHeight', { value: 400, configurable: true });
+    Object.defineProperty(scrollContainer, 'scrollTop', { value: 200, writable: true, configurable: true });
+
+    // Simulate user scrolling up
+    act(() => {
+      fireEvent.scroll(scrollContainer);
+    });
+
+    // Now Scroll to bottom button should be visible
+    const scrollBottomBtn = screen.getByLabelText('Scroll to bottom of chat messages');
+    expect(scrollBottomBtn).toBeInTheDocument();
+    expect(scrollBottomBtn).toHaveAttribute('title', 'Scroll to bottom');
+
+    // Click Scroll to bottom
+    act(() => {
+      fireEvent.click(scrollBottomBtn);
+    });
+
+    // Scroll to bottom button should disappear
+    expect(screen.queryByLabelText('Scroll to bottom of chat messages')).not.toBeInTheDocument();
+  });
+
   it('HardhatTerminal displays and interacts with Clear Logs button', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);

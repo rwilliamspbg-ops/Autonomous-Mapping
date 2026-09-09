@@ -27,14 +27,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
   const [chatCopied, setChatCopied] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
   const [lastAnnouncedMsg, setLastAnnouncedMsg] = useState<string | null>(null);
+  const [isScrolledUp, setIsScrolledUp] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
   const confirmTimerRef = useRef<number | null>(null);
 
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    const hasOverflow = scrollHeight > clientHeight + 10;
+    const isAtBottom = !hasOverflow || (scrollHeight - scrollTop - clientHeight < 60);
+    setIsScrolledUp(!isAtBottom);
+  };
+
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (!isScrolledUp) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isScrolledUp]);
 
   useEffect(() => {
     if (controlledOpen === undefined) return;
@@ -207,9 +219,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
           </div>
 
           <div
+            ref={scrollRef}
+            onScroll={handleScroll}
             tabIndex={0}
             aria-label="Chat messages list"
-            className="flex-1 overflow-y-auto p-4 space-y-4 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+            className="flex-1 overflow-y-auto p-4 space-y-4 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative"
           >
             <div role="status" aria-live="polite" className="sr-only">
               {copiedMsgIdx !== null ? "Message copied to clipboard." : chatCopied ? "Chat transcript copied to clipboard." : lastAnnouncedMsg || ""}
@@ -293,6 +307,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
             )}
             <div ref={chatEndRef} />
           </div>
+
+          {isScrolledUp && (
+            <button
+              onClick={() => {
+                chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                setIsScrolledUp(false);
+              }}
+              aria-label="Scroll to bottom of chat messages"
+              title="Scroll to bottom"
+              className="absolute bottom-20 right-4 px-3 py-1.5 bg-blue-600/90 hover:bg-blue-500 text-white font-mono text-[10px] font-bold uppercase tracking-wider rounded-xl border border-blue-400/40 shadow-lg backdrop-blur-md transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center gap-1.5 animate-in fade-in slide-in-from-bottom-2 duration-200 z-10"
+            >
+              <span>Scroll to bottom</span>
+              <span className="text-xs" aria-hidden="true">↓</span>
+            </button>
+          )}
 
           <form onSubmit={handleSubmit} className="p-4 border-t border-slate-800">
             <label htmlFor="chat-input" className="sr-only">
