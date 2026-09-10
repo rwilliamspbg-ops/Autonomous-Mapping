@@ -127,3 +127,7 @@
 ## 2027-05-02 - Discoverable Keyboard Shortcuts Modal & Accessible Hotkey Legend
 **Learning:** Dense web dashboards with global keyboard shortcuts (e.g. `C`, `M`, `S`, `T`, `+`, `-`, `R`) leave keyboard users searching through tooltips or guessing controls unless a central, accessible shortcut legend is discoverable. Adding a global `?` key listener paired with a top navigation "Shortcuts [?]" button and an accessible modal overlay (`role="dialog"`, `aria-modal="true"`, focus restoration, and Escape key listener) maximizes hotkey discoverability without cluttering the UI.
 **Action:** Always complement global hotkey systems with a `?` key shortcut legend modal and an explicit, focus-visible navigation header trigger.
+
+## 2027-05-15 - Live Log Streaming Controls & Ref-Guarded Interval Callbacks
+**Learning:** Continuous high-frequency log updates (e.g., 300ms terminal logs) create visual motion disruption and make copying or inspecting output frustrating for users. Providing a focus-visible "Pause Stream" / "Resume Stream" toggle button with polite live-region announcements (`role="status" aria-live="polite"`) gives users complete control over log streaming. Using a React `ref` (`isPausedRef`) to track pause state allows `setInterval` timers inside `useEffect` to check pause status seamlessly without requiring interval teardown or re-creation on state changes.
+**Action:** Use a ref-guarded `setInterval` pattern and a focus-visible toggle button with live-region status updates when building streaming console or live log views.

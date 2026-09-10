@@ -31,18 +31,28 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   const [output, setOutput] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
   const [cleared, setCleared] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [streamStatusMsg, setStreamStatusMsg] = useState<string | null>(null);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
+  const isPausedRef = useRef(isPaused);
   const scrollRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
+
+  useEffect(() => {
     if (isOpen) {
       lastActiveElementRef.current = document.activeElement as HTMLElement;
       setIsScrolledUp(false);
+      setIsPaused(false);
+      setStreamStatusMsg(null);
       setOutput(["> Establishing secure shell connection...", "> Node v1.0.4-PROD online."]);
       let i = 0;
       const interval = setInterval(() => {
+        if (isPausedRef.current) return;
         if (i < liveLogs.length) {
           setOutput(prev => [...prev, liveLogs[i]]);
           i++;
@@ -115,8 +125,25 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
           </div>
           <div className="flex items-center gap-4">
             <div role="status" aria-live="polite" className="sr-only">
-              {copied ? "Terminal logs copied to clipboard." : cleared ? "Terminal logs cleared." : ""}
+              {copied ? "Terminal logs copied to clipboard." : cleared ? "Terminal logs cleared." : streamStatusMsg || ""}
             </div>
+            <button
+              onClick={() => {
+                const newPaused = !isPaused;
+                setIsPaused(newPaused);
+                setStreamStatusMsg(newPaused ? "Terminal log streaming paused." : "Terminal log streaming resumed.");
+              }}
+              aria-label={isPaused ? "Resume live log streaming" : "Pause live log streaming"}
+              title={isPaused ? "Resume Stream" : "Pause Stream"}
+              className={`px-3 py-1.5 font-bold mono text-[10px] uppercase tracking-wider rounded-lg border shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0 flex items-center gap-1.5 ${
+                isPaused
+                  ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
+                  : 'bg-slate-800/80 hover:bg-slate-700 text-slate-300 border-white/10'
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${isPaused ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'}`}></span>
+              <span>{isPaused ? 'Resume Stream' : 'Pause Stream'}</span>
+            </button>
             {output.length > 0 && (
               <button
                 onClick={() => {
@@ -162,20 +189,38 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
           aria-label="Live Node Console logs"
           className="flex-1 overflow-y-auto p-12 mono text-[13px] leading-relaxed whitespace-pre font-medium text-slate-400 scroll-smooth bg-[#010409] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
         >
-          {output.map((line, idx) => {
-            let colorClass = "text-slate-500";
-            if (line.includes("[BLOCK]")) colorClass = "text-emerald-500 font-black";
-            if (line.includes("[NETWORK]")) colorClass = "text-blue-500 font-black";
-            if (line.includes("[ZK]")) colorClass = "text-violet-500 font-black";
-            if (line.startsWith(">")) colorClass = "text-white font-black italic";
-            if (line.includes("Verified")) colorClass = "text-emerald-400 italic";
-            
-            return (
-              <div key={idx} className={`${colorClass} mb-2 animate-in fade-in slide-in-from-left-4 duration-500`}>
-                {line}
+          {output.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 my-auto py-12">
+              <div className="text-slate-500 text-sm font-mono uppercase tracking-[0.3em] font-black">
+                Console output cleared
               </div>
-            );
-          })}
+              <p className="text-slate-600 text-xs font-mono max-w-sm leading-relaxed">
+                Live block stream is active. New telemetry events will stream shortly, or click below to restore initial connection logs.
+              </p>
+              <button
+                onClick={() => setOutput(["> Establishing secure shell connection...", "> Node v1.0.4-PROD online."])}
+                aria-label="Restore initial terminal logs"
+                className="px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-xs uppercase tracking-wider rounded-xl border border-blue-500/20 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shadow-md"
+              >
+                Restore Logs
+              </button>
+            </div>
+          ) : (
+            output.map((line, idx) => {
+              let colorClass = "text-slate-500";
+              if (line.includes("[BLOCK]")) colorClass = "text-emerald-500 font-black";
+              if (line.includes("[NETWORK]")) colorClass = "text-blue-500 font-black";
+              if (line.includes("[ZK]")) colorClass = "text-violet-500 font-black";
+              if (line.startsWith(">")) colorClass = "text-white font-black italic";
+              if (line.includes("Verified")) colorClass = "text-emerald-400 italic";
+
+              return (
+                <div key={idx} className={`${colorClass} mb-2 animate-in fade-in slide-in-from-left-4 duration-500`}>
+                  {line}
+                </div>
+              );
+            })
+          )}
         </div>
         {isScrolledUp && (
           <button

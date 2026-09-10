@@ -736,7 +736,7 @@ describe('UI Components', () => {
     expect(screen.queryByLabelText('Scroll to bottom of chat messages')).not.toBeInTheDocument();
   });
 
-  it('HardhatTerminal displays and interacts with Clear Logs button', async () => {
+  it('HardhatTerminal displays and interacts with Clear Logs button and Restore Logs empty state', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);
 
@@ -767,7 +767,61 @@ describe('UI Components', () => {
     // After clearing, the Clear Logs button should disappear as output is empty
     expect(screen.queryByLabelText('Clear terminal logs')).not.toBeInTheDocument();
 
+    // Check empty state text and Restore Logs button
+    expect(screen.getByText('Console output cleared')).toBeInTheDocument();
+    const restoreLogsBtn = screen.getByLabelText('Restore initial terminal logs');
+    expect(restoreLogsBtn).toBeInTheDocument();
+
+    // Click Restore Logs button
+    act(() => {
+      fireEvent.click(restoreLogsBtn);
+    });
+
+    expect(screen.getByText('> Establishing secure shell connection...')).toBeInTheDocument();
+    expect(screen.getByLabelText('Clear terminal logs')).toBeInTheDocument();
+
     vi.useRealTimers();
+  });
+
+  it('HardhatTerminal provides Pause Stream / Resume Stream toggle button with polite live region updates', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open terminal using the hotkey
+    act(() => {
+      const terminalEvent = new KeyboardEvent('keydown', { key: 't' });
+      window.dispatchEvent(terminalEvent);
+    });
+
+    const streamToggleBtn = screen.getByLabelText('Pause live log streaming');
+    expect(streamToggleBtn).toBeInTheDocument();
+    expect(streamToggleBtn).toHaveAttribute('title', 'Pause Stream');
+
+    // Click Pause Stream
+    act(() => {
+      fireEvent.click(streamToggleBtn);
+    });
+
+    expect(screen.getByLabelText('Resume live log streaming')).toBeInTheDocument();
+    expect(streamToggleBtn).toHaveAttribute('title', 'Resume Stream');
+    expect(streamToggleBtn.textContent).toContain('Resume Stream');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasPausedStatus = statusElements.some(el => el.textContent?.includes('Terminal log streaming paused.'));
+    expect(hasPausedStatus).toBe(true);
+
+    // Click Resume Stream
+    act(() => {
+      fireEvent.click(streamToggleBtn);
+    });
+
+    expect(screen.getByLabelText('Pause live log streaming')).toBeInTheDocument();
+    expect(streamToggleBtn).toHaveAttribute('title', 'Pause Stream');
+    expect(streamToggleBtn.textContent).toContain('Pause Stream');
+
+    const statusElements2 = screen.getAllByRole('status', { hidden: true });
+    const hasResumedStatus = statusElements2.some(el => el.textContent?.includes('Terminal log streaming resumed.'));
+    expect(hasResumedStatus).toBe(true);
   });
 
   it('HardhatTerminal displays Resume Auto-scroll button when user scrolls up and clicking it resets scroll', async () => {
