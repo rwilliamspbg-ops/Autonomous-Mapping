@@ -203,6 +203,53 @@ describe('UI Components', () => {
     expect(isYColliding).toBe(true);
   });
 
+  it('App header trigger buttons reflect aria-expanded and aria-pressed attributes when toggled', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    const manifestoBtn = screen.getByLabelText('Open Manifesto (Press m or M)');
+    const terminalBtn = screen.getByLabelText('Open Live Node Console (Press t or T)');
+    const scannerBtn = screen.getByLabelText('Check My Privacy (Press s or S)');
+    const shortcutsBtn = screen.getByLabelText('Keyboard Shortcuts (Press ?)');
+
+    // Initially closed
+    expect(manifestoBtn).toHaveAttribute('aria-expanded', 'false');
+    expect(manifestoBtn).toHaveAttribute('aria-pressed', 'false');
+
+    expect(terminalBtn).toHaveAttribute('aria-expanded', 'false');
+    expect(terminalBtn).toHaveAttribute('aria-pressed', 'false');
+
+    expect(scannerBtn).toHaveAttribute('aria-expanded', 'false');
+    expect(scannerBtn).toHaveAttribute('aria-pressed', 'false');
+
+    expect(shortcutsBtn).toHaveAttribute('aria-expanded', 'false');
+    expect(shortcutsBtn).toHaveAttribute('aria-pressed', 'false');
+
+    // Click manifesto button to open
+    await act(async () => {
+      fireEvent.click(manifestoBtn);
+    });
+
+    expect(manifestoBtn).toHaveAttribute('aria-expanded', 'true');
+    expect(manifestoBtn).toHaveAttribute('aria-pressed', 'true');
+
+    // Click manifesto button again to close
+    await act(async () => {
+      fireEvent.click(manifestoBtn);
+    });
+
+    expect(manifestoBtn).toHaveAttribute('aria-expanded', 'false');
+    expect(manifestoBtn).toHaveAttribute('aria-pressed', 'false');
+
+    // Click terminal button to open
+    await act(async () => {
+      fireEvent.click(terminalBtn);
+    });
+
+    expect(terminalBtn).toHaveAttribute('aria-expanded', 'true');
+    expect(terminalBtn).toHaveAttribute('aria-pressed', 'true');
+  });
+
   it('App component global hotkeys should trigger correctly', () => {
     const { container } = render(<App />);
 

@@ -367,10 +367,14 @@ const App: React.FC = () => {
         
         <div className="flex items-center gap-6">
           <button
-            onClick={() => setIsManifestoOpen(true)}
+            onClick={() => setIsManifestoOpen(prev => !prev)}
+            aria-expanded={isManifestoOpen}
+            aria-pressed={isManifestoOpen}
             aria-label="Open Manifesto (Press m or M)"
             title="Open Manifesto (M)"
-            className="relative group cursor-pointer active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-xl"
+            className={`relative group cursor-pointer active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-xl ${
+              isManifestoOpen ? 'ring-2 ring-blue-500' : ''
+            }`}
           >
             <div className="absolute inset-0 bg-blue-600 blur-xl opacity-20 group-hover:opacity-60 transition-all duration-500"></div>
             <div className="w-12 h-12 bg-gradient-to-br from-blue-700 to-indigo-950 rounded-xl flex items-center justify-center font-black text-2xl border border-blue-500/50 shadow-2xl text-white transform group-hover:rotate-12 transition-transform">Σ</div>
@@ -392,9 +396,13 @@ const App: React.FC = () => {
         <nav className="hidden lg:flex items-center gap-6 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mono">
           <button
             onClick={() => setIsTerminalOpen(prev => !prev)}
+            aria-expanded={isTerminalOpen}
+            aria-pressed={isTerminalOpen}
             aria-label="Open Live Node Console (Press t or T)"
             title="Open Live Node Console (T)"
-            className={`flex items-center gap-4 px-6 py-3 rounded-2xl border ${trackingInfo.bg} ${trackingInfo.border} ${trackingInfo.glow} transition-all active:scale-95 duration-700 group hover:border-emerald-500/50 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none`}
+            className={`flex items-center gap-4 px-6 py-3 rounded-2xl border ${trackingInfo.bg} ${trackingInfo.border} ${trackingInfo.glow} transition-all active:scale-95 duration-700 group hover:border-emerald-500/50 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
+              isTerminalOpen ? 'ring-2 ring-emerald-500/60' : ''
+            }`}
           >
             <div className="relative flex items-center justify-center">
                <span className={`w-3 h-3 rounded-full ${trackingInfo.dot} ${trackingState === TrackingState.OK ? 'animate-pulse' : ''}`}></span>
@@ -414,10 +422,14 @@ const App: React.FC = () => {
           <div className="h-10 w-px bg-white/10"></div>
           
           <button 
-            onClick={() => setIsScannerOpen(true)}
+            onClick={() => setIsScannerOpen(prev => !prev)}
+            aria-expanded={isScannerOpen}
+            aria-pressed={isScannerOpen}
             aria-label="Check My Privacy (Press s or S)"
             title="Check My Privacy (S)"
-            className="group relative px-8 py-3.5 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_30px_rgba(37,99,235,0.4)] flex items-center gap-4 border border-blue-400/30 overflow-hidden active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+            className={`group relative px-8 py-3.5 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_30px_rgba(37,99,235,0.4)] flex items-center gap-4 border border-blue-400/30 overflow-hidden active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
+              isScannerOpen ? 'ring-2 ring-blue-300' : ''
+            }`}
           >
             <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 skew-x-12"></div>
             <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse shadow-[0_0_12px_white]"></div>
@@ -426,10 +438,14 @@ const App: React.FC = () => {
           </button>
 
           <button
-            onClick={() => setIsShortcutsOpen(true)}
+            onClick={() => setIsShortcutsOpen(prev => !prev)}
+            aria-expanded={isShortcutsOpen}
+            aria-pressed={isShortcutsOpen}
             aria-label="Keyboard Shortcuts (Press ?)"
             title="Keyboard Shortcuts (?)"
-            className="px-4 py-3.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.25em] border border-white/10 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center gap-2"
+            className={`px-4 py-3.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.25em] border border-white/10 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center gap-2 ${
+              isShortcutsOpen ? 'ring-2 ring-blue-500/60' : ''
+            }`}
           >
             <span>Shortcuts</span>
             <kbd aria-hidden="true" className="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded text-[8px] text-blue-400 font-mono tracking-tighter">?</kbd>
