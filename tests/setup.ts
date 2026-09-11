@@ -57,3 +57,22 @@ global.ResizeObserver = vi.fn().mockImplementation(() => ({
 
 // Mock scrollIntoView
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
+
+// Mock global fetch for TopoJSON world atlas map data in test environment
+global.fetch = vi.fn().mockImplementation((url: string) => {
+  if (typeof url === 'string' && url.includes('world-atlas')) {
+    return Promise.resolve({
+      json: () => Promise.resolve({
+        type: 'Topology',
+        objects: {
+          countries: {
+            type: 'GeometryCollection',
+            geometries: []
+          }
+        },
+        arcs: []
+      })
+    });
+  }
+  return Promise.reject(new Error(`Unhandled fetch mock for ${url}`));
+});
