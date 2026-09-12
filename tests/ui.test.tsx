@@ -1641,4 +1641,34 @@ describe('UI Components', () => {
     const doneBadges = screen.getAllByText('[DONE]');
     expect(doneBadges.length).toBe(3);
   });
+
+  it('App displays native title tooltips on protocol controls and pillar cards, and accessible progressbar for Impact Stream', () => {
+    render(<App />);
+
+    // Protocol stage buttons title tooltips
+    const attestBtn = screen.getByLabelText(/Attest stage/i);
+    expect(attestBtn).toHaveAttribute('title', 'Attest: Capture a local claim and narrate it safely.');
+
+    // Track lane buttons title tooltips
+    const healthLaneBtn = screen.getByLabelText(/Select Health lane/i);
+    expect(healthLaneBtn).toHaveAttribute('title', 'Select Health lane (Kenya)');
+
+    // Walkthrough control buttons title tooltips
+    const demoBtn = screen.getByLabelText('Start 6-minute guided walkthrough demo');
+    expect(demoBtn).toHaveAttribute('title', 'Start 6-minute guided walkthrough demo');
+
+    const resetBtn = screen.getByLabelText('Reset walkthrough demo and clear panels');
+    expect(resetBtn).toHaveAttribute('title', 'Reset walkthrough demo');
+
+    // Pillar card title tooltips
+    const healthPillarBtn = screen.getByLabelText('Select Global Health use case (Kenya)');
+    expect(healthPillarBtn).toHaveAttribute('title', 'Select Global Health (Kenya): Privacy-preserving disease surveillance');
+
+    // Impact Stream progressbar
+    const progressBar = screen.getByRole('progressbar');
+    expect(progressBar).toBeInTheDocument();
+    expect(progressBar).toHaveAttribute('aria-valuemin', '0');
+    expect(progressBar).toHaveAttribute('aria-valuemax', '100');
+    expect(progressBar).toHaveAttribute('aria-label', expect.stringContaining('Impact Stream sync progress'));
+  });
 });
