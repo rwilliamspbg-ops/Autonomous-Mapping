@@ -490,6 +490,7 @@ const App: React.FC = () => {
                       onClick={() => setProtocolPhase(stage.key)}
                       aria-pressed={isActive}
                       aria-label={`${stage.label} stage. ${stage.detail} Status: ${isActive ? 'Active and processing' : isComplete ? 'Complete' : 'Pending'}.`}
+                      title={`${stage.label}: ${stage.detail}`}
                       className={`text-left rounded-2xl border p-3 transition-all active:scale-98 duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                         isActive
                           ? 'border-blue-400 bg-blue-500/10 shadow-[0_0_18px_rgba(59,130,246,0.18)]'
@@ -528,6 +529,7 @@ const App: React.FC = () => {
                       onClick={() => activateTrack(index)}
                       aria-pressed={isTrackActive}
                       aria-label={`Select ${track.label} (routes to ${track.country})`}
+                      title={`Select ${track.label} (${track.country})`}
                       className={`px-3 py-2 rounded-full border text-[9px] mono uppercase tracking-[0.25em] transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                         isTrackActive
                           ? 'border-blue-500 bg-blue-500/15 text-white shadow-[0_0_12px_rgba(59,130,246,0.3)]'
@@ -544,6 +546,7 @@ const App: React.FC = () => {
                 <button
                   onClick={runGuidedProtocol}
                   aria-label={demoRunning ? "Guided walkthrough demo running" : "Start 6-minute guided walkthrough demo"}
+                  title={demoRunning ? "Walkthrough in progress..." : "Start 6-minute guided walkthrough demo"}
                   className={`flex-1 px-4 py-3 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                     demoRunning
                       ? 'bg-blue-600/80 border border-blue-400/30 animate-pulse shadow-[0_0_20px_rgba(37,99,235,0.25)]'
@@ -555,6 +558,7 @@ const App: React.FC = () => {
                 <button
                   onClick={resetProtocol}
                   aria-label={resetDone ? "Walkthrough demo reset" : "Reset walkthrough demo and clear panels"}
+                  title={resetDone ? "Demo Reset!" : "Reset walkthrough demo"}
                   className={`px-4 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] border transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                     resetDone
                       ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
@@ -673,7 +677,14 @@ const App: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <div className="mt-6 h-1 w-full bg-slate-900 rounded-full overflow-hidden">
+              <div
+                role="progressbar"
+                aria-valuenow={Math.round(bootProgress)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Impact Stream sync progress: ${Math.round(bootProgress)}%`}
+                className="mt-6 h-1 w-full bg-slate-900 rounded-full overflow-hidden"
+              >
                 <div className="h-full bg-blue-600 transition-all duration-1000 ease-out shadow-[0_0_10px_#2563eb]" style={{ width: `${bootProgress}%` }}></div>
               </div>
             </div>
@@ -689,6 +700,7 @@ const App: React.FC = () => {
                       onClick={() => activateTrack(pillar.trackIndex)}
                       aria-pressed={isTrackActive}
                       aria-label={`Select ${pillar.label} use case (${pillar.country})`}
+                      title={`Select ${pillar.label} (${pillar.country}): ${pillar.value}`}
                       className={`w-full text-left p-3 rounded-2xl border ${pillar.border} ${pillar.bg} transition-all active:scale-98 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none cursor-pointer ${
                         isTrackActive ? 'ring-1 ring-blue-400/50 shadow-[0_0_12px_rgba(59,130,246,0.2)]' : 'hover:border-white/20'
                       }`}
