@@ -123,6 +123,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
   const [coords, setCoords] = useState({ x: 0, y: 0, lat: 0, lng: 0 });
   const [hoveredCountry, setHoveredCountry] = useState<{ name: string; id: string } | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [isLegendOpen, setIsLegendOpen] = useState(true);
   const hoverTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -602,28 +603,41 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
       )}
 
       {/* Map Legend Overlay */}
-      <div className="absolute bottom-20 right-8 bg-slate-900/80 backdrop-blur-md border border-white/10 p-4 rounded-xl shadow-2xl z-10 pointer-events-none min-w-[180px]">
-        <div className="mono text-[10px] text-blue-500 font-bold uppercase tracking-[0.2em] mb-3 border-b border-white/5 pb-2">
-          Engine_Symbology
-        </div>
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-blue-600/50 border border-blue-400 rounded-sm"></div>
-            <span className="mono text-[9px] text-slate-300 uppercase tracking-wider">Active Node</span>
+      <div className="absolute bottom-20 right-8 bg-slate-900/80 backdrop-blur-md border border-white/10 p-4 rounded-xl shadow-2xl z-10 pointer-events-auto min-w-[180px] transition-all">
+        <button
+          onClick={() => setIsLegendOpen(prev => !prev)}
+          aria-expanded={isLegendOpen}
+          aria-controls="map-legend-content"
+          aria-label={isLegendOpen ? "Collapse map legend" : "Expand map legend"}
+          title={isLegendOpen ? "Collapse Map Legend" : "Expand Map Legend"}
+          className={`w-full flex items-center justify-between gap-3 mono text-[10px] text-blue-500 font-bold uppercase tracking-[0.2em] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-lg p-1 -m-1 transition-all active:scale-95 ${
+            isLegendOpen ? 'border-b border-white/5 pb-2 mb-3' : ''
+          }`}
+        >
+          <span>Engine_Symbology</span>
+          <span className="text-slate-400 font-mono text-[11px] font-bold shrink-0">{isLegendOpen ? '−' : '+'}</span>
+        </button>
+
+        {isLegendOpen && (
+          <div id="map-legend-content" className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-blue-600/50 border border-blue-400 rounded-sm"></div>
+              <span className="mono text-[9px] text-slate-300 uppercase tracking-wider">Active Node</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-blue-500/30 border border-blue-400/60 rounded-sm animate-pulse"></div>
+              <span className="mono text-[9px] text-slate-300 uppercase tracking-wider">Voxel Scanning</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="mono text-[9px] text-slate-300 uppercase tracking-wider">Heritage Sanctuary</span>
+            </div>
+            <div className="flex items-center gap-3 border-t border-white/5 pt-2 mt-2">
+              <div className="w-3 h-0.5 bg-blue-500/20"></div>
+              <span className="mono text-[9px] text-slate-500 uppercase tracking-wider">Spatial Grid (0.5°)</span>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-blue-500/30 border border-blue-400/60 rounded-sm animate-pulse"></div>
-            <span className="mono text-[9px] text-slate-300 uppercase tracking-wider">Voxel Scanning</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-            <span className="mono text-[9px] text-slate-300 uppercase tracking-wider">Heritage Sanctuary</span>
-          </div>
-          <div className="flex items-center gap-3 border-t border-white/5 pt-2 mt-2">
-            <div className="w-3 h-0.5 bg-blue-500/20"></div>
-            <span className="mono text-[9px] text-slate-500 uppercase tracking-wider">Spatial Grid (0.5°)</span>
-          </div>
-        </div>
+        )}
       </div>
 
       <div className="absolute bottom-6 left-6 flex items-center gap-4 text-slate-600 text-[10px] mono uppercase tracking-[0.4em] font-medium pointer-events-none">

@@ -135,3 +135,7 @@
 ## 2027-05-20 - Semantic Progress Bar Markup and Desktop Tooltip Hints for Protocol Dashboard Controls
 **Learning:** Dense dashboard controls (such as protocol stages, pilot lane chips, and pillar cards) benefit immensely from native `title` tooltip hints that provide mouse hover explanations without cluttering the screen. Furthermore, telemetry progress indicators styled visually as horizontal bars must be backed by semantic `role="progressbar"`, `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, and descriptive `aria-label` markup so screen readers can accurately communicate percentage progress.
 **Action:** Always complement visual progress bars with semantic `role="progressbar"` attributes and provide native `title` attributes for compact interactive dashboard controls.
+
+## 2027-06-01 - Interactive Collapsible Map Legends for Viewport Unblocking
+**Learning:** Fixed overlay cards on spatial maps (such as legend overlays) can obscure map features and interactive nodes near viewport boundaries. Converting static legend overlays into focusable, collapsible panels (`aria-expanded`, `aria-controls`, `aria-label`, and `title`) allows users to minimize overlay occlusion on demand while keeping keyboard and screen reader accessibility intact.
+**Action:** Make fixed map legend overlays collapsible with semantic `aria-expanded` toggle buttons and keyboard focus states.

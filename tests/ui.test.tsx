@@ -203,6 +203,43 @@ describe('UI Components', () => {
     expect(isYColliding).toBe(true);
   });
 
+  it('WorldMap should render collapsible interactive map legend and toggle content on click', () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<WorldMap onCountrySelect={vi.fn()} />);
+
+    const legendToggleBtn = screen.getByLabelText('Collapse map legend');
+    expect(legendToggleBtn).toBeInTheDocument();
+    expect(legendToggleBtn).toHaveAttribute('aria-expanded', 'true');
+    expect(legendToggleBtn).toHaveAttribute('aria-controls', 'map-legend-content');
+    expect(legendToggleBtn).toHaveAttribute('title', 'Collapse Map Legend');
+
+    // Content is initially visible
+    expect(screen.getByText('Active Node')).toBeInTheDocument();
+    expect(screen.getByText('Heritage Sanctuary')).toBeInTheDocument();
+
+    // Click toggle button to collapse legend
+    act(() => {
+      fireEvent.click(legendToggleBtn);
+    });
+
+    expect(screen.getByLabelText('Expand map legend')).toBeInTheDocument();
+    expect(legendToggleBtn).toHaveAttribute('aria-expanded', 'false');
+    expect(legendToggleBtn).toHaveAttribute('title', 'Expand Map Legend');
+
+    // Legend content is now hidden/collapsed
+    expect(screen.queryByText('Active Node')).not.toBeInTheDocument();
+    expect(screen.queryByText('Heritage Sanctuary')).not.toBeInTheDocument();
+
+    // Click toggle button again to expand legend
+    act(() => {
+      fireEvent.click(legendToggleBtn);
+    });
+
+    expect(screen.getByLabelText('Collapse map legend')).toBeInTheDocument();
+    expect(legendToggleBtn).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('Active Node')).toBeInTheDocument();
+  });
+
   it('App header trigger buttons reflect aria-expanded and aria-pressed attributes when toggled', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);
