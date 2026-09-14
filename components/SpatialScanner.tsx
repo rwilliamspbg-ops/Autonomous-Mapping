@@ -15,6 +15,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
   const [status, setStatus] = useState<'IDLE' | 'BOOTING' | 'TRACKING' | 'COMMITTING' | 'FINALIZED' | 'ERROR'>('IDLE');
   const [points, setPoints] = useState<{ x: number; y: number; life: number; color: string }[]>([]);
   const [telemetry, setTelemetry] = useState({ pose: [0,0,0], keyframes: 0, voxels: 0, stability: 100 });
+  const [telemetryCopied, setTelemetryCopied] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
@@ -209,8 +210,26 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
               </div>
             </div>
 
-            <div className="bg-slate-950/90 backdrop-blur-2xl p-6 rounded-3xl border border-blue-600/40 w-80 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-              <div className="text-[11px] text-blue-500 font-black uppercase mb-4 tracking-[0.4em]">Local_Telemetry</div>
+            <div className="bg-slate-950/90 backdrop-blur-2xl p-6 rounded-3xl border border-blue-600/40 w-80 shadow-[0_0_50px_rgba(0,0,0,0.8)] pointer-events-auto">
+              <div className="text-[11px] text-blue-500 font-black uppercase mb-4 tracking-[0.4em] flex justify-between items-center border-b border-white/5 pb-3">
+                <span>Local_Telemetry</span>
+                <button
+                  onClick={() => {
+                    const text = `ACTIVE_MAP_SIZE: ${(telemetry.voxels / 1000).toFixed(2)} k-vox | RECOVERY_STAB: ${telemetry.stability.toFixed(2)}% | QSB_RATIO: 124:1`;
+                    navigator.clipboard.writeText(text);
+                    setTelemetryCopied(true);
+                    setTimeout(() => setTelemetryCopied(false), 2000);
+                  }}
+                  aria-label="Copy Local Telemetry to clipboard"
+                  title="Copy Telemetry"
+                  className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                >
+                  {telemetryCopied ? 'Copied! ✓' : 'Copy'}
+                </button>
+              </div>
+              <div role="status" aria-live="polite" className="sr-only">
+                {telemetryCopied ? 'Local telemetry details copied to clipboard.' : ''}
+              </div>
               <div className="space-y-3 text-[10px] text-slate-300">
                 <div className="flex justify-between border-b border-white/5 pb-1"><span>ACTIVE_MAP_SIZE:</span> <span className="text-white">{(telemetry.voxels / 1000).toFixed(2)} k-vox</span></div>
                 <div className="flex justify-between border-b border-white/5 pb-1"><span>RECOVERY_STAB:</span> <span className="text-emerald-400 font-black">{telemetry.stability.toFixed(2)}%</span></div>

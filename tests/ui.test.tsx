@@ -466,6 +466,67 @@ describe('UI Components', () => {
     }
   });
 
+  it('SpatialScanner displays and interacts with Copy Local Telemetry button', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    const mockGetUserMedia = vi.fn().mockImplementation(() => new Promise(() => {}));
+    const originalMediaDevices = navigator.mediaDevices;
+    Object.defineProperty(navigator, 'mediaDevices', {
+      writable: true,
+      configurable: true,
+      value: {
+        getUserMedia: mockGetUserMedia
+      }
+    });
+
+    render(<SpatialScanner isOpen={true} onClose={() => {}} onScanComplete={() => {}} />);
+
+    const copyTelemetryBtn = screen.getByLabelText('Copy Local Telemetry to clipboard');
+    expect(copyTelemetryBtn).toBeInTheDocument();
+    expect(copyTelemetryBtn).toHaveAttribute('title', 'Copy Telemetry');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copyTelemetryBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('ACTIVE_MAP_SIZE: 0.00 k-vox | RECOVERY_STAB: 100.00% | QSB_RATIO: 124:1');
+    expect(copyTelemetryBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Local telemetry details copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyTelemetryBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyTelemetryBtn.textContent).toContain('Copy');
+
+    vi.useRealTimers();
+
+    if (originalMediaDevices) {
+      Object.defineProperty(navigator, 'mediaDevices', {
+        writable: true,
+        configurable: true,
+        value: originalMediaDevices
+      });
+    } else {
+      // @ts-ignore
+      delete navigator.mediaDevices;
+    }
+  });
+
   it('SpatialScanner should auto-focus the "Verify Privacy" button when camera stream initialization succeeds and status reaches TRACKING', async () => {
     const mockGetUserMedia = vi.fn().mockResolvedValue({
       getTracks: () => [{ stop: vi.fn() }]
@@ -1191,7 +1252,7 @@ describe('UI Components', () => {
 
     // Check that booting state is displayed
     expect(screen.getByText('BOOTING_SPATIAL_SCANNER')).toBeInTheDocument();
-    expect(screen.getByRole('status')).toBeInTheDocument();
+    expect(screen.getAllByRole('status').length).toBeGreaterThan(0);
     expect(screen.getByText(/Awaiting camera hardware access/i)).toBeInTheDocument();
 
     // Restore original mediaDevices
