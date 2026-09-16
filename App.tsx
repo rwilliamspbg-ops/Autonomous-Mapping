@@ -673,7 +673,7 @@ const App: React.FC = () => {
                 {logs.map((log, i) => (
                   <div key={i} className={`text-[10px] mono flex gap-3 transition-all duration-300 ${i === logs.length - 1 ? 'text-blue-400 font-bold' : 'text-slate-500'}`}>
                     <span className="shrink-0 opacity-20">[{i.toString().padStart(2, '0')}]</span>
-                    <span className="truncate">{log}</span>
+                    <span className="truncate" title={log} aria-label={log}>{log}</span>
                   </div>
                 ))}
               </div>
