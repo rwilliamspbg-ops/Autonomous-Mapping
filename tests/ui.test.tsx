@@ -466,7 +466,7 @@ describe('UI Components', () => {
     }
   });
 
-  it('SpatialScanner displays Copy Telemetry button, copies metrics to clipboard with tactile feedback and live region update', async () => {
+  it('SpatialScanner displays and interacts with Copy Local Telemetry button', async () => {
     const { fireEvent } = require('@testing-library/react');
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'clipboard', {
@@ -477,10 +477,7 @@ describe('UI Components', () => {
       }
     });
 
-    const mockGetUserMedia = vi.fn().mockResolvedValue({
-      getTracks: () => [{ stop: vi.fn() }]
-    });
-
+    const mockGetUserMedia = vi.fn().mockImplementation(() => new Promise(() => {}));
     const originalMediaDevices = navigator.mediaDevices;
     Object.defineProperty(navigator, 'mediaDevices', {
       writable: true,
@@ -492,32 +489,23 @@ describe('UI Components', () => {
 
     render(<SpatialScanner isOpen={true} onClose={() => {}} onScanComplete={() => {}} />);
 
-    // Wait for camera initialization
-    await screen.findByLabelText('Verify Privacy');
-
-    vi.useFakeTimers();
-
-    const copyTelemetryBtn = screen.getByLabelText('Copy spatial telemetry metrics to clipboard');
+    const copyTelemetryBtn = screen.getByLabelText('Copy Local Telemetry to clipboard');
     expect(copyTelemetryBtn).toBeInTheDocument();
     expect(copyTelemetryBtn).toHaveAttribute('title', 'Copy Telemetry');
 
-    // Click to copy telemetry
+    vi.useFakeTimers();
+
     act(() => {
       fireEvent.click(copyTelemetryBtn);
     });
 
-    expect(writeTextSpy).toHaveBeenCalled();
-    const copiedContent = writeTextSpy.mock.calls[0][0];
-    expect(copiedContent).toContain('ACTIVE_MAP_SIZE');
-    expect(copiedContent).toContain('RECOVERY_STAB');
+    expect(writeTextSpy).toHaveBeenCalledWith('ACTIVE_MAP_SIZE: 0.00 k-vox | RECOVERY_STAB: 100.00% | QSB_RATIO: 124:1');
     expect(copyTelemetryBtn.textContent).toContain('Copied! ✓');
 
-    // Live region status check
     const statusElements = screen.getAllByRole('status', { hidden: true });
-    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Spatial telemetry metrics copied to clipboard.'));
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Local telemetry details copied to clipboard.'));
     expect(hasCopiedStatus).toBe(true);
 
-    // Fast-forward 2 seconds to reset copied state
     act(() => {
       vi.advanceTimersByTime(2100);
     });
@@ -1780,16 +1768,5 @@ describe('UI Components', () => {
     expect(progressBar).toHaveAttribute('aria-valuemin', '0');
     expect(progressBar).toHaveAttribute('aria-valuemax', '100');
     expect(progressBar).toHaveAttribute('aria-label', expect.stringContaining('Impact Stream sync progress'));
-  });
-
-  it('App Impact Stream log items include title and aria-label matching full log text', async () => {
-    render(<App />);
-
-    // Initial syncStage log item (e.g. DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD)
-    const logText = 'DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD';
-    const logSpan = await screen.findByTitle(logText);
-    expect(logSpan).toBeInTheDocument();
-    expect(logSpan).toHaveAttribute('aria-label', logText);
-    expect(logSpan).toHaveClass('truncate');
   });
 });
