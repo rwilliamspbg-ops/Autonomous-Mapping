@@ -17,6 +17,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
   const [telemetry, setTelemetry] = useState({ pose: [0,0,0], keyframes: 0, voxels: 0, stability: 100 });
   const [telemetryCopied, setTelemetryCopied] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [telemetryCopied, setTelemetryCopied] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
   const retryButtonRef = useRef<HTMLButtonElement>(null);
@@ -184,6 +185,13 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
         onClose();
       }, 1500);
     }, 4000);
+  };
+
+  const handleCopyTelemetry = () => {
+    const text = `ACTIVE_MAP_SIZE: ${(telemetry.voxels / 1000).toFixed(2)} k-vox | RECOVERY_STAB: ${telemetry.stability.toFixed(2)}% | QSB_RATIO: 124:1 | POSE_YAW: ${telemetry.pose[0].toFixed(8)}`;
+    navigator.clipboard.writeText(text);
+    setTelemetryCopied(true);
+    setTimeout(() => setTelemetryCopied(false), 2000);
   };
 
   if (!isOpen) return null;

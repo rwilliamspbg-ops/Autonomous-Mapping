@@ -1769,4 +1769,15 @@ describe('UI Components', () => {
     expect(progressBar).toHaveAttribute('aria-valuemax', '100');
     expect(progressBar).toHaveAttribute('aria-label', expect.stringContaining('Impact Stream sync progress'));
   });
+
+  it('App Impact Stream log items include title and aria-label matching full log text', async () => {
+    render(<App />);
+
+    // Initial syncStage log item (e.g. DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD)
+    const logText = 'DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD';
+    const logSpan = await screen.findByTitle(logText);
+    expect(logSpan).toBeInTheDocument();
+    expect(logSpan).toHaveAttribute('aria-label', logText);
+    expect(logSpan).toHaveClass('truncate');
+  });
 });
