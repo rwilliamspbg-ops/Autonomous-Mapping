@@ -673,7 +673,7 @@ const App: React.FC = () => {
                 {logs.map((log, i) => (
                   <div key={i} className={`text-[10px] mono flex gap-3 transition-all duration-300 ${i === logs.length - 1 ? 'text-blue-400 font-bold' : 'text-slate-500'}`}>
                     <span className="shrink-0 opacity-20">[{i.toString().padStart(2, '0')}]</span>
-                    <span className="truncate">{log}</span>
+                    <span className="truncate" title={log} aria-label={log}>{log}</span>
                   </div>
                 ))}
               </div>
@@ -863,7 +863,15 @@ const App: React.FC = () => {
              <span className="text-slate-600 font-bold">EDGE_SAVINGS:</span>
              <span className="text-blue-500 font-black tracking-widest">68% LESS CLOUD ENERGY</span>
           </div>
-          <div className="flex gap-2 h-4 items-center">
+          <div
+            role="progressbar"
+            aria-valuenow={68}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Edge energy savings: 68% less cloud energy"
+            title="68% edge energy savings (7/10 efficiency index)"
+            className="flex gap-2 h-4 items-center"
+          >
             {[1,2,3,4,5,6,7,8,9,10].map(i => (
               <div key={i} className={`w-1 h-full rounded-full transition-all duration-300 ${i <= 7 ? 'bg-blue-600 animate-pulse' : 'bg-slate-900'}`} style={{ animationDelay: `${i*0.1}s` }}></div>
             ))}
