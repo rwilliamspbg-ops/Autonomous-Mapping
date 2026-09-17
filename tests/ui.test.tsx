@@ -1763,10 +1763,27 @@ describe('UI Components', () => {
     expect(healthPillarBtn).toHaveAttribute('title', 'Select Global Health (Kenya): Privacy-preserving disease surveillance');
 
     // Impact Stream progressbar
-    const progressBar = screen.getByRole('progressbar');
-    expect(progressBar).toBeInTheDocument();
-    expect(progressBar).toHaveAttribute('aria-valuemin', '0');
-    expect(progressBar).toHaveAttribute('aria-valuemax', '100');
-    expect(progressBar).toHaveAttribute('aria-label', expect.stringContaining('Impact Stream sync progress'));
+    const progressBars = screen.getAllByRole('progressbar');
+    expect(progressBars.length).toBeGreaterThanOrEqual(2);
+
+    const impactProgressBar = progressBars[0];
+    expect(impactProgressBar).toHaveAttribute('aria-valuemin', '0');
+    expect(impactProgressBar).toHaveAttribute('aria-valuemax', '100');
+    expect(impactProgressBar).toHaveAttribute('aria-label', expect.stringContaining('Impact Stream sync progress'));
+  });
+
+  it('App footer Edge Energy Savings meter displays semantic progressbar attributes and truncated log items render with title and aria-label', async () => {
+    render(<App />);
+
+    const energyProgressbar = screen.getByRole('progressbar', { name: 'Edge energy savings: 68% less cloud energy' });
+    expect(energyProgressbar).toBeInTheDocument();
+    expect(energyProgressbar).toHaveAttribute('aria-valuenow', '68');
+    expect(energyProgressbar).toHaveAttribute('aria-valuemin', '0');
+    expect(energyProgressbar).toHaveAttribute('aria-valuemax', '100');
+    expect(energyProgressbar).toHaveAttribute('title', '68% edge energy savings (7/10 efficiency index)');
+
+    const logItem = await screen.findByTitle('DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD');
+    expect(logItem).toBeInTheDocument();
+    expect(logItem).toHaveAttribute('aria-label', 'DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD');
   });
 });
