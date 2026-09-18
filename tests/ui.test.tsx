@@ -1786,4 +1786,28 @@ describe('UI Components', () => {
     expect(logItem).toBeInTheDocument();
     expect(logItem).toHaveAttribute('aria-label', 'DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD');
   });
+
+  it('CountryPanel Regional Readiness meter renders as an accessible progressbar with valid ARIA attributes and title tooltip', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    const readinessProgressBar = await screen.findByRole('progressbar', { name: 'Regional pilot readiness score: 99.2%' });
+    expect(readinessProgressBar).toBeInTheDocument();
+    expect(readinessProgressBar).toHaveAttribute('aria-valuenow', '99');
+    expect(readinessProgressBar).toHaveAttribute('aria-valuemin', '0');
+    expect(readinessProgressBar).toHaveAttribute('aria-valuemax', '100');
+    expect(readinessProgressBar).toHaveAttribute('title', '99.2% regional readiness score');
+  });
 });
