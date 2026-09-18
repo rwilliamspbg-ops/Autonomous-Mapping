@@ -201,7 +201,15 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               <div className="bg-slate-900/60 p-4 rounded-2xl border border-white/5 space-y-1">
                 <div className="text-slate-500 text-[8px] mono uppercase tracking-widest">Readiness</div>
                 <div className="text-white text-xl font-black">99.2%</div>
-                <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
+                <div
+                  role="progressbar"
+                  aria-valuenow={99}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="Regional pilot readiness score: 99.2%"
+                  title="99.2% regional readiness score"
+                  className="w-full h-1 bg-slate-800 rounded-full overflow-hidden"
+                >
                    <div className="w-[99%] h-full bg-emerald-500"></div>
                 </div>
               </div>
