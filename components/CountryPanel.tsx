@@ -32,6 +32,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [verifyStep, setVerifyStep] = useState(0);
   const [copied, setCopied] = useState(false);
   const [summaryCopied, setSummaryCopied] = useState(false);
+  const [riskCopied, setRiskCopied] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
   const retryButtonRef = React.useRef<HTMLButtonElement>(null);
@@ -43,6 +44,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
     setVerifyStep(0);
     setCopied(false);
     setSummaryCopied(false);
+    setRiskCopied(false);
     getSovereignInsights(countryName)
       .then((data) => {
         setInsight(data);
@@ -238,6 +240,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 {zkStatus === 'COMMITTED' && 'Privacy Trail Finalized and verified successfully.'}
                 {copied && 'Proof Hash copied to clipboard.'}
                 {summaryCopied && 'Local Deployment Summary copied to clipboard.'}
+                {riskCopied && 'Program Risk Matrix copied to clipboard.'}
               </div>
 
               {zkStatus === 'VERIFYING' && (
@@ -345,7 +348,23 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
 
             {/* Risk Distribution */}
             <section className="bg-slate-900/50 p-6 rounded-3xl border border-white/5 relative">
-              <h3 className="text-slate-500 text-[10px] mono font-bold uppercase mb-6 tracking-[0.4em]">Program Risk Matrix</h3>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-slate-500 text-[10px] mono font-bold uppercase tracking-[0.4em]">Program Risk Matrix</h3>
+                <button
+                  onClick={() => {
+                    const formattedRisks = insight.keyRisks.map(r => `- ${r.name}: ${r.severity}%`).join('\n');
+                    const text = `Program Risk Matrix (${country.name}):\n${formattedRisks}`;
+                    navigator.clipboard.writeText(text);
+                    setRiskCopied(true);
+                    setTimeout(() => setRiskCopied(false), 2000);
+                  }}
+                  aria-label="Copy Program Risk Matrix to clipboard"
+                  title="Copy Risk Matrix"
+                  className="px-2.5 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                >
+                  {riskCopied ? 'Copied! ✓' : 'Copy Risks'}
+                </button>
+              </div>
               <div className="h-64 relative">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>

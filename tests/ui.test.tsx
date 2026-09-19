@@ -1810,4 +1810,61 @@ describe('UI Components', () => {
     expect(readinessProgressBar).toHaveAttribute('aria-valuemax', '100');
     expect(readinessProgressBar).toHaveAttribute('title', '99.2% regional readiness score');
   });
+
+  it('CountryPanel displays and interacts with Copy Program Risk Matrix button', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [
+        { name: 'Access', severity: 20 },
+        { name: 'Infrastructure', severity: 35 }
+      ],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Wait for insights loading to finish
+    await screen.findByText('Kenya local pilot insights.');
+
+    vi.useFakeTimers();
+
+    const copyRiskBtn = screen.getByLabelText('Copy Program Risk Matrix to clipboard');
+    expect(copyRiskBtn).toBeInTheDocument();
+    expect(copyRiskBtn).toHaveAttribute('title', 'Copy Risk Matrix');
+
+    // Click to copy risk matrix
+    act(() => {
+      fireEvent.click(copyRiskBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('Program Risk Matrix (Kenya):\n- Access: 20%\n- Infrastructure: 35%');
+    expect(copyRiskBtn.textContent).toContain('Copied! ✓');
+
+    // Fast-forward 2 seconds to reset copied state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyRiskBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyRiskBtn.textContent).toContain('Copy Risks');
+
+    vi.useRealTimers();
+  });
 });
