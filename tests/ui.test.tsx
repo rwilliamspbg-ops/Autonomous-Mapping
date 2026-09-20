@@ -319,6 +319,9 @@ describe('UI Components', () => {
       fireEvent.click(shortcutsTriggerBtn);
     });
 
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements.some(el => el.textContent?.includes('Keyboard shortcuts modal opened.'))).toBe(true);
+
     const dialog = screen.getByRole('dialog', { name: 'Keyboard Shortcuts' });
     expect(dialog).toBeInTheDocument();
     expect(dialog).toHaveAttribute('aria-modal', 'true');
