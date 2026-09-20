@@ -782,6 +782,10 @@ const App: React.FC = () => {
         onScanComplete={(claim) => setLogs(prev => [...prev.slice(-5), `LOCAL_CONTRIBUTION: VERIFIED [0x${claim.id.toString(16).toUpperCase()}]`])}
       />
 
+      <div role="status" aria-live="polite" className="sr-only">
+        {isShortcutsOpen ? "Keyboard shortcuts modal opened." : ""}
+      </div>
+
       {/* Keyboard Shortcuts Overlay Modal */}
       {isShortcutsOpen && (
         <div
