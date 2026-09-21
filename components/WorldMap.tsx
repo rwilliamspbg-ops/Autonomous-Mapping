@@ -584,9 +584,11 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
           </div>
           
           <div className="flex items-center justify-between gap-4">
-            <span className="text-[9px] text-slate-500 mono font-bold uppercase tracking-wider">Capital:</span>
+            <span className="text-[9px] text-slate-500 mono font-bold uppercase tracking-wider">
+              {hoveredCountry.id.startsWith('SGP-') ? 'Type:' : 'Capital:'}
+            </span>
             <span className="text-[10px] text-emerald-400 mono font-bold text-right truncate">
-              {countryCapitals[hoveredCountry.name] || 'ANALYZING...'}
+              {hoveredCountry.id.startsWith('SGP-') ? 'Heritage Sanctuary' : (countryCapitals[hoveredCountry.name] || 'ANALYZING...')}
             </span>
           </div>
 
