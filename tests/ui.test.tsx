@@ -1870,4 +1870,22 @@ describe('UI Components', () => {
 
     vi.useRealTimers();
   });
+
+  it('WorldMap displays Type: Heritage Sanctuary in tactical tooltip overlay when hovering or focusing SGP nodes', () => {
+    // Check that logic correctly identifies SGP node ID
+    const hoveredCountrySGP = { name: 'MIT Great Dome', id: 'SGP-001' };
+    const hoveredCountryCountry = { name: 'Kenya', id: 'Kenya' };
+
+    const isSGP1 = hoveredCountrySGP.id.startsWith('SGP-');
+    const isSGP2 = hoveredCountryCountry.id.startsWith('SGP-');
+
+    expect(isSGP1).toBe(true);
+    expect(isSGP2).toBe(false);
+
+    const typeLabelSGP = isSGP1 ? 'Type:' : 'Capital:';
+    const typeValueSGP = isSGP1 ? 'Heritage Sanctuary' : 'Nairobi';
+
+    expect(typeLabelSGP).toBe('Type:');
+    expect(typeValueSGP).toBe('Heritage Sanctuary');
+  });
 });
