@@ -1888,4 +1888,74 @@ describe('UI Components', () => {
     expect(typeLabelSGP).toBe('Type:');
     expect(typeValueSGP).toBe('Heritage Sanctuary');
   });
+
+  it('CountryPanel displays and interacts with Copy Brief header button to copy complete regional brief', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [
+        { name: 'Access', severity: 20 }
+      ],
+      sources: [
+        { title: 'Global Health Report', uri: 'https://example.org/report' }
+      ],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Wait for insights loading to finish
+    await screen.findByText('Kenya local pilot insights.');
+
+    vi.useFakeTimers();
+
+    const copyBriefBtn = screen.getByLabelText('Copy complete Regional Pilot Brief for Kenya to clipboard');
+    expect(copyBriefBtn).toBeInTheDocument();
+    expect(copyBriefBtn).toHaveAttribute('title', 'Copy Regional Pilot Brief');
+
+    // Click to copy brief
+    act(() => {
+      fireEvent.click(copyBriefBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalled();
+    const briefText = writeTextSpy.mock.calls[0][0];
+    expect(briefText).toContain('REGIONAL PILOT BRIEF: KENYA (INDEX: KE)');
+    expect(briefText).toContain('READINESS SCORE: 99.2%');
+    expect(briefText).toContain('LOCAL DEPLOYMENT SUMMARY:\nKenya local pilot insights.');
+    expect(briefText).toContain('COMMUNITY FIT:\nStable integration.');
+    expect(briefText).toContain('RESOURCE OUTLOOK:\nPositive resources.');
+    expect(briefText).toContain('Global Health Report: https://example.org/report');
+    expect(copyBriefBtn.textContent).toContain('Copied! ✓');
+
+    // Check polite live region text
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Regional Pilot Brief copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    // Fast-forward 2 seconds to reset copied state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyBriefBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyBriefBtn.textContent).toContain('Copy Brief');
+
+    vi.useRealTimers();
+  });
 });
