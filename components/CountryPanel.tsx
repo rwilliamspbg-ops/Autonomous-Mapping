@@ -33,6 +33,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [copied, setCopied] = useState(false);
   const [summaryCopied, setSummaryCopied] = useState(false);
   const [riskCopied, setRiskCopied] = useState(false);
+  const [briefCopied, setBriefCopied] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
   const retryButtonRef = React.useRef<HTMLButtonElement>(null);
@@ -45,6 +46,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
     setCopied(false);
     setSummaryCopied(false);
     setRiskCopied(false);
+    setBriefCopied(false);
     getSovereignInsights(countryName)
       .then((data) => {
         setInsight(data);
@@ -100,6 +102,38 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [country, onClose]);
 
+  const handleCopyBrief = () => {
+    if (!insight || !country) return;
+    const formattedRisks = insight.keyRisks.map(r => `- ${r.name}: ${r.severity}%`).join('\n');
+    const sourcesText = insight.sources && insight.sources.length > 0
+      ? '\nGROUNDING SOURCES:\n' + insight.sources.map(s => `- ${s.title}: ${s.uri}`).join('\n')
+      : '';
+
+    const briefText = [
+      `REGIONAL PILOT BRIEF: ${country.name.toUpperCase()} (INDEX: ${country.id})`,
+      `==================================================`,
+      `READINESS SCORE: 99.2%`,
+      `DEPLOYMENT LENS: Community Impact (Pilot-Ready)`,
+      ``,
+      `LOCAL DEPLOYMENT SUMMARY:`,
+      insight.summary,
+      ``,
+      `PROGRAM RISK MATRIX:`,
+      formattedRisks,
+      ``,
+      `COMMUNITY FIT:`,
+      insight.politicalStatus,
+      ``,
+      `RESOURCE OUTLOOK:`,
+      insight.economicOutlook,
+      sourcesText
+    ].filter(Boolean).join('\n');
+
+    navigator.clipboard.writeText(briefText);
+    setBriefCopied(true);
+    setTimeout(() => setBriefCopied(false), 2000);
+  };
+
   const handleZkExport = () => {
     setZkStatus('GENERATING');
     setTimeout(() => {
@@ -139,16 +173,28 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               <span className="text-[9px] text-slate-500 mono font-bold uppercase tracking-widest">Aggregate Registry Status</span>
             </div>
           </div>
-          <button
-            ref={closeButtonRef}
-            onClick={onClose}
-            aria-label="Close Regional Pilot Brief (Escape)"
-            title="Close (Escape)"
-            className="hover:bg-white/10 rounded-full p-2 transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative group"
-          >
-            <svg className="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
-            <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
-          </button>
+          <div className="flex items-center gap-3">
+            {insight && !loading && !error && (
+              <button
+                onClick={handleCopyBrief}
+                aria-label={`Copy complete Regional Pilot Brief for ${country.name} to clipboard`}
+                title="Copy Regional Pilot Brief"
+                className="px-3 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[10px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+              >
+                {briefCopied ? 'Copied! ✓' : 'Copy Brief'}
+              </button>
+            )}
+            <button
+              ref={closeButtonRef}
+              onClick={onClose}
+              aria-label="Close Regional Pilot Brief (Escape)"
+              title="Close (Escape)"
+              className="hover:bg-white/10 rounded-full p-2 transition-all active:scale-90 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative group"
+            >
+              <svg className="w-7 h-7 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -241,6 +287,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 {copied && 'Proof Hash copied to clipboard.'}
                 {summaryCopied && 'Local Deployment Summary copied to clipboard.'}
                 {riskCopied && 'Program Risk Matrix copied to clipboard.'}
+                {briefCopied && 'Regional Pilot Brief copied to clipboard.'}
               </div>
 
               {zkStatus === 'VERIFYING' && (

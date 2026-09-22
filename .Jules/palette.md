@@ -59,3 +59,7 @@
 ## 2027-06-12 - Copy-to-Clipboard Functionality on HUD Overlay Panels
 **Learning:** Full-screen AR overlays with pointer-events-disabled HUD containers block user interaction with HUD metrics unless specific HUD cards are set to `pointer-events-auto`. Enabling `pointer-events-auto` on the `Local_Telemetry` HUD card in `SpatialScanner.tsx` allows adding a keyboard-accessible, focus-visible "Copy Telemetry" button. Pairing it with immediate tactile feedback ("Copied! ✓") resetting after 2 seconds and a polite live region (`role="status" aria-live="polite"`) ensures both sighted and assistive technology users can easily export spatial node metrics.
 **Action:** Enable `pointer-events-auto` on interactive HUD overlay cards and equip them with focus-visible copy buttons, tactile feedback, and screen reader live region announcements.
+
+## 2027-06-25 - Comprehensive Brief Export Action in Detail Drawers
+**Learning:** When detail drawers present structured data across multiple nested sections (such as Readiness, Summaries, Risk Matrices, and Grounding Sources), forcing users to copy section by section causes high friction during executive reporting. Adding a top-level "Copy Brief" action in the drawer header that aggregates all sections into a clean, markdown-formatted plain text transcript allows rapid export for documentation and stakeholders.
+**Action:** Provide a top-level "Copy Brief" button in multi-section detail drawers to export full structured summaries in a single accessible action.
