@@ -16,6 +16,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
   const [points, setPoints] = useState<{ x: number; y: number; life: number; color: string }[]>([]);
   const [telemetry, setTelemetry] = useState({ pose: [0,0,0], keyframes: 0, voxels: 0, stability: 100 });
   const [telemetryCopied, setTelemetryCopied] = useState(false);
+  const [poseCopied, setPoseCopied] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
@@ -198,10 +199,28 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
       <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-between p-12 font-mono">
         <div className="flex justify-between items-start">
           <div className="space-y-8">
-            <div className="bg-slate-950/90 backdrop-blur-2xl p-6 rounded-3xl border border-blue-600/40 w-80 shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+            <div className="bg-slate-950/90 backdrop-blur-2xl p-6 rounded-3xl border border-blue-600/40 w-80 shadow-[0_0_50px_rgba(0,0,0,0.8)] pointer-events-auto">
               <div className="text-[11px] text-blue-500 font-black uppercase mb-4 tracking-[0.4em] flex justify-between items-center border-b border-white/5 pb-3">
                 <span>PRIVACY_CHECK_v1</span>
-                <span className="text-emerald-500 animate-pulse">LOCAL</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const text = `EULER_YAW: ${telemetry.pose[0].toFixed(8)} | EULER_PITCH: ${telemetry.pose[1].toFixed(8)} | RMS_DRIFT: 0.024 mm`;
+                      navigator.clipboard.writeText(text);
+                      setPoseCopied(true);
+                      setTimeout(() => setPoseCopied(false), 2000);
+                    }}
+                    aria-label="Copy Privacy Pose Check metrics to clipboard"
+                    title="Copy Pose Check"
+                    className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                  >
+                    {poseCopied ? 'Copied! ✓' : 'Copy'}
+                  </button>
+                  <span className="text-emerald-500 animate-pulse">LOCAL</span>
+                </div>
+              </div>
+              <div role="status" aria-live="polite" className="sr-only">
+                {poseCopied ? 'Privacy pose check details copied to clipboard.' : ''}
               </div>
               <div className="space-y-3 text-[10px] text-slate-300">
                 <div className="flex justify-between border-b border-white/5 pb-1"><span>EULER_YAW:</span> <span className="text-white font-black">{telemetry.pose[0].toFixed(8)}</span></div>
