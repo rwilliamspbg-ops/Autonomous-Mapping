@@ -1958,4 +1958,65 @@ describe('UI Components', () => {
 
     vi.useRealTimers();
   });
+
+  it('SpatialScanner displays and interacts with Copy Privacy Pose Check metrics button', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    const mockGetUserMedia = vi.fn().mockImplementation(() => new Promise(() => {}));
+    const originalMediaDevices = navigator.mediaDevices;
+    Object.defineProperty(navigator, 'mediaDevices', {
+      writable: true,
+      configurable: true,
+      value: {
+        getUserMedia: mockGetUserMedia
+      }
+    });
+
+    render(<SpatialScanner isOpen={true} onClose={() => {}} onScanComplete={() => {}} />);
+
+    const copyPoseBtn = screen.getByLabelText('Copy Privacy Pose Check metrics to clipboard');
+    expect(copyPoseBtn).toBeInTheDocument();
+    expect(copyPoseBtn).toHaveAttribute('title', 'Copy Pose Check');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copyPoseBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('EULER_YAW: 0.00000000 | EULER_PITCH: 0.00000000 | RMS_DRIFT: 0.024 mm');
+    expect(copyPoseBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Privacy pose check details copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyPoseBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyPoseBtn.textContent).toContain('Copy');
+
+    vi.useRealTimers();
+
+    if (originalMediaDevices) {
+      Object.defineProperty(navigator, 'mediaDevices', {
+        writable: true,
+        configurable: true,
+        value: originalMediaDevices
+      });
+    } else {
+      // @ts-ignore
+      delete navigator.mediaDevices;
+    }
+  });
 });
