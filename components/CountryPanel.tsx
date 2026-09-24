@@ -412,7 +412,11 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                   {riskCopied ? 'Copied! ✓' : 'Copy Risks'}
                 </button>
               </div>
-              <div className="h-64 relative">
+              <div
+                role="img"
+                aria-label={`Program Risk Matrix chart for ${country.name}: ${insight.keyRisks.map(r => `${r.name} ${r.severity}%`).join(', ')}`}
+                className="h-64 relative"
+              >
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie

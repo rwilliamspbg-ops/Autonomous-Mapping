@@ -2019,4 +2019,51 @@ describe('UI Components', () => {
       delete navigator.mediaDevices;
     }
   });
+
+  it('CountryPanel renders Program Risk Matrix chart container with img role and descriptive aria-label', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [
+        { name: 'Access', severity: 20 },
+        { name: 'Infrastructure', severity: 35 }
+      ],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    const chartImg = await screen.findByRole('img', { name: /Program Risk Matrix chart for Kenya: Access 20%, Infrastructure 35%/i });
+    expect(chartImg).toBeInTheDocument();
+  });
+
+  it('ChatInterface quick prompt suggestion click updates polite live region announcement', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const promptBtn = screen.getByLabelText('Use prompt: Health pilot privacy');
+    expect(promptBtn).toBeInTheDocument();
+
+    act(() => {
+      fireEvent.click(promptBtn);
+    });
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasPromptAnnouncement = statusElements.some(el =>
+      el.textContent?.includes('Prompt loaded: "Health pilot privacy". Press Enter to send.')
+    );
+    expect(hasPromptAnnouncement).toBe(true);
+  });
 });
