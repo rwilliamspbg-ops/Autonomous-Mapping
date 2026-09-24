@@ -251,6 +251,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                             key={prompt}
                             onClick={() => {
                               setInput(prompt);
+                              setLastAnnouncedMsg(`Prompt loaded: "${prompt}". Press Enter to send.`);
                               inputRef.current?.focus();
                             }}
                             aria-label={`Use prompt: ${prompt}`}
