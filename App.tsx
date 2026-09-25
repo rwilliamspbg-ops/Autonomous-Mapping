@@ -572,7 +572,13 @@ const App: React.FC = () => {
               <div className="mt-4 text-[10px] mono text-slate-500 uppercase tracking-[0.3em]">
                 <div className="flex items-center justify-between gap-3">
                   <span>Tap a stage or lane to steer the narrative.</span>
-                  <span className="text-blue-400">{demoClockLabel}</span>
+                  <span
+                    aria-label={`Guided walkthrough demo elapsed time: ${demoClockLabel}`}
+                    title="Guided walkthrough demo elapsed time"
+                    className="text-blue-400 font-bold"
+                  >
+                    {demoClockLabel}
+                  </span>
                 </div>
               </div>
 
