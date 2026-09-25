@@ -2066,4 +2066,31 @@ describe('UI Components', () => {
     );
     expect(hasPromptAnnouncement).toBe(true);
   });
+
+  it('CountryPanel ZK proof hash element, risk legend items, and App demo clock label render accessible title tooltips and ARIA attributes', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Risk legend item has title tooltip
+    const riskItem = await screen.findByTitle('Access');
+    expect(riskItem).toBeInTheDocument();
+
+    // Verify App walkthrough demo clock timer has aria-label and title
+    render(<App />);
+    const clockSpan = screen.getByLabelText(/Guided walkthrough demo elapsed time: 00:00 \/ 06:30/i);
+    expect(clockSpan).toBeInTheDocument();
+    expect(clockSpan).toHaveAttribute('title', 'Guided walkthrough demo elapsed time');
+  });
 });

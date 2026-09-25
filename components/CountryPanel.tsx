@@ -352,7 +352,11 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                     <span className="text-slate-500 font-bold">SHA-256</span>
                   </div>
                   <div className="flex items-center justify-between gap-3 mt-1">
-                    <span className="font-mono text-[10px] text-white select-all break-all bg-slate-950/50 p-2 rounded border border-white/5 flex-1 tracking-tight">
+                    <span
+                      title="0xbf31da86c729c19fb7ae4f3bc42f9e4bc11be4f0de318182ba0337b5ba7be01d"
+                      aria-label="ZK Proof Hash: 0xbf31da86c729c19fb7ae4f3bc42f9e4bc11be4f0de318182ba0337b5ba7be01d"
+                      className="font-mono text-[10px] text-white select-all break-all bg-slate-950/50 p-2 rounded border border-white/5 flex-1 tracking-tight"
+                    >
                       0xbf31da86c7...4f0de318182b
                     </span>
                     <button
@@ -451,7 +455,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                   <div key={i} className="flex items-center justify-between gap-2 border-b border-white/5 pb-1">
                     <div className="flex items-center gap-2 truncate">
                       <div className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)] shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }}></div>
-                      <span className="text-[10px] text-slate-300 mono truncate font-medium uppercase tracking-tighter">{risk.name}</span>
+                      <span className="text-[10px] text-slate-300 mono truncate font-medium uppercase tracking-tighter" title={risk.name}>{risk.name}</span>
                     </div>
                     <span className="text-[10px] text-blue-400 mono font-bold shrink-0">{risk.severity}%</span>
                   </div>
