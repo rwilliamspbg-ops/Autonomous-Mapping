@@ -594,6 +594,35 @@ describe('UI Components', () => {
     expect(verifyBtn).toHaveAttribute('title', 'Verify on-device contribution proof');
   });
 
+  it('CountryPanel ZK verification button displays animated loading spinner during proof generation', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    const verifyBtn = await screen.findByText('⊕ Verify On-Device Contribution');
+    expect(verifyBtn).toBeInTheDocument();
+
+    act(() => {
+      fireEvent.click(verifyBtn);
+    });
+
+    expect(screen.getAllByText('Generating Privacy Proof...').length).toBeGreaterThan(0);
+    const spinnerSvg = verifyBtn.querySelector('svg.animate-spin');
+    expect(spinnerSvg).toBeInTheDocument();
+  });
+
   it('ChatInterface send button displays descriptive title attributes reflecting active and disabled states', () => {
     render(<App />);
 
