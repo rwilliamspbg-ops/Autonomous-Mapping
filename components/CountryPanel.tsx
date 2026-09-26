@@ -333,15 +333,22 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                   zkStatus === 'COMMITTED' ? 'Privacy trail finalized and committed' :
                   'Generating and verifying proof...'
                 }
-                className={`w-full py-4 rounded-xl border mono text-[10px] font-black uppercase tracking-widest transition-all shadow-lg focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
+                className={`w-full py-4 rounded-xl border mono text-[10px] font-black uppercase tracking-widest transition-all shadow-lg focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center justify-center gap-2 ${
                   zkStatus === 'IDLE' ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500 shadow-blue-600/20' :
                   zkStatus === 'COMMITTED' ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 cursor-default mb-3' :
-                  'bg-slate-800 border-slate-700 text-slate-500 animate-pulse cursor-wait'
+                  'bg-slate-800 border-slate-700 text-slate-500 cursor-wait'
                 }`}
               >
                 {zkStatus === 'IDLE' && '⊕ Verify On-Device Contribution'}
-                {zkStatus === 'GENERATING' && 'Generating Privacy Proof...'}
-                {zkStatus === 'VERIFYING' && 'Verifying Local Contribution...'}
+                {(zkStatus === 'GENERATING' || zkStatus === 'VERIFYING') && (
+                  <>
+                    <svg className="animate-spin h-3.5 w-3.5 text-blue-400 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>{zkStatus === 'GENERATING' ? 'Generating Privacy Proof...' : 'Verifying Local Contribution...'}</span>
+                  </>
+                )}
                 {zkStatus === 'COMMITTED' && '✓ Privacy Trail Finalized'}
               </button>
 
