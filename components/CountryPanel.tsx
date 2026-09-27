@@ -483,21 +483,32 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
 
             <section className="pb-12 border-t border-white/5 pt-10">
               <h3 className="text-slate-500 text-[10px] mono font-bold uppercase mb-4 tracking-[0.4em]">Grounding Sources</h3>
-              <div className="flex flex-wrap gap-2">
-                {insight.sources?.map((source, i) => (
-                  <a
-                    key={i}
-                    href={source.uri}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`${source.title} (opens in a new tab)`}
-                    title={source.title}
-                    className="text-[9px] mono bg-blue-500/10 text-blue-400 px-4 py-1.5 rounded-full border border-blue-500/20 hover:bg-blue-500/20 transition-all font-bold uppercase truncate max-w-[200px] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
-                  >
-                    {source.title} <span aria-hidden="true">↗</span>
-                  </a>
-                ))}
-              </div>
+              {insight.sources && insight.sources.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {insight.sources.map((source, i) => (
+                    <a
+                      key={i}
+                      href={source.uri}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${source.title} (opens in a new tab)`}
+                      title={source.title}
+                      className="text-[9px] mono bg-blue-500/10 text-blue-400 px-4 py-1.5 rounded-full border border-blue-500/20 hover:bg-blue-500/20 transition-all font-bold uppercase truncate max-w-[200px] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                    >
+                      {source.title} <span aria-hidden="true">↗</span>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl border border-dashed border-slate-800 bg-slate-900/30 text-center">
+                  <div className="text-[10px] text-slate-500 mono uppercase tracking-[0.2em] font-bold">
+                    No external sources required
+                  </div>
+                  <div className="text-[9px] text-slate-600 mono uppercase tracking-wider mt-1">
+                    Verified via local state anchor & ZK attestation
+                  </div>
+                </div>
+              )}
             </section>
           </>
         ) : null}

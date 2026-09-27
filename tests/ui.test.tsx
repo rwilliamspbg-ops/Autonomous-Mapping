@@ -2122,4 +2122,27 @@ describe('UI Components', () => {
     expect(clockSpan).toBeInTheDocument();
     expect(clockSpan).toHaveAttribute('title', 'Guided walkthrough demo elapsed time');
   });
+
+  it('CountryPanel displays empty state message for Grounding Sources when sources array is empty', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights without external sources.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Wait for insights loading to finish
+    await screen.findByText('Kenya local pilot insights without external sources.');
+
+    expect(screen.getByText('No external sources required')).toBeInTheDocument();
+    expect(screen.getByText('Verified via local state anchor & ZK attestation')).toBeInTheDocument();
+  });
 });
