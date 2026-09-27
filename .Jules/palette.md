@@ -63,3 +63,7 @@
 ## 2027-06-25 - Comprehensive Brief Export Action in Detail Drawers
 **Learning:** When detail drawers present structured data across multiple nested sections (such as Readiness, Summaries, Risk Matrices, and Grounding Sources), forcing users to copy section by section causes high friction during executive reporting. Adding a top-level "Copy Brief" action in the drawer header that aggregates all sections into a clean, markdown-formatted plain text transcript allows rapid export for documentation and stakeholders.
 **Action:** Provide a top-level "Copy Brief" button in multi-section detail drawers to export full structured summaries in a single accessible action.
+
+## 2027-07-02 - Explicit Empty State Fallbacks for Dynamic Reference Sections
+**Learning:** In detail drawers with dynamic list sections (such as Grounding Sources or Citation Links), leaving empty lists unrendered creates blank whitespace that makes users question if data failed to load. Rendering a cyber-styled empty state fallback banner ("NO EXTERNAL SOURCES REQUIRED // VERIFIED VIA LOCAL STATE ANCHOR & ZK ATTESTATION") explicitly confirms that the section is empty by design and fully verified.
+**Action:** Always render explicit empty state banners for optional or dynamic reference lists in detail panels when empty.
