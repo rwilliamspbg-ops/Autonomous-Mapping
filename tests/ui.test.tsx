@@ -121,6 +121,44 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('App Impact Stream displays and interacts with Clear Stream button requiring confirmation and shows empty state', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Wait for initial sync logs to render
+    const clearStreamBtn = await screen.findByLabelText('Clear impact stream logs');
+    expect(clearStreamBtn).toBeInTheDocument();
+    expect(clearStreamBtn).toHaveAttribute('title', 'Clear impact stream logs');
+
+    vi.useFakeTimers();
+
+    // Click Clear Stream once to enter confirmation state
+    act(() => {
+      fireEvent.click(clearStreamBtn);
+    });
+
+    expect(clearStreamBtn).toHaveAttribute('aria-label', 'Confirm clear impact stream logs');
+    expect(clearStreamBtn).toHaveAttribute('title', 'Confirm clear impact stream?');
+    expect(clearStreamBtn.textContent).toContain('Sure?');
+
+    // Click again to confirm clear
+    act(() => {
+      fireEvent.click(clearStreamBtn);
+    });
+
+    // Stream logs cleared, button disappears and empty state renders
+    expect(screen.queryByLabelText('Clear impact stream logs')).not.toBeInTheDocument();
+    expect(screen.getByText('Telemetry stream cleared')).toBeInTheDocument();
+    expect(screen.getByText('Awaiting new telemetry events...')).toBeInTheDocument();
+
+    // Check polite live region announcement
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasClearedStatus = statusElements.some(el => el.textContent?.includes('Impact stream logs cleared.'));
+    expect(hasClearedStatus).toBe(true);
+
+    vi.useRealTimers();
+  });
+
   it('App Evidence Trail displays and interacts with Clear Trail button requiring confirmation', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);

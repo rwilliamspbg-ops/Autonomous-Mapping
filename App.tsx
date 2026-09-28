@@ -51,10 +51,13 @@ const App: React.FC = () => {
   const [confirmClearTrail, setConfirmClearTrail] = useState(false);
   const [lastAnnouncedTrailStatus, setLastAnnouncedTrailStatus] = useState<string | null>(null);
   const [streamCopied, setStreamCopied] = useState(false);
+  const [confirmClearStream, setConfirmClearStream] = useState(false);
+  const [lastAnnouncedStreamStatus, setLastAnnouncedStreamStatus] = useState<string | null>(null);
   const [coordsCopied, setCoordsCopied] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const protocolTimersRef = useRef<number[]>([]);
   const clearTrailTimerRef = useRef<number | null>(null);
+  const clearStreamTimerRef = useRef<number | null>(null);
   const demoTickRef = useRef<number | null>(null);
   const demoStartRef = useRef<number | null>(null);
   const impactPillars = [
@@ -96,6 +99,9 @@ const App: React.FC = () => {
       }
       if (clearTrailTimerRef.current) {
         window.clearTimeout(clearTrailTimerRef.current);
+      }
+      if (clearStreamTimerRef.current) {
+        window.clearTimeout(clearStreamTimerRef.current);
       }
     };
   }, []);
@@ -316,6 +322,24 @@ const App: React.FC = () => {
     }
   };
 
+  const handleClearStream = () => {
+    if (!confirmClearStream) {
+      setConfirmClearStream(true);
+      if (clearStreamTimerRef.current) clearTimeout(clearStreamTimerRef.current);
+      clearStreamTimerRef.current = window.setTimeout(() => {
+        setConfirmClearStream(false);
+      }, 4000);
+    } else {
+      setLogs([]);
+      setLastAnnouncedStreamStatus('Impact stream logs cleared.');
+      setConfirmClearStream(false);
+      if (clearStreamTimerRef.current) {
+        clearTimeout(clearStreamTimerRef.current);
+        clearStreamTimerRef.current = null;
+      }
+    }
+  };
+
   const resetProtocol = () => {
     clearProtocolTimers();
     setProtocolPhase('IDLE');
@@ -332,6 +356,8 @@ const App: React.FC = () => {
     setConfirmClearTrail(false);
     setLastAnnouncedTrailStatus(null);
     setStreamCopied(false);
+    setConfirmClearStream(false);
+    setLastAnnouncedStreamStatus(null);
     setCoordsCopied(false);
     demoStartRef.current = null;
     addProtocolLog('PROTOCOL: demo reset for next walkthrough');
@@ -652,18 +678,32 @@ const App: React.FC = () => {
                 <span>Impact_Stream</span>
                 <div className="flex items-center gap-2">
                   {logs.length > 0 && (
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(logs.join('\n'));
-                        setStreamCopied(true);
-                        setTimeout(() => setStreamCopied(false), 2000);
-                      }}
-                      aria-label="Copy Impact Stream logs to clipboard"
-                      title="Copy Stream Logs"
-                      className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
-                    >
-                      {streamCopied ? 'Copied! ✓' : 'Copy Stream'}
-                    </button>
+                    <>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(logs.join('\n'));
+                          setStreamCopied(true);
+                          setTimeout(() => setStreamCopied(false), 2000);
+                        }}
+                        aria-label="Copy Impact Stream logs to clipboard"
+                        title="Copy Stream Logs"
+                        className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                      >
+                        {streamCopied ? 'Copied! ✓' : 'Copy Stream'}
+                      </button>
+                      <button
+                        onClick={handleClearStream}
+                        aria-label={confirmClearStream ? "Confirm clear impact stream logs" : "Clear impact stream logs"}
+                        title={confirmClearStream ? "Confirm clear impact stream?" : "Clear impact stream logs"}
+                        className={`px-2 py-1 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border shadow-md focus-visible:ring-2 outline-none transition-all active:scale-95 shrink-0 ${
+                          confirmClearStream
+                            ? 'bg-rose-500/20 border-rose-500 text-rose-400 hover:bg-rose-500 hover:text-white focus-visible:ring-rose-500'
+                            : 'bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-rose-400 border-white/10 focus-visible:ring-blue-500'
+                        }`}
+                      >
+                        {confirmClearStream ? 'Sure?' : 'Clear Stream'}
+                      </button>
+                    </>
                   )}
                   <span className="text-[9px] text-slate-700">READY</span>
                 </div>
@@ -671,17 +711,28 @@ const App: React.FC = () => {
               <div role="status" aria-live="polite" className="sr-only">
                 {streamCopied
                   ? 'Impact stream logs copied to clipboard.'
-                  : logs.length > 0
+                  : lastAnnouncedStreamStatus || (logs.length > 0
                   ? `Latest telemetry update: ${logs[logs.length - 1]}`
-                  : 'Telemetry system ready'}
+                  : 'Telemetry system ready')}
               </div>
               <div className="space-y-4">
-                {logs.map((log, i) => (
-                  <div key={i} className={`text-[10px] mono flex gap-3 transition-all duration-300 ${i === logs.length - 1 ? 'text-blue-400 font-bold' : 'text-slate-500'}`}>
-                    <span className="shrink-0 opacity-20">[{i.toString().padStart(2, '0')}]</span>
-                    <span className="truncate" title={log} aria-label={log}>{log}</span>
+                {logs.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/20 p-4 text-center">
+                    <div className="text-[10px] text-slate-500 mono uppercase tracking-[0.25em] font-black mb-1">
+                      Telemetry stream cleared
+                    </div>
+                    <p className="text-[9px] text-slate-600 leading-normal font-medium max-w-[240px] mx-auto uppercase tracking-wider">
+                      Awaiting new telemetry events...
+                    </p>
                   </div>
-                ))}
+                ) : (
+                  logs.map((log, i) => (
+                    <div key={i} className={`text-[10px] mono flex gap-3 transition-all duration-300 ${i === logs.length - 1 ? 'text-blue-400 font-bold' : 'text-slate-500'}`}>
+                      <span className="shrink-0 opacity-20">[{i.toString().padStart(2, '0')}]</span>
+                      <span className="truncate" title={log} aria-label={log}>{log}</span>
+                    </div>
+                  ))
+                )}
               </div>
               <div
                 role="progressbar"
