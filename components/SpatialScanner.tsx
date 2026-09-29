@@ -190,7 +190,12 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] bg-black flex flex-col overflow-hidden animate-in fade-in duration-1000">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Spatial Privacy Scanner"
+      className="fixed inset-0 z-[100] bg-black flex flex-col overflow-hidden animate-in fade-in duration-1000"
+    >
       {/* Live Camera Feed */}
       <video ref={videoRef} autoPlay playsInline className="absolute inset-0 w-full h-full object-cover opacity-70" />
       <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight} className="absolute inset-0 z-10" />

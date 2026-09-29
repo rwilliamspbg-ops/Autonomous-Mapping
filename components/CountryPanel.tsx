@@ -156,7 +156,12 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   if (!country) return null;
 
   return (
-    <div className="fixed top-0 right-0 h-full w-full md:w-[500px] bg-slate-950/98 backdrop-blur-2xl border-l border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] z-40 flex flex-col transition-all duration-500 ease-out border-t border-blue-500/20">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Regional Pilot Brief for ${country.name}`}
+      className="fixed top-0 right-0 h-full w-full md:w-[500px] bg-slate-950/98 backdrop-blur-2xl border-l border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.5)] z-40 flex flex-col transition-all duration-500 ease-out border-t border-blue-500/20"
+    >
       <div className="bg-slate-950 p-8 border-b border-white/5 relative overflow-hidden">
         <div className="absolute top-0 right-0 p-4 opacity-10">
           <div className="w-24 h-24 border-r-2 border-t-2 border-blue-500"></div>

@@ -112,6 +112,9 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Live Node Console"
         className="w-full max-w-5xl h-[700px] bg-[#0d1117] border border-blue-500/30 rounded-[2.5rem] shadow-[0_0_120px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-500 cursor-default relative"
       >
         <div className="bg-[#161b22] px-10 py-6 border-b border-white/10 flex justify-between items-center">
