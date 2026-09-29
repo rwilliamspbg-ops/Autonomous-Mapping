@@ -68,6 +68,9 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo }) =
     >
       <div
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Sovereign Map Manifesto"
         className="w-full max-w-4xl max-h-[90vh] bg-slate-900 border border-blue-500/30 rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.1)] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-300 cursor-default"
       >
         {/* Header */}

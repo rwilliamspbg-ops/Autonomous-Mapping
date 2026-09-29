@@ -2161,6 +2161,58 @@ describe('UI Components', () => {
     expect(clockSpan).toHaveAttribute('title', 'Guided walkthrough demo elapsed time');
   });
 
+  it('Overlays and drawers render role="dialog", aria-modal="true", and descriptive aria-labels', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    // Test Manifesto dialog attributes
+    const { rerender } = render(<Manifesto isOpen={true} onClose={() => {}} />);
+    const manifestoDialog = screen.getByRole('dialog', { name: 'Sovereign Map Manifesto' });
+    expect(manifestoDialog).toBeInTheDocument();
+    expect(manifestoDialog).toHaveAttribute('aria-modal', 'true');
+
+    // Test CountryPanel dialog attributes
+    rerender(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+    const countryPanelDialog = screen.getByRole('dialog', { name: 'Regional Pilot Brief for Kenya' });
+    expect(countryPanelDialog).toBeInTheDocument();
+    expect(countryPanelDialog).toHaveAttribute('aria-modal', 'true');
+
+    // Test SpatialScanner dialog attributes
+    rerender(<SpatialScanner isOpen={true} onClose={() => {}} onScanComplete={() => {}} />);
+    const scannerDialog = screen.getByRole('dialog', { name: 'Spatial Privacy Scanner' });
+    expect(scannerDialog).toBeInTheDocument();
+    expect(scannerDialog).toHaveAttribute('aria-modal', 'true');
+
+    // Test ChatInterface dialog attributes
+    rerender(<App />);
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+    const chatDialog = screen.getByRole('dialog', { name: 'Impact Chat Assistant' });
+    expect(chatDialog).toBeInTheDocument();
+    expect(chatDialog).toHaveAttribute('aria-modal', 'true');
+
+    // Test HardhatTerminal dialog attributes
+    act(() => {
+      const terminalEvent = new KeyboardEvent('keydown', { key: 't' });
+      window.dispatchEvent(terminalEvent);
+    });
+    const terminalDialog = screen.getByRole('dialog', { name: 'Live Node Console' });
+    expect(terminalDialog).toBeInTheDocument();
+    expect(terminalDialog).toHaveAttribute('aria-modal', 'true');
+  });
+
   it('CountryPanel displays empty state message for Grounding Sources when sources array is empty', async () => {
     const { getSovereignInsights } = await import('../services/geminiService');
     const mockedGetInsights = vi.mocked(getSovereignInsights);

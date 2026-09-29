@@ -162,7 +162,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {isOpen ? (
-        <div className="w-80 md:w-96 h-[500px] bg-slate-900/95 backdrop-blur-lg rounded-2xl border border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Impact Chat Assistant"
+          className="w-80 md:w-96 h-[500px] bg-slate-900/95 backdrop-blur-lg rounded-2xl border border-slate-800 shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 duration-300"
+        >
           <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-blue-500"></div>
