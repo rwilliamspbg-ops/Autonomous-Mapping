@@ -54,6 +54,7 @@ const App: React.FC = () => {
   const [confirmClearStream, setConfirmClearStream] = useState(false);
   const [lastAnnouncedStreamStatus, setLastAnnouncedStreamStatus] = useState<string | null>(null);
   const [coordsCopied, setCoordsCopied] = useState(false);
+  const [shortcutsCopied, setShortcutsCopied] = useState(false);
   const [resetDone, setResetDone] = useState(false);
   const protocolTimersRef = useRef<number[]>([]);
   const clearTrailTimerRef = useRef<number | null>(null);
@@ -840,7 +841,7 @@ const App: React.FC = () => {
       />
 
       <div role="status" aria-live="polite" className="sr-only">
-        {isShortcutsOpen ? "Keyboard shortcuts modal opened." : ""}
+        {isShortcutsOpen ? (shortcutsCopied ? "Keyboard shortcuts copied to clipboard." : "Keyboard shortcuts modal opened.") : ""}
       </div>
 
       {/* Keyboard Shortcuts Overlay Modal */}
@@ -861,18 +862,43 @@ const App: React.FC = () => {
                 <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
                 <h3 className="font-mono text-sm font-black text-white uppercase tracking-[0.3em]">Keyboard_Shortcuts</h3>
               </div>
-              <button
-                ref={shortcutsCloseRef}
-                onClick={() => setIsShortcutsOpen(false)}
-                aria-label="Close Keyboard Shortcuts (Escape)"
-                title="Close (Escape)"
-                className="p-2 hover:bg-white/10 rounded-full transition-all active:scale-90 text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative group"
-              >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    const shortcutsText = [
+                      { key: 'M', desc: 'Toggle Manifesto & Narrative Modal' },
+                      { key: 'T', desc: 'Toggle Live Node Console (Terminal)' },
+                      { key: 'S', desc: 'Toggle Spatial Privacy Scanner' },
+                      { key: 'C', desc: 'Toggle Impact Analyst Chat' },
+                      { key: '+ / =', desc: 'Tactile World Map Zoom In' },
+                      { key: '- / _', desc: 'Tactile World Map Zoom Out' },
+                      { key: 'R', desc: 'Reset World Map Zoom Level' },
+                      { key: '?', desc: 'Show / Hide Keyboard Shortcuts Modal' },
+                      { key: 'ESC', desc: 'Close Any Active Panel or Modal' },
+                    ].map(s => `${s.key}: ${s.desc}`).join('\n');
+                    navigator.clipboard.writeText(shortcutsText);
+                    setShortcutsCopied(true);
+                    setTimeout(() => setShortcutsCopied(false), 2000);
+                  }}
+                  aria-label="Copy Keyboard Shortcuts to clipboard"
+                  title="Copy Shortcuts"
+                  className="px-3 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[10px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                >
+                  {shortcutsCopied ? 'Copied! ✓' : 'Copy Shortcuts'}
+                </button>
+                <button
+                  ref={shortcutsCloseRef}
+                  onClick={() => setIsShortcutsOpen(false)}
+                  aria-label="Close Keyboard Shortcuts (Escape)"
+                  title="Close (Escape)"
+                  className="p-2 hover:bg-white/10 rounded-full transition-all active:scale-90 text-slate-400 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none relative group"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <kbd aria-hidden="true" className="absolute -bottom-1 -right-1 px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400 font-mono tracking-tighter uppercase select-none">Esc</kbd>
+                </button>
+              </div>
             </div>
 
             <div

@@ -393,6 +393,63 @@ describe('UI Components', () => {
     expect(screen.getByRole('dialog', { name: 'Keyboard Shortcuts' })).toBeInTheDocument();
   });
 
+  it('App Keyboard Shortcuts modal displays Copy Shortcuts button and copies formatted hotkeys to clipboard', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    // Open Keyboard Shortcuts modal
+    const shortcutsTriggerBtn = screen.getByLabelText('Keyboard Shortcuts (Press ?)');
+    await act(async () => {
+      fireEvent.click(shortcutsTriggerBtn);
+    });
+
+    const copyShortcutsBtn = screen.getByLabelText('Copy Keyboard Shortcuts to clipboard');
+    expect(copyShortcutsBtn).toBeInTheDocument();
+    expect(copyShortcutsBtn).toHaveAttribute('title', 'Copy Shortcuts');
+
+    vi.useFakeTimers();
+
+    // Click Copy Shortcuts button
+    act(() => {
+      fireEvent.click(copyShortcutsBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalled();
+    const copiedText = writeTextSpy.mock.calls[0][0];
+    expect(copiedText).toContain('M: Toggle Manifesto & Narrative Modal');
+    expect(copiedText).toContain('T: Toggle Live Node Console (Terminal)');
+    expect(copiedText).toContain('S: Toggle Spatial Privacy Scanner');
+    expect(copiedText).toContain('C: Toggle Impact Analyst Chat');
+    expect(copiedText).toContain('?: Show / Hide Keyboard Shortcuts Modal');
+    expect(copiedText).toContain('ESC: Close Any Active Panel or Modal');
+
+    expect(copyShortcutsBtn.textContent).toContain('Copied! ✓');
+
+    // Live region status check
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Keyboard shortcuts copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    // Fast-forward 2 seconds
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyShortcutsBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyShortcutsBtn.textContent).toContain('Copy Shortcuts');
+
+    vi.useRealTimers();
+  });
+
   it('App component global hotkeys should not trigger when typing in inputs', () => {
     const { container } = render(<App />);
 
