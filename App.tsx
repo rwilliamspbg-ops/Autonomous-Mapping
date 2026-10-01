@@ -397,8 +397,8 @@ const App: React.FC = () => {
             onClick={() => setIsManifestoOpen(prev => !prev)}
             aria-expanded={isManifestoOpen}
             aria-pressed={isManifestoOpen}
-            aria-label="Open Manifesto (Press m or M)"
-            title="Open Manifesto (M)"
+            aria-label={isManifestoOpen ? "Close Manifesto (Press m or M)" : "Open Manifesto (Press m or M)"}
+            title={isManifestoOpen ? "Close Manifesto (M)" : "Open Manifesto (M)"}
             className={`relative group cursor-pointer active:scale-95 transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-xl ${
               isManifestoOpen ? 'ring-2 ring-blue-500' : ''
             }`}
@@ -425,8 +425,8 @@ const App: React.FC = () => {
             onClick={() => setIsTerminalOpen(prev => !prev)}
             aria-expanded={isTerminalOpen}
             aria-pressed={isTerminalOpen}
-            aria-label="Open Live Node Console (Press t or T)"
-            title="Open Live Node Console (T)"
+            aria-label={isTerminalOpen ? "Close Live Node Console (Press t or T)" : "Open Live Node Console (Press t or T)"}
+            title={isTerminalOpen ? "Close Live Node Console (T)" : "Open Live Node Console (T)"}
             className={`flex items-center gap-4 px-6 py-3 rounded-2xl border ${trackingInfo.bg} ${trackingInfo.border} ${trackingInfo.glow} transition-all active:scale-95 duration-700 group hover:border-emerald-500/50 cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
               isTerminalOpen ? 'ring-2 ring-emerald-500/60' : ''
             }`}
@@ -452,8 +452,8 @@ const App: React.FC = () => {
             onClick={() => setIsScannerOpen(prev => !prev)}
             aria-expanded={isScannerOpen}
             aria-pressed={isScannerOpen}
-            aria-label="Check My Privacy (Press s or S)"
-            title="Check My Privacy (S)"
+            aria-label={isScannerOpen ? "Close Spatial Privacy Scanner (Press s or S)" : "Check My Privacy (Press s or S)"}
+            title={isScannerOpen ? "Close Spatial Privacy Scanner (S)" : "Check My Privacy (S)"}
             className={`group relative px-8 py-3.5 bg-blue-700 hover:bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all shadow-[0_0_30px_rgba(37,99,235,0.4)] flex items-center gap-4 border border-blue-400/30 overflow-hidden active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
               isScannerOpen ? 'ring-2 ring-blue-300' : ''
             }`}
@@ -468,8 +468,8 @@ const App: React.FC = () => {
             onClick={() => setIsShortcutsOpen(prev => !prev)}
             aria-expanded={isShortcutsOpen}
             aria-pressed={isShortcutsOpen}
-            aria-label="Keyboard Shortcuts (Press ?)"
-            title="Keyboard Shortcuts (?)"
+            aria-label={isShortcutsOpen ? "Close Keyboard Shortcuts (Press ?)" : "Keyboard Shortcuts (Press ?)"}
+            title={isShortcutsOpen ? "Close Keyboard Shortcuts (?)" : "Keyboard Shortcuts (?)"}
             className={`px-4 py-3.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.25em] border border-white/10 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center gap-2 ${
               isShortcutsOpen ? 'ring-2 ring-blue-500/60' : ''
             }`}
@@ -935,9 +935,13 @@ const App: React.FC = () => {
 
       <footer className="h-12 bg-slate-950/95 border-t border-white/10 flex items-center justify-between px-10 text-[10px] text-slate-600 mono uppercase tracking-[0.3em] shrink-0 z-30 backdrop-blur-xl">
         <div className="flex gap-10 items-center">
-          <div className="flex items-center gap-3">
+          <div
+            aria-label={`Demo runtime readiness status: ${bootProgress.toFixed(2)}%`}
+            title={`System Demo Readiness: ${bootProgress.toFixed(2)}%`}
+            className="flex items-center gap-3"
+          >
             <span className={`w-2.5 h-2.5 rounded-sm transition-all duration-500 ${trackingState === TrackingState.OK ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)]' : 'bg-slate-800'}`}></span>
-            <span className="font-black text-slate-400">DEMO_READY: 100.00%</span>
+            <span className="font-black text-slate-400">DEMO_READY: {bootProgress.toFixed(2)}%</span>
           </div>
           <div className="w-px h-4 bg-white/10"></div>
           <div className="flex items-center gap-3 text-slate-500">

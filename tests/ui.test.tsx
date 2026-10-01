@@ -290,15 +290,23 @@ describe('UI Components', () => {
     // Initially closed
     expect(manifestoBtn).toHaveAttribute('aria-expanded', 'false');
     expect(manifestoBtn).toHaveAttribute('aria-pressed', 'false');
+    expect(manifestoBtn).toHaveAttribute('aria-label', 'Open Manifesto (Press m or M)');
+    expect(manifestoBtn).toHaveAttribute('title', 'Open Manifesto (M)');
 
     expect(terminalBtn).toHaveAttribute('aria-expanded', 'false');
     expect(terminalBtn).toHaveAttribute('aria-pressed', 'false');
+    expect(terminalBtn).toHaveAttribute('aria-label', 'Open Live Node Console (Press t or T)');
+    expect(terminalBtn).toHaveAttribute('title', 'Open Live Node Console (T)');
 
     expect(scannerBtn).toHaveAttribute('aria-expanded', 'false');
     expect(scannerBtn).toHaveAttribute('aria-pressed', 'false');
+    expect(scannerBtn).toHaveAttribute('aria-label', 'Check My Privacy (Press s or S)');
+    expect(scannerBtn).toHaveAttribute('title', 'Check My Privacy (S)');
 
     expect(shortcutsBtn).toHaveAttribute('aria-expanded', 'false');
     expect(shortcutsBtn).toHaveAttribute('aria-pressed', 'false');
+    expect(shortcutsBtn).toHaveAttribute('aria-label', 'Keyboard Shortcuts (Press ?)');
+    expect(shortcutsBtn).toHaveAttribute('title', 'Keyboard Shortcuts (?)');
 
     // Click manifesto button to open
     await act(async () => {
@@ -307,6 +315,8 @@ describe('UI Components', () => {
 
     expect(manifestoBtn).toHaveAttribute('aria-expanded', 'true');
     expect(manifestoBtn).toHaveAttribute('aria-pressed', 'true');
+    expect(manifestoBtn).toHaveAttribute('aria-label', 'Close Manifesto (Press m or M)');
+    expect(manifestoBtn).toHaveAttribute('title', 'Close Manifesto (M)');
 
     // Click manifesto button again to close
     await act(async () => {
@@ -315,6 +325,8 @@ describe('UI Components', () => {
 
     expect(manifestoBtn).toHaveAttribute('aria-expanded', 'false');
     expect(manifestoBtn).toHaveAttribute('aria-pressed', 'false');
+    expect(manifestoBtn).toHaveAttribute('aria-label', 'Open Manifesto (Press m or M)');
+    expect(manifestoBtn).toHaveAttribute('title', 'Open Manifesto (M)');
 
     // Click terminal button to open
     await act(async () => {
@@ -323,6 +335,8 @@ describe('UI Components', () => {
 
     expect(terminalBtn).toHaveAttribute('aria-expanded', 'true');
     expect(terminalBtn).toHaveAttribute('aria-pressed', 'true');
+    expect(terminalBtn).toHaveAttribute('aria-label', 'Close Live Node Console (Press t or T)');
+    expect(terminalBtn).toHaveAttribute('title', 'Close Live Node Console (T)');
   });
 
   it('App component global hotkeys should trigger correctly', () => {
@@ -1899,7 +1913,7 @@ describe('UI Components', () => {
     expect(impactProgressBar).toHaveAttribute('aria-label', expect.stringContaining('Impact Stream sync progress'));
   });
 
-  it('App footer Edge Energy Savings meter displays semantic progressbar attributes and truncated log items render with title and aria-label', async () => {
+  it('App footer Edge Energy Savings meter displays semantic progressbar attributes and readiness status is accessible', async () => {
     render(<App />);
 
     const energyProgressbar = screen.getByRole('progressbar', { name: 'Edge energy savings: 68% less cloud energy' });
@@ -1908,6 +1922,10 @@ describe('UI Components', () => {
     expect(energyProgressbar).toHaveAttribute('aria-valuemin', '0');
     expect(energyProgressbar).toHaveAttribute('aria-valuemax', '100');
     expect(energyProgressbar).toHaveAttribute('title', '68% edge energy savings (7/10 efficiency index)');
+
+    const readinessMetric = screen.getByTitle(/System Demo Readiness:/i);
+    expect(readinessMetric).toBeInTheDocument();
+    expect(readinessMetric).toHaveAttribute('aria-label', expect.stringContaining('Demo runtime readiness status:'));
 
     const logItem = await screen.findByTitle('DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD');
     expect(logItem).toBeInTheDocument();
