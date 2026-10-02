@@ -148,6 +148,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
         clearTimeout(confirmTimerRef.current);
         confirmTimerRef.current = null;
       }
+      inputRef.current?.focus();
     }
   };
 

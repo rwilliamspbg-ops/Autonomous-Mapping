@@ -895,6 +895,9 @@ describe('UI Components', () => {
     const hasClearedAnnouncement = statusElements.some(el => el.textContent?.includes('Chat history cleared.'));
     expect(hasClearedAnnouncement).toBe(true);
 
+    // Verify focus returned to the chat input field
+    expect(document.activeElement).toBe(chatInput);
+
     vi.useRealTimers();
   });
 
