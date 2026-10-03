@@ -578,6 +578,49 @@ describe('UI Components', () => {
     }
   });
 
+  it('SpatialScanner displays "Simulate Stream" fallback button on camera failure, transitioning to TRACKING status on click', async () => {
+    const mockGetUserMedia = vi.fn().mockRejectedValue(new Error('No camera hardware found'));
+    const originalMediaDevices = navigator.mediaDevices;
+
+    Object.defineProperty(navigator, 'mediaDevices', {
+      writable: true,
+      configurable: true,
+      value: {
+        getUserMedia: mockGetUserMedia
+      }
+    });
+
+    render(<SpatialScanner isOpen={true} onClose={() => {}} onScanComplete={() => {}} />);
+
+    // Wait for camera initialization to fail
+    await screen.findByText('CAMERA_ERROR');
+
+    const simulateBtn = screen.getByLabelText('Simulate stream without camera hardware');
+    expect(simulateBtn).toBeInTheDocument();
+    expect(simulateBtn.textContent).toContain('Simulate_Stream');
+
+    // Click Simulate Stream button
+    await act(async () => {
+      simulateBtn.click();
+    });
+
+    // Scanner should clear error and transition to TRACKING state, showing Verify Privacy button
+    const verifyBtn = await screen.findByLabelText('Verify Privacy');
+    expect(verifyBtn).toBeInTheDocument();
+    expect(screen.queryByText('CAMERA_ERROR')).not.toBeInTheDocument();
+
+    if (originalMediaDevices) {
+      Object.defineProperty(navigator, 'mediaDevices', {
+        writable: true,
+        configurable: true,
+        value: originalMediaDevices
+      });
+    } else {
+      // @ts-ignore
+      delete navigator.mediaDevices;
+    }
+  });
+
   it('SpatialScanner displays and interacts with Copy Local Telemetry button', async () => {
     const { fireEvent } = require('@testing-library/react');
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);

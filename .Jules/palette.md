@@ -67,3 +67,7 @@
 ## 2027-07-02 - Explicit Empty State Fallbacks for Dynamic Reference Sections
 **Learning:** In detail drawers with dynamic list sections (such as Grounding Sources or Citation Links), leaving empty lists unrendered creates blank whitespace that makes users question if data failed to load. Rendering a cyber-styled empty state fallback banner ("NO EXTERNAL SOURCES REQUIRED // VERIFIED VIA LOCAL STATE ANCHOR & ZK ATTESTATION") explicitly confirms that the section is empty by design and fully verified.
 **Action:** Always render explicit empty state banners for optional or dynamic reference lists in detail panels when empty.
+
+## 2027-07-15 - Software Simulation Fallback Triggers for Hardware-Gated AR Overlays
+**Learning:** When full-screen AR/spatial overlays require camera hardware access that fails or is denied (e.g. desktop browsers, headless environments, or missing permissions), leaving the view stuck in an error block prevents users from discovering and testing the interactive feature. Providing a focus-visible, keyboard-accessible "Simulate Stream" action button directly in the error card seamlessly transitions the view to simulated tracking state (`status='TRACKING'`), enabling complete workflow testing without hardware dependencies.
+**Action:** Always provide an accessible "Simulate Stream" fallback action button alongside hardware error messages in AR/camera overlays to allow hardware-independent simulation.

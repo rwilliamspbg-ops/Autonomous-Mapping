@@ -374,19 +374,29 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
               <p className="text-[11px] text-slate-300 mono font-black tracking-widest uppercase mb-8 leading-relaxed max-w-md mx-auto">
                 {cameraError || "ACCESS_DENIED // HARDWARE_INIT_FAILED"}
               </p>
-              <div className="flex gap-4 justify-center">
+              <div className="flex flex-wrap gap-3 justify-center">
                 <button
                   ref={retryButtonRef}
                   onClick={startCamera}
                   aria-label="Retry camera initialization"
-                  className="px-8 py-3 bg-rose-950/50 hover:bg-rose-900/60 text-rose-400 border border-rose-500/30 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-rose-500 outline-none"
+                  className="px-6 py-3 bg-rose-950/50 hover:bg-rose-900/60 text-rose-400 border border-rose-500/30 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-rose-500 outline-none active:scale-95"
                 >
                   Retry_Sync
                 </button>
                 <button
+                  onClick={() => {
+                    setCameraError(null);
+                    setStatus('TRACKING');
+                  }}
+                  aria-label="Simulate stream without camera hardware"
+                  className="px-6 py-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/40 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none active:scale-95 shadow-md"
+                >
+                  Simulate_Stream
+                </button>
+                <button
                   onClick={onClose}
                   aria-label="Dismiss and close scanner"
-                  className="px-8 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-white/10 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
+                  className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-white/10 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none active:scale-95"
                 >
                   Dismiss
                 </button>
