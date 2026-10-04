@@ -578,6 +578,70 @@ describe('UI Components', () => {
     }
   });
 
+  it('SpatialScanner renders Cancel Commit button during COMMITTING status and allows cancelling commitment', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const mockGetUserMedia = vi.fn().mockResolvedValue({
+      getTracks: () => [{ stop: vi.fn() }]
+    });
+
+    const originalMediaDevices = navigator.mediaDevices;
+    Object.defineProperty(navigator, 'mediaDevices', {
+      writable: true,
+      configurable: true,
+      value: {
+        getUserMedia: mockGetUserMedia
+      }
+    });
+
+    render(<SpatialScanner isOpen={true} onClose={() => {}} onScanComplete={() => {}} />);
+
+    // Wait for camera stream to settle into TRACKING state
+    const verifyBtn = await screen.findByLabelText('Verify Privacy');
+    expect(verifyBtn).toBeInTheDocument();
+
+    vi.useFakeTimers();
+
+    // Click Verify Privacy to transition to COMMITTING state
+    act(() => {
+      fireEvent.click(verifyBtn);
+    });
+
+    // Verify status displays AGGLAYER_COMMIT_PENDING and Cancel_Commit button is present
+    expect(screen.getByText('AGGLAYER_COMMIT_PENDING')).toBeInTheDocument();
+    const cancelCommitBtn = screen.getByLabelText('Cancel privacy proof commit process');
+    expect(cancelCommitBtn).toBeInTheDocument();
+    expect(cancelCommitBtn).toHaveAttribute('title', 'Cancel Commit');
+
+    // Click Cancel Commit
+    act(() => {
+      fireEvent.click(cancelCommitBtn);
+    });
+
+    // Scanner should return to TRACKING state with Verify Privacy button visible again
+    expect(screen.getByLabelText('Verify Privacy')).toBeInTheDocument();
+    expect(screen.queryByText('AGGLAYER_COMMIT_PENDING')).not.toBeInTheDocument();
+
+    // Verify screen reader polite live region announcement
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCancelledStatus = statusElements.some(el =>
+      el.textContent?.includes('Commit process cancelled. Returned to spatial tracking state.')
+    );
+    expect(hasCancelledStatus).toBe(true);
+
+    vi.useRealTimers();
+
+    if (originalMediaDevices) {
+      Object.defineProperty(navigator, 'mediaDevices', {
+        writable: true,
+        configurable: true,
+        value: originalMediaDevices
+      });
+    } else {
+      // @ts-ignore
+      delete navigator.mediaDevices;
+    }
+  });
+
   it('SpatialScanner displays "Simulate Stream" fallback button on camera failure, transitioning to TRACKING status on click', async () => {
     const mockGetUserMedia = vi.fn().mockRejectedValue(new Error('No camera hardware found'));
     const originalMediaDevices = navigator.mediaDevices;
