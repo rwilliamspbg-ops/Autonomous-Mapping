@@ -22,6 +22,9 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
   const retryButtonRef = useRef<HTMLButtonElement>(null);
   const verifyButtonRef = useRef<HTMLButtonElement>(null);
+  const commitTimeoutRef = useRef<number | null>(null);
+  const finalizeTimeoutRef = useRef<number | null>(null);
+  const [cancelAnnounceMsg, setCancelAnnounceMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -177,15 +180,38 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
 
   const handleCommit = () => {
     setStatus('COMMITTING');
+    setCancelAnnounceMsg(null);
+    if (commitTimeoutRef.current) clearTimeout(commitTimeoutRef.current);
+    if (finalizeTimeoutRef.current) clearTimeout(finalizeTimeoutRef.current);
     // Simulate real network/ZK handshake
-    setTimeout(() => {
+    commitTimeoutRef.current = window.setTimeout(() => {
       setStatus('FINALIZED');
-      setTimeout(() => {
+      finalizeTimeoutRef.current = window.setTimeout(() => {
         onScanComplete({ id: Date.now(), voxels: telemetry.voxels });
         onClose();
       }, 1500);
     }, 4000);
   };
+
+  const handleCancelCommit = () => {
+    if (commitTimeoutRef.current) {
+      clearTimeout(commitTimeoutRef.current);
+      commitTimeoutRef.current = null;
+    }
+    if (finalizeTimeoutRef.current) {
+      clearTimeout(finalizeTimeoutRef.current);
+      finalizeTimeoutRef.current = null;
+    }
+    setStatus('TRACKING');
+    setCancelAnnounceMsg('Commit process cancelled. Returned to spatial tracking state.');
+  };
+
+  useEffect(() => {
+    return () => {
+      if (commitTimeoutRef.current) clearTimeout(commitTimeoutRef.current);
+      if (finalizeTimeoutRef.current) clearTimeout(finalizeTimeoutRef.current);
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -196,6 +222,10 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
       aria-label="Spatial Privacy Scanner"
       className="fixed inset-0 z-[100] bg-black flex flex-col overflow-hidden animate-in fade-in duration-1000"
     >
+      <div role="status" aria-live="polite" className="sr-only">
+        {cancelAnnounceMsg || (poseCopied ? 'Privacy pose check details copied to clipboard.' : '')}
+      </div>
+
       {/* Live Camera Feed */}
       <video ref={videoRef} autoPlay playsInline className="absolute inset-0 w-full h-full object-cover opacity-70" />
       <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight} className="absolute inset-0 z-10" />
@@ -314,19 +344,27 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
               role="status"
               aria-live="polite"
               aria-busy="true"
-              className="bg-slate-950/98 border border-blue-600/60 p-12 rounded-[2.5rem] w-full max-w-xl shadow-[0_0_150px_rgba(37,99,235,0.3)] backdrop-blur-3xl"
+              className="bg-slate-950/98 border border-blue-600/60 p-12 rounded-[2.5rem] w-full max-w-xl shadow-[0_0_150px_rgba(37,99,235,0.3)] backdrop-blur-3xl text-center space-y-8"
             >
                <span className="sr-only">Generating on-device privacy proof, please wait...</span>
-               <div className="text-center space-y-8">
-                  <div className="text-blue-500 text-base font-black uppercase tracking-[0.6em] animate-pulse">AGGLAYER_COMMIT_PENDING</div>
-                  <div className="grid grid-cols-12 gap-2 h-10">
-                    {Array.from({ length: 24 }).map((_, i) => (
-                      <div key={i} className="bg-blue-900/40 border border-blue-500/20 rounded-md relative overflow-hidden">
-                         <div className="absolute inset-0 bg-blue-500/80 animate-[shimmer_1.5s_infinite]" style={{ animationDelay: `${i*0.05}s` }}></div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-[11px] text-slate-500 uppercase tracking-[0.3em] font-black">Executing local privacy proof generation...</p>
+               <div className="text-blue-500 text-base font-black uppercase tracking-[0.6em] animate-pulse">AGGLAYER_COMMIT_PENDING</div>
+               <div className="grid grid-cols-12 gap-2 h-10">
+                 {Array.from({ length: 24 }).map((_, i) => (
+                   <div key={i} className="bg-blue-900/40 border border-blue-500/20 rounded-md relative overflow-hidden">
+                      <div className="absolute inset-0 bg-blue-500/80 animate-[shimmer_1.5s_infinite]" style={{ animationDelay: `${i*0.05}s` }}></div>
+                   </div>
+                 ))}
+               </div>
+               <p className="text-[11px] text-slate-500 uppercase tracking-[0.3em] font-black">Executing local privacy proof generation...</p>
+               <div className="pt-2">
+                 <button
+                   onClick={handleCancelCommit}
+                   aria-label="Cancel privacy proof commit process"
+                   title="Cancel Commit"
+                   className="pointer-events-auto px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-rose-400 hover:text-rose-300 border border-rose-500/30 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none active:scale-95 shadow-lg"
+                 >
+                   Cancel_Commit
+                 </button>
                </div>
             </div>
           )}
