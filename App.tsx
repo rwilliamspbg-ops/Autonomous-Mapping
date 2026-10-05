@@ -48,6 +48,7 @@ const App: React.FC = () => {
   const [demoRunning, setDemoRunning] = useState(false);
   const [evidenceTrail, setEvidenceTrail] = useState<EvidenceEntry[]>([]);
   const [trailCopied, setTrailCopied] = useState(false);
+  const [copiedEntryIdx, setCopiedEntryIdx] = useState<number | null>(null);
   const [confirmClearTrail, setConfirmClearTrail] = useState(false);
   const [lastAnnouncedTrailStatus, setLastAnnouncedTrailStatus] = useState<string | null>(null);
   const [streamCopied, setStreamCopied] = useState(false);
@@ -611,7 +612,11 @@ const App: React.FC = () => {
 
               <div className="mt-4 border-t border-white/5 pt-4">
                 <div role="status" aria-live="polite" className="sr-only">
-                  {trailCopied ? "Evidence Trail copied to clipboard." : lastAnnouncedTrailStatus || ""}
+                  {copiedEntryIdx !== null
+                    ? `Evidence entry "${evidenceTrail[copiedEntryIdx]?.title}" copied to clipboard.`
+                    : trailCopied
+                    ? "Evidence Trail copied to clipboard."
+                    : lastAnnouncedTrailStatus || ""}
                 </div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] mono text-slate-500 uppercase tracking-[0.35em] font-black">Evidence_Trail</span>
@@ -664,8 +669,26 @@ const App: React.FC = () => {
                     </div>
                   ) : (
                     evidenceTrail.map((entry, index) => (
-                      <div key={`${entry.title}-${index}`} className="rounded-2xl border border-white/5 bg-slate-900/40 p-3">
-                        <div className="text-[10px] mono font-black uppercase tracking-[0.3em] text-blue-400">{entry.title}</div>
+                      <div key={`${entry.title}-${index}`} className="rounded-2xl border border-white/5 bg-slate-900/40 p-3 relative group">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="text-[10px] mono font-black uppercase tracking-[0.3em] text-blue-400 truncate pr-12">{entry.title}</div>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(`[${entry.title}]: ${entry.detail}`);
+                              setCopiedEntryIdx(index);
+                              setTimeout(() => setCopiedEntryIdx(null), 2000);
+                            }}
+                            aria-label={`Copy evidence entry "${entry.title}" to clipboard`}
+                            title={`Copy entry "${entry.title}"`}
+                            className={`px-1.5 py-0.5 rounded text-[8px] mono font-bold uppercase tracking-wider transition-all active:scale-95 border focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
+                              copiedEntryIdx === index
+                                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 opacity-100'
+                                : 'bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border-blue-500/20 opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
+                            }`}
+                          >
+                            {copiedEntryIdx === index ? 'Copied! ✓' : 'Copy'}
+                          </button>
+                        </div>
                         <div className="text-[10px] text-slate-300 mt-1 leading-snug">{entry.detail}</div>
                       </div>
                     ))
