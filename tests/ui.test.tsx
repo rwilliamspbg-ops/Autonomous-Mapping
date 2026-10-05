@@ -121,6 +121,52 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('App Evidence Trail entries render individual Copy buttons and copy formatted entry details on click', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    // Select a track lane to record an evidence event
+    const healthLaneBtn = screen.getByLabelText(/Select Health lane/i);
+    await act(async () => {
+      fireEvent.click(healthLaneBtn);
+    });
+
+    const copyEntryBtn = screen.getByLabelText('Copy evidence entry "Lane selected" to clipboard');
+    expect(copyEntryBtn).toBeInTheDocument();
+    expect(copyEntryBtn).toHaveAttribute('title', 'Copy entry "Lane selected"');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copyEntryBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('[Lane selected]: PROTOCOL_ROUTE: HEALTH -> Kenya');
+    expect(copyEntryBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Evidence entry "Lane selected" copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyEntryBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyEntryBtn.textContent).toContain('Copy');
+
+    vi.useRealTimers();
+  });
+
   it('App Impact Stream displays and interacts with Clear Stream button requiring confirmation and shows empty state', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);
