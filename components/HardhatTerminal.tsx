@@ -30,6 +30,7 @@ const liveLogs = [
 const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   const [output, setOutput] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
+  const [copiedLineIdx, setCopiedLineIdx] = useState<number | null>(null);
   const [cleared, setCleared] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [streamStatusMsg, setStreamStatusMsg] = useState<string | null>(null);
@@ -128,7 +129,13 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
           </div>
           <div className="flex items-center gap-4">
             <div role="status" aria-live="polite" className="sr-only">
-              {copied ? "Terminal logs copied to clipboard." : cleared ? "Terminal logs cleared." : streamStatusMsg || ""}
+              {copiedLineIdx !== null
+                ? `Log entry "${output[copiedLineIdx]?.substring(0, 30)}..." copied to clipboard.`
+                : copied
+                ? "Terminal logs copied to clipboard."
+                : cleared
+                ? "Terminal logs cleared."
+                : streamStatusMsg || ""}
             </div>
             <button
               onClick={() => {
@@ -218,8 +225,24 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
               if (line.includes("Verified")) colorClass = "text-emerald-400 italic";
 
               return (
-                <div key={idx} className={`${colorClass} mb-2 animate-in fade-in slide-in-from-left-4 duration-500`}>
-                  {line}
+                <div key={idx} className={`${colorClass} mb-2 animate-in fade-in slide-in-from-left-4 duration-500 flex items-center justify-between group gap-4 relative`}>
+                  <span className="truncate">{line}</span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(line);
+                      setCopiedLineIdx(idx);
+                      setTimeout(() => setCopiedLineIdx(null), 2000);
+                    }}
+                    aria-label={`Copy terminal log entry "${line.substring(0, 30)}..." to clipboard`}
+                    title={`Copy entry "${line.substring(0, 30)}..."`}
+                    className={`px-2 py-0.5 rounded text-[10px] mono font-bold uppercase tracking-wider transition-all active:scale-95 border focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shrink-0 ${
+                      copiedLineIdx === idx
+                        ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 opacity-100'
+                        : 'bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border-blue-500/20 opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
+                    }`}
+                  >
+                    {copiedLineIdx === idx ? 'Copied! ✓' : 'Copy'}
+                  </button>
                 </div>
               );
             })
