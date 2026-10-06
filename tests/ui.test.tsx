@@ -1616,6 +1616,52 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('HardhatTerminal renders individual log line copy buttons and copies individual lines', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    // Open terminal using the hotkey
+    act(() => {
+      const terminalEvent = new KeyboardEvent('keydown', { key: 't' });
+      window.dispatchEvent(terminalEvent);
+    });
+
+    expect(screen.getByText(/Live_Node_Console/i)).toBeInTheDocument();
+
+    const lineCopyBtns = screen.getAllByLabelText(/Copy terminal log entry/i);
+    expect(lineCopyBtns.length).toBeGreaterThan(0);
+
+    const firstCopyBtn = lineCopyBtns[0];
+    expect(firstCopyBtn).toHaveAttribute('title', expect.stringContaining('Copy entry'));
+
+    vi.useFakeTimers();
+
+    // Click individual log copy button
+    act(() => {
+      fireEvent.click(firstCopyBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('> Establishing secure shell connection...');
+    expect(firstCopyBtn.textContent).toContain('Copied! ✓');
+
+    // Fast-forward timers for resetting copied state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(firstCopyBtn.textContent).toContain('Copy');
+    vi.useRealTimers();
+  });
+
   it('App Evidence Trail displays and interacts with Copy Trail button when events exist', async () => {
     const { getSovereignInsights } = await import('../services/geminiService');
     const mockedGetInsights = vi.mocked(getSovereignInsights);
