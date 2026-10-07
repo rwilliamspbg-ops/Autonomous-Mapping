@@ -52,6 +52,7 @@ const App: React.FC = () => {
   const [confirmClearTrail, setConfirmClearTrail] = useState(false);
   const [lastAnnouncedTrailStatus, setLastAnnouncedTrailStatus] = useState<string | null>(null);
   const [streamCopied, setStreamCopied] = useState(false);
+  const [copiedStreamLineIdx, setCopiedStreamLineIdx] = useState<number | null>(null);
   const [confirmClearStream, setConfirmClearStream] = useState(false);
   const [lastAnnouncedStreamStatus, setLastAnnouncedStreamStatus] = useState<string | null>(null);
   const [coordsCopied, setCoordsCopied] = useState(false);
@@ -358,6 +359,7 @@ const App: React.FC = () => {
     setConfirmClearTrail(false);
     setLastAnnouncedTrailStatus(null);
     setStreamCopied(false);
+    setCopiedStreamLineIdx(null);
     setConfirmClearStream(false);
     setLastAnnouncedStreamStatus(null);
     setCoordsCopied(false);
@@ -733,7 +735,9 @@ const App: React.FC = () => {
                 </div>
               </h4>
               <div role="status" aria-live="polite" className="sr-only">
-                {streamCopied
+                {copiedStreamLineIdx !== null
+                  ? `Telemetry log "${logs[copiedStreamLineIdx]}" copied to clipboard.`
+                  : streamCopied
                   ? 'Impact stream logs copied to clipboard.'
                   : lastAnnouncedStreamStatus || (logs.length > 0
                   ? `Latest telemetry update: ${logs[logs.length - 1]}`
@@ -751,9 +755,27 @@ const App: React.FC = () => {
                   </div>
                 ) : (
                   logs.map((log, i) => (
-                    <div key={i} className={`text-[10px] mono flex gap-3 transition-all duration-300 ${i === logs.length - 1 ? 'text-blue-400 font-bold' : 'text-slate-500'}`}>
-                      <span className="shrink-0 opacity-20">[{i.toString().padStart(2, '0')}]</span>
-                      <span className="truncate" title={log} aria-label={log}>{log}</span>
+                    <div key={i} className={`text-[10px] mono flex items-center justify-between gap-2 transition-all duration-300 group relative ${i === logs.length - 1 ? 'text-blue-400 font-bold' : 'text-slate-500'}`}>
+                      <div className="flex items-center gap-3 truncate min-w-0">
+                        <span className="shrink-0 opacity-20">[{i.toString().padStart(2, '0')}]</span>
+                        <span className="truncate" title={log} aria-label={log}>{log}</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(log);
+                          setCopiedStreamLineIdx(i);
+                          setTimeout(() => setCopiedStreamLineIdx(null), 2000);
+                        }}
+                        aria-label={`Copy telemetry log "${log}" to clipboard`}
+                        title={`Copy telemetry log "${log}"`}
+                        className={`px-1.5 py-0.5 rounded text-[8px] mono font-bold uppercase tracking-wider transition-all active:scale-95 border focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shrink-0 ${
+                          copiedStreamLineIdx === i
+                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 opacity-100'
+                            : 'bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border-blue-500/20 opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
+                        }`}
+                      >
+                        {copiedStreamLineIdx === i ? 'Copied! ✓' : 'Copy'}
+                      </button>
                     </div>
                   ))
                 )}

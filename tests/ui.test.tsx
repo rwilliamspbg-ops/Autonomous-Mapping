@@ -121,6 +121,49 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('App Impact Stream log entries render individual Copy buttons and copy log text on click', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    // Wait for initial log to populate
+    const copyLogBtn = await screen.findByLabelText('Copy telemetry log "DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD" to clipboard');
+    expect(copyLogBtn).toBeInTheDocument();
+    expect(copyLogBtn).toHaveAttribute('title', 'Copy telemetry log "DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD"');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copyLogBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD');
+    expect(copyLogBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el =>
+      el.textContent?.includes('Telemetry log "DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD" copied to clipboard.')
+    );
+    expect(hasCopiedStatus).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyLogBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyLogBtn.textContent).toContain('Copy');
+
+    vi.useRealTimers();
+  });
+
   it('App Evidence Trail entries render individual Copy buttons and copy formatted entry details on click', async () => {
     const { fireEvent } = require('@testing-library/react');
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
