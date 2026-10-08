@@ -34,6 +34,8 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [summaryCopied, setSummaryCopied] = useState(false);
   const [riskCopied, setRiskCopied] = useState(false);
   const [briefCopied, setBriefCopied] = useState(false);
+  const [fitCopied, setFitCopied] = useState(false);
+  const [outlookCopied, setOutlookCopied] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
   const retryButtonRef = React.useRef<HTMLButtonElement>(null);
@@ -47,6 +49,8 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
     setSummaryCopied(false);
     setRiskCopied(false);
     setBriefCopied(false);
+    setFitCopied(false);
+    setOutlookCopied(false);
     getSovereignInsights(countryName)
       .then((data) => {
         setInsight(data);
@@ -293,6 +297,8 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 {summaryCopied && 'Local Deployment Summary copied to clipboard.'}
                 {riskCopied && 'Program Risk Matrix copied to clipboard.'}
                 {briefCopied && 'Regional Pilot Brief copied to clipboard.'}
+                {fitCopied && 'Community Fit summary copied to clipboard.'}
+                {outlookCopied && 'Resource Outlook summary copied to clipboard.'}
               </div>
 
               {zkStatus === 'VERIFYING' && (
@@ -477,11 +483,39 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
 
             <section className="space-y-4">
               <div className="p-5 bg-slate-900/60 rounded-2xl border border-white/5 group hover:border-blue-500/30 transition-colors">
-                <h4 className="text-blue-500 text-[10px] font-black uppercase mb-3 mono tracking-widest">Community Fit</h4>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-blue-500 text-[10px] font-black uppercase mono tracking-widest">Community Fit</h4>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(insight.politicalStatus);
+                      setFitCopied(true);
+                      setTimeout(() => setFitCopied(false), 2000);
+                    }}
+                    aria-label="Copy Community Fit summary to clipboard"
+                    title="Copy Community Fit"
+                    className="px-2.5 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                  >
+                    {fitCopied ? 'Copied! ✓' : 'Copy'}
+                  </button>
+                </div>
                 <p className="text-slate-300 text-sm leading-relaxed">{insight.politicalStatus}</p>
               </div>
               <div className="p-5 bg-slate-900/60 rounded-2xl border border-white/5 group hover:border-emerald-500/30 transition-colors">
-                <h4 className="text-emerald-500 text-[10px] font-black uppercase mb-3 mono tracking-widest">Resource Outlook</h4>
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-emerald-500 text-[10px] font-black uppercase mono tracking-widest">Resource Outlook</h4>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(insight.economicOutlook);
+                      setOutlookCopied(true);
+                      setTimeout(() => setOutlookCopied(false), 2000);
+                    }}
+                    aria-label="Copy Resource Outlook summary to clipboard"
+                    title="Copy Resource Outlook"
+                    className="px-2.5 py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-emerald-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none transition-all active:scale-95 shrink-0"
+                  >
+                    {outlookCopied ? 'Copied! ✓' : 'Copy'}
+                  </button>
+                </div>
                 <p className="text-slate-300 text-sm leading-relaxed">{insight.economicOutlook}</p>
               </div>
             </section>

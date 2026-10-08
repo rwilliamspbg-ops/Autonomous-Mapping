@@ -2555,4 +2555,83 @@ describe('UI Components', () => {
     expect(screen.getByText('No external sources required')).toBeInTheDocument();
     expect(screen.getByText('Verified via local state anchor & ZK attestation')).toBeInTheDocument();
   });
+
+  it('CountryPanel displays and interacts with Copy buttons for Community Fit and Resource Outlook', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Community integration stable.',
+      economicOutlook: 'Positive resource Outlook.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Wait for insights loading to finish
+    await screen.findByText('Kenya local pilot insights.');
+
+    vi.useFakeTimers();
+
+    const copyFitBtn = screen.getByLabelText('Copy Community Fit summary to clipboard');
+    const copyOutlookBtn = screen.getByLabelText('Copy Resource Outlook summary to clipboard');
+
+    expect(copyFitBtn).toBeInTheDocument();
+    expect(copyFitBtn).toHaveAttribute('title', 'Copy Community Fit');
+
+    expect(copyOutlookBtn).toBeInTheDocument();
+    expect(copyOutlookBtn).toHaveAttribute('title', 'Copy Resource Outlook');
+
+    // Click Copy Community Fit
+    act(() => {
+      fireEvent.click(copyFitBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('Community integration stable.');
+    expect(copyFitBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements1 = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements1.some(el => el.textContent?.includes('Community Fit summary copied to clipboard.'))).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyFitBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyFitBtn.textContent).toContain('Copy');
+
+    // Click Copy Resource Outlook
+    act(() => {
+      fireEvent.click(copyOutlookBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('Positive resource Outlook.');
+    expect(copyOutlookBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements2 = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements2.some(el => el.textContent?.includes('Resource Outlook summary copied to clipboard.'))).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyOutlookBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyOutlookBtn.textContent).toContain('Copy');
+
+    vi.useRealTimers();
+  });
 });
