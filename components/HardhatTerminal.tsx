@@ -32,6 +32,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   const [copied, setCopied] = useState(false);
   const [copiedLineIdx, setCopiedLineIdx] = useState<number | null>(null);
   const [cleared, setCleared] = useState(false);
+  const [confirmClear, setConfirmClear] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [streamStatusMsg, setStreamStatusMsg] = useState<string | null>(null);
   const [isScrolledUp, setIsScrolledUp] = useState(false);
@@ -39,6 +40,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
+  const confirmTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
     isPausedRef.current = isPaused;
@@ -49,6 +51,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
       lastActiveElementRef.current = document.activeElement as HTMLElement;
       setIsScrolledUp(false);
       setIsPaused(false);
+      setConfirmClear(false);
       setStreamStatusMsg(null);
       setOutput(["> Establishing secure shell connection...", "> Node v1.0.4-PROD online."]);
       let i = 0;
@@ -85,6 +88,33 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [output, isScrolledUp]);
+
+  const handleClearLogs = () => {
+    if (!confirmClear) {
+      setConfirmClear(true);
+      if (confirmTimerRef.current) clearTimeout(confirmTimerRef.current);
+      confirmTimerRef.current = window.setTimeout(() => {
+        setConfirmClear(false);
+      }, 4000);
+    } else {
+      setOutput([]);
+      setCleared(true);
+      setConfirmClear(false);
+      if (confirmTimerRef.current) {
+        clearTimeout(confirmTimerRef.current);
+        confirmTimerRef.current = null;
+      }
+      setTimeout(() => setCleared(false), 2000);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (confirmTimerRef.current) {
+        clearTimeout(confirmTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -156,16 +186,16 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
             </button>
             {output.length > 0 && (
               <button
-                onClick={() => {
-                  setOutput([]);
-                  setCleared(true);
-                  setTimeout(() => setCleared(false), 2000);
-                }}
-                aria-label="Clear terminal logs"
-                title="Clear Logs"
-                className="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold mono text-[10px] uppercase tracking-wider rounded-lg border border-rose-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-rose-500 outline-none transition-all active:scale-95 shrink-0"
+                onClick={handleClearLogs}
+                aria-label={confirmClear ? "Confirm clear terminal logs" : "Clear terminal logs"}
+                title={confirmClear ? "Confirm clear?" : "Clear Logs"}
+                className={`px-3 py-1.5 font-bold mono text-[10px] uppercase tracking-wider rounded-lg border shadow-md focus-visible:ring-2 focus-visible:ring-rose-500 outline-none transition-all active:scale-95 shrink-0 ${
+                  confirmClear
+                    ? 'bg-rose-500/20 border-rose-500 text-rose-400 hover:bg-rose-500 hover:text-white'
+                    : 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border-rose-500/20'
+                }`}
               >
-                Clear Logs
+                {confirmClear ? 'Sure?' : 'Clear Logs'}
               </button>
             )}
             <button

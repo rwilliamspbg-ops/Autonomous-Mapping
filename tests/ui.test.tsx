@@ -1221,7 +1221,7 @@ describe('UI Components', () => {
     expect(screen.queryByLabelText('Scroll to bottom of chat messages')).not.toBeInTheDocument();
   });
 
-  it('HardhatTerminal displays and interacts with Clear Logs button and Restore Logs empty state', async () => {
+  it('HardhatTerminal displays and interacts with Clear Logs button requiring confirmation and Restore Logs empty state', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);
 
@@ -1239,7 +1239,16 @@ describe('UI Components', () => {
 
     vi.useFakeTimers();
 
-    // Click clear logs
+    // First click to enter confirmation state
+    act(() => {
+      fireEvent.click(clearLogsBtn);
+    });
+
+    expect(clearLogsBtn).toHaveAttribute('aria-label', 'Confirm clear terminal logs');
+    expect(clearLogsBtn).toHaveAttribute('title', 'Confirm clear?');
+    expect(clearLogsBtn.textContent).toContain('Sure?');
+
+    // Second click to confirm clear
     act(() => {
       fireEvent.click(clearLogsBtn);
     });
