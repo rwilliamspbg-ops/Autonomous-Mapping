@@ -446,6 +446,29 @@ describe('UI Components', () => {
     expect(screen.getByText(/Live_Node_Console/i)).toBeInTheDocument();
   });
 
+  it('App Keyboard Shortcuts modal renders shortcut items as interactive buttons that execute actions on click', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open Keyboard Shortcuts modal using trigger button
+    const shortcutsTriggerBtn = screen.getByLabelText('Keyboard Shortcuts (Press ?)');
+    await act(async () => {
+      fireEvent.click(shortcutsTriggerBtn);
+    });
+
+    const terminalShortcutBtn = screen.getByLabelText('Execute shortcut T: Toggle Live Node Console (Terminal)');
+    expect(terminalShortcutBtn).toBeInTheDocument();
+    expect(terminalShortcutBtn).toHaveAttribute('title', 'Execute T shortcut (Toggle Live Node Console (Terminal))');
+
+    // Click terminal shortcut button to open Live Node Console and close shortcuts modal
+    await act(async () => {
+      fireEvent.click(terminalShortcutBtn);
+    });
+
+    expect(screen.queryByRole('dialog', { name: 'Keyboard Shortcuts' })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Live Node Console' })).toBeInTheDocument();
+  });
+
   it('App Keyboard Shortcuts modal opens via ? key and header trigger button, manages focus, and closes via Escape key', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);

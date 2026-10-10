@@ -952,22 +952,94 @@ const App: React.FC = () => {
               className="p-6 space-y-3 font-mono text-xs overflow-y-auto max-h-[60vh] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-b-2xl"
             >
               {[
-                { key: 'M', desc: 'Toggle Manifesto & Narrative Modal' },
-                { key: 'T', desc: 'Toggle Live Node Console (Terminal)' },
-                { key: 'S', desc: 'Toggle Spatial Privacy Scanner' },
-                { key: 'C', desc: 'Toggle Impact Analyst Chat' },
-                { key: '+ / =', desc: 'Tactile World Map Zoom In' },
-                { key: '- / _', desc: 'Tactile World Map Zoom Out' },
-                { key: 'R', desc: 'Reset World Map Zoom Level' },
-                { key: '?', desc: 'Show / Hide Keyboard Shortcuts Modal' },
-                { key: 'ESC', desc: 'Close Any Active Panel or Modal' },
+                {
+                  key: 'M',
+                  desc: 'Toggle Manifesto & Narrative Modal',
+                  action: () => {
+                    setIsManifestoOpen(prev => !prev);
+                    setIsShortcutsOpen(false);
+                  }
+                },
+                {
+                  key: 'T',
+                  desc: 'Toggle Live Node Console (Terminal)',
+                  action: () => {
+                    setIsTerminalOpen(prev => !prev);
+                    setIsShortcutsOpen(false);
+                  }
+                },
+                {
+                  key: 'S',
+                  desc: 'Toggle Spatial Privacy Scanner',
+                  action: () => {
+                    setIsScannerOpen(prev => !prev);
+                    setIsShortcutsOpen(false);
+                  }
+                },
+                {
+                  key: 'C',
+                  desc: 'Toggle Impact Analyst Chat',
+                  action: () => {
+                    setIsChatOpen(prev => !prev);
+                    setIsShortcutsOpen(false);
+                  }
+                },
+                {
+                  key: '+ / =',
+                  desc: 'Tactile World Map Zoom In',
+                  action: () => {
+                    window.dispatchEvent(new KeyboardEvent('keydown', { key: '+' }));
+                    setIsShortcutsOpen(false);
+                  }
+                },
+                {
+                  key: '- / _',
+                  desc: 'Tactile World Map Zoom Out',
+                  action: () => {
+                    window.dispatchEvent(new KeyboardEvent('keydown', { key: '-' }));
+                    setIsShortcutsOpen(false);
+                  }
+                },
+                {
+                  key: 'R',
+                  desc: 'Reset World Map Zoom Level',
+                  action: () => {
+                    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'r' }));
+                    setIsShortcutsOpen(false);
+                  }
+                },
+                {
+                  key: '?',
+                  desc: 'Show / Hide Keyboard Shortcuts Modal',
+                  action: () => {
+                    setIsShortcutsOpen(false);
+                  }
+                },
+                {
+                  key: 'ESC',
+                  desc: 'Close Any Active Panel or Modal',
+                  action: () => {
+                    setIsShortcutsOpen(false);
+                    setIsManifestoOpen(false);
+                    setIsTerminalOpen(false);
+                    setIsScannerOpen(false);
+                    setIsChatOpen(false);
+                    setSelectedCountry(null);
+                  }
+                },
               ].map((item) => (
-                <div key={item.key} className="flex items-center justify-between p-3 rounded-xl bg-slate-950/60 border border-white/5 hover:border-blue-500/20 transition-colors">
-                  <span className="text-slate-300 font-medium">{item.desc}</span>
-                  <kbd className="px-2.5 py-1 bg-slate-800 border border-blue-500/40 rounded-lg text-blue-400 font-black text-[11px] shadow-sm tracking-widest shrink-0">
+                <button
+                  key={item.key}
+                  onClick={item.action}
+                  aria-label={`Execute shortcut ${item.key}: ${item.desc}`}
+                  title={`Execute ${item.key} shortcut (${item.desc})`}
+                  className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950/60 hover:bg-slate-950 border border-white/5 hover:border-blue-500/40 transition-all active:scale-98 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none cursor-pointer text-left group"
+                >
+                  <span className="text-slate-300 group-hover:text-white font-medium transition-colors">{item.desc}</span>
+                  <kbd className="px-2.5 py-1 bg-slate-800 group-hover:bg-blue-600/20 border border-blue-500/40 rounded-lg text-blue-400 group-hover:text-blue-300 font-black text-[11px] shadow-sm tracking-widest shrink-0 transition-colors">
                     {item.key}
                   </kbd>
-                </div>
+                </button>
               ))}
             </div>
 
