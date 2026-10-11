@@ -10,6 +10,7 @@ interface ManifestoProps {
 const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo }) => {
   const [copied, setCopied] = React.useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
+  const dialogRef = React.useRef<HTMLDivElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
 
   const handleCopyManifesto = () => {
@@ -50,6 +51,29 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo }) =
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -67,6 +91,7 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo }) =
       className="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md cursor-pointer"
     >
       <div
+        ref={dialogRef}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"

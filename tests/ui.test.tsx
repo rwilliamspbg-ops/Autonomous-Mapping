@@ -1827,6 +1827,26 @@ describe('UI Components', () => {
     expect(handleClose).toHaveBeenCalledTimes(1);
   });
 
+  it('Manifesto modal dialog traps focus within the dialog when tabbing', () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<Manifesto isOpen={true} onClose={() => {}} />);
+
+    const copyBtn = screen.getByLabelText('Copy Sovereign Map Manifesto to clipboard');
+    const ctaBtn = screen.getByLabelText('Use this demo and start guided walkthrough');
+
+    // Focus last focusable element in dialog
+    ctaBtn.focus();
+    expect(document.activeElement).toBe(ctaBtn);
+
+    // Press Tab on last element -> focus should wrap around to first focusable element (Copy Manifesto button)
+    fireEvent.keyDown(ctaBtn, { key: 'Tab', shiftKey: false });
+    expect(document.activeElement).toBe(copyBtn);
+
+    // Press Shift+Tab on first element -> focus should wrap around back to last focusable element (Use This Demo button)
+    fireEvent.keyDown(copyBtn, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(ctaBtn);
+  });
+
   it('Manifesto displays Copy Manifesto button and copies formatted text to clipboard with tactile feedback', async () => {
     const { fireEvent } = require('@testing-library/react');
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
