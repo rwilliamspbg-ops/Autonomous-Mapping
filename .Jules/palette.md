@@ -75,3 +75,7 @@
 ## 2027-08-01 - Individual Copy Actions for Telemetry & Evidence Stream Entries
 **Learning:** In scrollable event feeds (such as the Evidence Trail), top-level bulk copy actions force users to manually edit out unneeded log lines when they only want to extract a single event item. Adding hover- and focus-revealed individual copy buttons (`opacity-0 group-hover:opacity-100 focus-visible:opacity-100`) to individual entry cards—complete with tactile visual confirmation ("Copied! ✓") resetting after 2 seconds and polite live-region announcements—enables precise single-item extraction without cluttering the compact UI.
 **Action:** Equip individual cards in event or telemetry feeds with focus-revealed copy buttons, tactile feedback, and polite screen reader announcements.
+
+## 2027-08-15 - Keyboard Focus Trapping for Modal Dialogs
+**Learning:** Modal dialogs rendered with `role="dialog"` and `aria-modal="true"` allow keyboard focus to bleed out into background application controls when users press `Tab` or `Shift+Tab` unless keydown handlers explicitly trap focus inside the modal boundary (`dialogRef.current`). Intercepting `Tab` navigation on boundary focusable elements wraps focus cleanly to the opposite end of the dialog.
+**Action:** Always attach a `Tab` and `Shift+Tab` key listener to modal container refs to keep keyboard navigation trapped within open modal dialogs.
