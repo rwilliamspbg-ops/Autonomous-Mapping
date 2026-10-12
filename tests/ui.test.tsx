@@ -1608,6 +1608,74 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('SpatialScanner dialog traps focus within the dialog when tabbing and announces status transitions in polite live region', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const mockGetUserMedia = vi.fn().mockResolvedValue({
+      getTracks: () => [{ stop: vi.fn() }]
+    });
+
+    const originalMediaDevices = navigator.mediaDevices;
+    Object.defineProperty(navigator, 'mediaDevices', {
+      writable: true,
+      configurable: true,
+      value: {
+        getUserMedia: mockGetUserMedia
+      }
+    });
+
+    render(<SpatialScanner isOpen={true} onClose={() => {}} onScanComplete={() => {}} />);
+
+    // Wait for camera stream to settle into TRACKING state
+    const verifyBtn = await screen.findByLabelText('Verify Privacy');
+    expect(verifyBtn).toBeInTheDocument();
+
+    const copyPoseBtn = screen.getByLabelText('Copy Privacy Pose Check metrics to clipboard');
+    const closeBtn = screen.getByLabelText('Close Spatial Scanner (Escape)');
+
+    // Focus last focusable element in Spatial Scanner (Verify Privacy button)
+    verifyBtn.focus();
+    expect(document.activeElement).toBe(verifyBtn);
+
+    // Press Tab on last element -> focus wraps around to first focusable element (Copy Pose Check button)
+    fireEvent.keyDown(verifyBtn, { key: 'Tab', shiftKey: false });
+    expect(document.activeElement).toBe(copyPoseBtn);
+
+    // Press Shift+Tab on first element -> focus wraps around back to last focusable element (Verify Privacy button)
+    fireEvent.keyDown(copyPoseBtn, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(verifyBtn);
+
+    vi.useFakeTimers();
+
+    // Trigger commit transition to test polite live region announcements for COMMITTING and FINALIZED
+    act(() => {
+      fireEvent.click(verifyBtn);
+    });
+
+    const statusElementsCommitting = screen.getAllByRole('status', { hidden: true });
+    expect(statusElementsCommitting.some(el => el.textContent?.includes('Executing local privacy proof generation.'))).toBe(true);
+
+    // Fast-forward timer to reach FINALIZED state
+    act(() => {
+      vi.advanceTimersByTime(4100);
+    });
+
+    const statusElementsFinalized = screen.getAllByRole('status', { hidden: true });
+    expect(statusElementsFinalized.some(el => el.textContent?.includes('Contribution verified. Local data stayed on device.'))).toBe(true);
+
+    vi.useRealTimers();
+
+    if (originalMediaDevices) {
+      Object.defineProperty(navigator, 'mediaDevices', {
+        writable: true,
+        configurable: true,
+        value: originalMediaDevices
+      });
+    } else {
+      // @ts-ignore
+      delete navigator.mediaDevices;
+    }
+  });
+
   it('SpatialScanner should show boot loading state with status role and correct text when camera is initializing', () => {
     const mockGetUserMedia = vi.fn().mockImplementation(() => new Promise(() => {}));
 

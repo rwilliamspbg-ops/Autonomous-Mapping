@@ -18,6 +18,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
   const [telemetryCopied, setTelemetryCopied] = useState(false);
   const [poseCopied, setPoseCopied] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
   const retryButtonRef = useRef<HTMLButtonElement>(null);
@@ -89,6 +90,29 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -217,13 +241,26 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label="Spatial Privacy Scanner"
       className="fixed inset-0 z-[100] bg-black flex flex-col overflow-hidden animate-in fade-in duration-1000"
     >
       <div role="status" aria-live="polite" className="sr-only">
-        {cancelAnnounceMsg || (poseCopied ? 'Privacy pose check details copied to clipboard.' : '')}
+        {cancelAnnounceMsg
+          ? cancelAnnounceMsg
+          : poseCopied
+          ? 'Privacy pose check details copied to clipboard.'
+          : telemetryCopied
+          ? 'Local telemetry details copied to clipboard.'
+          : status === 'FINALIZED'
+          ? 'Contribution verified. Local data stayed on device.'
+          : status === 'COMMITTING'
+          ? 'Executing local privacy proof generation.'
+          : status === 'ERROR'
+          ? 'Camera hardware access denied. Error encountered.'
+          : ''}
       </div>
 
       {/* Live Camera Feed */}
