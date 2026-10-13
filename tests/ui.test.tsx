@@ -56,6 +56,47 @@ describe('UI Components', () => {
     expect(document.activeElement).toBe(closeBtn);
   });
 
+  it('CountryPanel dialog traps focus within the drawer when tabbing', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Wait for content to render
+    const copyBriefBtn = await screen.findByLabelText('Copy complete Regional Pilot Brief for Kenya to clipboard');
+
+    const focusableInDrawer = document.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstFocusable = focusableInDrawer[0];
+    const lastFocusable = focusableInDrawer[focusableInDrawer.length - 1];
+
+    expect(firstFocusable).toBe(copyBriefBtn);
+
+    // Focus first focusable element
+    firstFocusable.focus();
+    expect(document.activeElement).toBe(firstFocusable);
+
+    // Press Shift+Tab on first element -> focus wraps around to last focusable element in drawer
+    fireEvent.keyDown(firstFocusable, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(lastFocusable);
+
+    // Press Tab on last element -> focus wraps around to first focusable element
+    fireEvent.keyDown(lastFocusable, { key: 'Tab', shiftKey: false });
+    expect(document.activeElement).toBe(firstFocusable);
+  });
+
   it('WorldMap should render tactical zoom controls and update visual feedback and status region on click', () => {
     const { fireEvent } = require('@testing-library/react');
     render(<WorldMap onCountrySelect={vi.fn()} />);
