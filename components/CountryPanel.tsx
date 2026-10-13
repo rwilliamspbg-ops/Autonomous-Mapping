@@ -37,6 +37,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [fitCopied, setFitCopied] = useState(false);
   const [outlookCopied, setOutlookCopied] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
+  const dialogRef = React.useRef<HTMLDivElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
   const retryButtonRef = React.useRef<HTMLButtonElement>(null);
 
@@ -100,6 +101,29 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
+        return;
+      }
+
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -161,6 +185,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label={`Regional Pilot Brief for ${country.name}`}
