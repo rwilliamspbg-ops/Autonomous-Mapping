@@ -1422,6 +1422,50 @@ describe('UI Components', () => {
     expect(screen.queryByLabelText('Resume auto-scroll to bottom of terminal logs')).not.toBeInTheDocument();
   });
 
+  it('HardhatTerminal supports log filtering, updates match count badge, and shows empty state when no logs match', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open terminal using hotkey
+    act(() => {
+      const terminalEvent = new KeyboardEvent('keydown', { key: 't' });
+      window.dispatchEvent(terminalEvent);
+    });
+
+    const filterInput = screen.getByLabelText('Filter terminal logs by keyword') as HTMLInputElement;
+    expect(filterInput).toBeInTheDocument();
+    expect(filterInput).toHaveAttribute('placeholder', 'Filter logs...');
+
+    // Match count badge displays initially e.g. "2/2 LOGS"
+    expect(screen.getByTitle(/log lines match filter/i)).toBeInTheDocument();
+
+    // Filter for "secure"
+    fireEvent.change(filterInput, { target: { value: 'secure' } });
+
+    expect(filterInput.value).toBe('secure');
+    expect(screen.getByText('> Establishing secure shell connection...')).toBeInTheDocument();
+    expect(screen.queryByText('> Node v1.0.4-PROD online.')).not.toBeInTheDocument();
+
+    const clearFilterInputBtn = screen.getByLabelText('Clear log filter');
+    expect(clearFilterInputBtn).toBeInTheDocument();
+
+    // Filter for non-matching string
+    fireEvent.change(filterInput, { target: { value: 'nonexistentlogentry123' } });
+
+    expect(screen.getByText('No logs match filter')).toBeInTheDocument();
+    const clearFilterBtn = screen.getByRole('button', { name: 'Clear log filter search query' });
+    expect(clearFilterBtn).toBeInTheDocument();
+
+    // Click Clear Filter button in empty state
+    act(() => {
+      fireEvent.click(clearFilterBtn);
+    });
+
+    expect(filterInput.value).toBe('');
+    expect(screen.getByText('> Establishing secure shell connection...')).toBeInTheDocument();
+    expect(screen.getByText('> Node v1.0.4-PROD online.')).toBeInTheDocument();
+  });
+
   it('ChatInterface renders clear text button when typing in input, and clicking it clears text and focuses input', () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);
