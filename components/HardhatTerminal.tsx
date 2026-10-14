@@ -29,6 +29,7 @@ const liveLogs = [
 
 const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   const [output, setOutput] = useState<string[]>([]);
+  const [filter, setFilter] = useState('');
   const [copied, setCopied] = useState(false);
   const [copiedLineIdx, setCopiedLineIdx] = useState<number | null>(null);
   const [cleared, setCleared] = useState(false);
@@ -38,6 +39,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
   const [isScrolledUp, setIsScrolledUp] = useState(false);
   const isPausedRef = useRef(isPaused);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const filterInputRef = useRef<HTMLInputElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
   const confirmTimerRef = useRef<number | null>(null);
@@ -52,6 +54,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
       setIsScrolledUp(false);
       setIsPaused(false);
       setConfirmClear(false);
+      setFilter('');
       setStreamStatusMsg(null);
       setOutput(["> Establishing secure shell connection...", "> Node v1.0.4-PROD online."]);
       let i = 0;
@@ -98,6 +101,7 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
       }, 4000);
     } else {
       setOutput([]);
+      setFilter('');
       setCleared(true);
       setConfirmClear(false);
       if (confirmTimerRef.current) {
@@ -148,25 +152,64 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
         aria-label="Live Node Console"
         className="w-full max-w-5xl h-[700px] bg-[#0d1117] border border-blue-500/30 rounded-[2.5rem] shadow-[0_0_120px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden animate-in zoom-in-95 duration-500 cursor-default relative"
       >
-        <div className="bg-[#161b22] px-10 py-6 border-b border-white/10 flex justify-between items-center">
+        <div className="bg-[#161b22] px-8 py-5 border-b border-white/10 flex justify-between items-center flex-wrap gap-4">
           <div className="flex items-center gap-4">
             <div className="flex gap-2">
               <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
               <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
               <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
             </div>
-            <span className="ml-5 text-[11px] text-slate-400 mono font-black uppercase tracking-[0.5em]">Live_Node_Console // production_access</span>
+            <span className="ml-3 text-[11px] text-slate-400 mono font-black uppercase tracking-[0.4em]">Live_Node_Console // production_access</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div role="status" aria-live="polite" className="sr-only">
               {copiedLineIdx !== null
-                ? `Log entry "${output[copiedLineIdx]?.substring(0, 30)}..." copied to clipboard.`
+                ? `Log entry "${output.filter(line => line.toLowerCase().includes(filter.toLowerCase()))[copiedLineIdx]?.substring(0, 30)}..." copied to clipboard.`
                 : copied
                 ? "Terminal logs copied to clipboard."
                 : cleared
                 ? "Terminal logs cleared."
                 : streamStatusMsg || ""}
             </div>
+
+            {/* Filter Input */}
+            <div className="relative flex items-center">
+              <input
+                ref={filterInputRef}
+                type="text"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                placeholder="Filter logs..."
+                aria-label="Filter terminal logs by keyword"
+                title="Filter terminal logs"
+                className="bg-slate-900/90 border border-slate-700/80 rounded-lg py-1 px-3 pr-7 text-xs mono text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 w-36 md:w-48 transition-all"
+              />
+              {filter && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFilter('');
+                    filterInputRef.current?.focus();
+                  }}
+                  aria-label="Clear log filter"
+                  title="Clear filter"
+                  className="absolute right-2 text-slate-400 hover:text-white text-xs font-mono rounded focus-visible:ring-2 focus-visible:ring-blue-500 outline-none cursor-pointer p-0.5"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Match Count Badge */}
+            {output.length > 0 && (
+              <span
+                title={`${output.filter(line => line.toLowerCase().includes(filter.toLowerCase())).length} of ${output.length} log lines match filter`}
+                className="px-2 py-1 bg-slate-900 border border-slate-800 rounded-lg text-[9px] mono font-bold uppercase text-slate-400 shrink-0"
+              >
+                {output.filter(line => line.toLowerCase().includes(filter.toLowerCase())).length}/{output.length} LOGS
+              </span>
+            )}
+
             <button
               onClick={() => {
                 const newPaused = !isPaused;
@@ -200,7 +243,8 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
             )}
             <button
               onClick={() => {
-                navigator.clipboard.writeText(output.join('\n'));
+                const filtered = output.filter(line => line.toLowerCase().includes(filter.toLowerCase()));
+                navigator.clipboard.writeText(filtered.join('\n'));
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
               }}
@@ -245,8 +289,30 @@ const NodeConsole: React.FC<NodeConsoleProps> = ({ isOpen, onClose }) => {
                 Restore Logs
               </button>
             </div>
+          ) : output.filter(line => line.toLowerCase().includes(filter.toLowerCase())).length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full text-center space-y-4 my-auto py-12">
+              <div className="text-slate-500 text-sm font-mono uppercase tracking-[0.3em] font-black">
+                No logs match filter
+              </div>
+              <p className="text-slate-600 text-xs font-mono max-w-sm leading-relaxed">
+                No log entries matching "{filter}". Try a different keyword or clear the filter.
+              </p>
+              <button
+                onClick={() => {
+                  setFilter('');
+                  filterInputRef.current?.focus();
+                }}
+                aria-label="Clear log filter search query"
+                title="Clear log filter"
+                className="px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-xs uppercase tracking-wider rounded-xl border border-blue-500/20 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shadow-md"
+              >
+                Clear Filter
+              </button>
+            </div>
           ) : (
-            output.map((line, idx) => {
+            output
+              .filter(line => line.toLowerCase().includes(filter.toLowerCase()))
+              .map((line, idx) => {
               let colorClass = "text-slate-500";
               if (line.includes("[BLOCK]")) colorClass = "text-emerald-500 font-black";
               if (line.includes("[NETWORK]")) colorClass = "text-blue-500 font-black";
