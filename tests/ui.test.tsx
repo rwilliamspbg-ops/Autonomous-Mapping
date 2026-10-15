@@ -1285,6 +1285,40 @@ describe('UI Components', () => {
     expect(screen.queryByLabelText('Scroll to bottom of chat messages')).not.toBeInTheDocument();
   });
 
+  it('HardhatTerminal dialog traps focus within the console modal when tabbing', () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open terminal using the hotkey
+    act(() => {
+      const terminalEvent = new KeyboardEvent('keydown', { key: 't' });
+      window.dispatchEvent(terminalEvent);
+    });
+
+    const terminalDialog = screen.getByRole('dialog', { name: 'Live Node Console' });
+    expect(terminalDialog).toBeInTheDocument();
+
+    const focusableInTerminal = terminalDialog.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    expect(focusableInTerminal.length).toBeGreaterThan(1);
+
+    const firstFocusable = focusableInTerminal[0];
+    const lastFocusable = focusableInTerminal[focusableInTerminal.length - 1];
+
+    // Focus last element
+    lastFocusable.focus();
+    expect(document.activeElement).toBe(lastFocusable);
+
+    // Press Tab on last element -> wraps to first focusable element
+    fireEvent.keyDown(lastFocusable, { key: 'Tab', shiftKey: false });
+    expect(document.activeElement).toBe(firstFocusable);
+
+    // Press Shift+Tab on first element -> wraps to last focusable element
+    fireEvent.keyDown(firstFocusable, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(lastFocusable);
+  });
+
   it('HardhatTerminal displays and interacts with Clear Logs button requiring confirmation and Restore Logs empty state', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);
