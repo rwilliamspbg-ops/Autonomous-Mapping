@@ -1031,7 +1031,8 @@ describe('UI Components', () => {
     expect(document.activeElement).toBe(chatInput);
   });
 
-  it('ChatInterface includes a maximum character length input and character counter', () => {
+  it('ChatInterface includes a maximum character length input and character counter with dynamic tooltips and limit announcements', () => {
+    const { fireEvent } = require('@testing-library/react');
     render(<App />);
 
     // Open chat
@@ -1046,7 +1047,25 @@ describe('UI Components', () => {
     const counter = screen.getByText('0/200');
     expect(counter).toBeInTheDocument();
     expect(counter).toHaveAttribute('aria-live', 'polite');
+    expect(counter).toHaveAttribute('title', '200 characters remaining');
+    expect(counter).toHaveAttribute('aria-label', '200 characters remaining');
     expect(chatInput).toHaveAttribute('aria-describedby', 'chat-char-counter');
+
+    // Type 200 characters to reach max limit
+    const maxText = 'a'.repeat(200);
+    act(() => {
+      fireEvent.change(chatInput, { target: { value: maxText } });
+    });
+
+    expect(counter.textContent).toBe('200/200');
+    expect(counter).toHaveAttribute('title', 'Maximum character limit reached (200/200)');
+    expect(counter).toHaveAttribute('aria-label', 'Maximum character limit reached (200/200)');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasLimitAnnouncement = statusElements.some(el =>
+      el.textContent?.includes('Maximum message character limit reached (200/200).')
+    );
+    expect(hasLimitAnnouncement).toBe(true);
   });
 
   it('ChatInterface allows copying chat messages and shows feedback', async () => {
