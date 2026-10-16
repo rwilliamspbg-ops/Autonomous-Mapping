@@ -341,7 +341,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                 type="text"
                 maxLength={charLimit}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val.length === charLimit && input.length < charLimit) {
+                    setLastAnnouncedMsg('Maximum message character limit reached (200/200).');
+                  }
+                  setInput(val);
+                }}
                 placeholder="Ask about a pilot or funding story..."
                 aria-describedby="chat-char-counter"
                 className="w-full bg-slate-800 border-none rounded-xl py-2 pl-4 pr-24 text-white placeholder-slate-500 focus:ring-1 focus:ring-blue-500"
@@ -366,6 +372,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                 <span
                   id="chat-char-counter"
                   aria-live="polite"
+                  aria-label={inputLen >= charLimit ? 'Maximum character limit reached (200/200)' : `${charLimit - inputLen} character${charLimit - inputLen === 1 ? '' : 's'} remaining`}
+                  title={inputLen >= charLimit ? 'Maximum character limit reached (200/200)' : `${charLimit - inputLen} character${charLimit - inputLen === 1 ? '' : 's'} remaining`}
                   className={`mono text-[9px] uppercase tracking-tighter pointer-events-none ${counterColorClass}`}
                 >
                   {inputLen}/{charLimit}
