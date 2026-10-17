@@ -79,3 +79,7 @@
 ## 2027-08-15 - Keyboard Focus Trapping for Modal Dialogs
 **Learning:** Modal dialogs rendered with `role="dialog"` and `aria-modal="true"` allow keyboard focus to bleed out into background application controls when users press `Tab` or `Shift+Tab` unless keydown handlers explicitly trap focus inside the modal boundary (`dialogRef.current`). Intercepting `Tab` navigation on boundary focusable elements wraps focus cleanly to the opposite end of the dialog.
 **Action:** Always attach a `Tab` and `Shift+Tab` key listener to modal container refs to keep keyboard navigation trapped within open modal dialogs.
+
+## 2027-09-01 - Explicit Stop Control for Automated Long-Running Walkthrough Sequences
+**Learning:** Automated walkthrough sequences (like 6-minute protocol demo runs) that lack an in-flight stop or pause mechanism force users to either wait through long sequence timers or execute a full system reset, losing their current dashboard context. Transforming the launch button into a dynamic Stop control (`Stop_Demo ⏹`) while active—with rose styling, updated ARIA labels, and event logging—gives users immediate agency to halt automated sequences without wiping their active state.
+**Action:** Always equip automated long-running walkthrough triggers with a dynamic Stop action that halts timers and updates ARIA labels without resetting active state.

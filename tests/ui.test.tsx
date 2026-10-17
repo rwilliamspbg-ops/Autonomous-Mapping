@@ -2321,6 +2321,39 @@ describe('UI Components', () => {
     expect(mainContainer).toHaveAttribute('tabIndex', '-1');
   });
 
+  it('App Protocol_Flow allows stopping an active guided walkthrough demo', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    const runDemoBtn = screen.getByLabelText('Start 6-minute guided walkthrough demo');
+    expect(runDemoBtn).toBeInTheDocument();
+    expect(runDemoBtn.textContent).toContain('Run_6_Min_Demo');
+
+    // Click Run Demo to launch walkthrough
+    act(() => {
+      fireEvent.click(runDemoBtn);
+    });
+
+    // Button updates to Stop_Demo state
+    const stopDemoBtn = screen.getByLabelText('Stop guided walkthrough demo');
+    expect(stopDemoBtn).toBeInTheDocument();
+    expect(stopDemoBtn).toHaveAttribute('title', 'Stop guided walkthrough demo');
+    expect(stopDemoBtn.textContent).toContain('Stop_Demo ⏹');
+
+    // Click Stop Demo to pause walkthrough
+    act(() => {
+      fireEvent.click(stopDemoBtn);
+    });
+
+    // Button reverts back to Run_6_Min_Demo
+    const resetRunDemoBtn = screen.getByLabelText('Start 6-minute guided walkthrough demo');
+    expect(resetRunDemoBtn).toBeInTheDocument();
+    expect(resetRunDemoBtn.textContent).toContain('Run_6_Min_Demo');
+
+    // Check that stop event was logged to impact stream
+    expect(screen.getByTitle('PROTOCOL: guided walkthrough stopped by user')).toBeInTheDocument();
+  });
+
   it('App Protocol_Flow Reset button displays Reset! ✓ feedback and updates polite live region', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);

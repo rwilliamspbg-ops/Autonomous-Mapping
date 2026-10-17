@@ -307,6 +307,14 @@ const App: React.FC = () => {
     });
   };
 
+  const stopGuidedProtocol = () => {
+    clearProtocolTimers();
+    setDemoRunning(false);
+    demoStartRef.current = null;
+    addProtocolLog('PROTOCOL: guided walkthrough stopped by user');
+    addEvidence('Demo stopped', 'Guided walkthrough paused');
+  };
+
   const handleClearTrail = () => {
     if (!confirmClearTrail) {
       setConfirmClearTrail(true);
@@ -574,16 +582,16 @@ const App: React.FC = () => {
 
               <div className="flex gap-2">
                 <button
-                  onClick={runGuidedProtocol}
-                  aria-label={demoRunning ? "Guided walkthrough demo running" : "Start 6-minute guided walkthrough demo"}
-                  title={demoRunning ? "Walkthrough in progress..." : "Start 6-minute guided walkthrough demo"}
+                  onClick={demoRunning ? stopGuidedProtocol : runGuidedProtocol}
+                  aria-label={demoRunning ? "Stop guided walkthrough demo" : "Start 6-minute guided walkthrough demo"}
+                  title={demoRunning ? "Stop guided walkthrough demo" : "Start 6-minute guided walkthrough demo"}
                   className={`flex-1 px-4 py-3 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
                     demoRunning
-                      ? 'bg-blue-600/80 border border-blue-400/30 animate-pulse shadow-[0_0_20px_rgba(37,99,235,0.25)]'
+                      ? 'bg-rose-600 hover:bg-rose-500 border border-rose-400/30 shadow-[0_0_20px_rgba(225,29,72,0.35)]'
                       : 'bg-blue-700 hover:bg-blue-600 shadow-[0_0_24px_rgba(37,99,235,0.35)]'
                   }`}
                 >
-                  {demoRunning ? 'Demo_Running...' : 'Run_6_Min_Demo'}
+                  {demoRunning ? 'Stop_Demo ⏹' : 'Run_6_Min_Demo'}
                 </button>
                 <button
                   onClick={resetProtocol}
