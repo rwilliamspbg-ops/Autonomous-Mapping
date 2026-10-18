@@ -40,7 +40,9 @@ const App: React.FC = () => {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const [shortcutsFilter, setShortcutsFilter] = useState('');
   const shortcutsCloseRef = useRef<HTMLButtonElement>(null);
+  const shortcutsFilterInputRef = useRef<HTMLInputElement>(null);
   const shortcutsLastActiveRef = useRef<HTMLElement | null>(null);
   const [bootProgress, setBootProgress] = useState(0);
   const [protocolPhase, setProtocolPhase] = useState<ProtocolPhase>('IDLE');
@@ -147,12 +149,14 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (!isShortcutsOpen) {
+      setShortcutsFilter('');
       if (shortcutsLastActiveRef.current) {
         shortcutsLastActiveRef.current.focus();
         shortcutsLastActiveRef.current = null;
       }
       return;
     }
+    setShortcutsFilter('');
     shortcutsLastActiveRef.current = document.activeElement as HTMLElement;
     const timer = setTimeout(() => {
       shortcutsCloseRef.current?.focus();
@@ -389,6 +393,90 @@ const App: React.FC = () => {
         return { label: 'SYNCHRONIZING...', color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/30', glow: '', dot: 'bg-blue-400' };
     }
   }, [trackingState]);
+
+  const allShortcutItems = useMemo(() => [
+    {
+      key: 'M',
+      desc: 'Toggle Manifesto & Narrative Modal',
+      action: () => {
+        setIsManifestoOpen(prev => !prev);
+        setIsShortcutsOpen(false);
+      }
+    },
+    {
+      key: 'T',
+      desc: 'Toggle Live Node Console (Terminal)',
+      action: () => {
+        setIsTerminalOpen(prev => !prev);
+        setIsShortcutsOpen(false);
+      }
+    },
+    {
+      key: 'S',
+      desc: 'Toggle Spatial Privacy Scanner',
+      action: () => {
+        setIsScannerOpen(prev => !prev);
+        setIsShortcutsOpen(false);
+      }
+    },
+    {
+      key: 'C',
+      desc: 'Toggle Impact Analyst Chat',
+      action: () => {
+        setIsChatOpen(prev => !prev);
+        setIsShortcutsOpen(false);
+      }
+    },
+    {
+      key: '+ / =',
+      desc: 'Tactile World Map Zoom In',
+      action: () => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: '+' }));
+        setIsShortcutsOpen(false);
+      }
+    },
+    {
+      key: '- / _',
+      desc: 'Tactile World Map Zoom Out',
+      action: () => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: '-' }));
+        setIsShortcutsOpen(false);
+      }
+    },
+    {
+      key: 'R',
+      desc: 'Reset World Map Zoom Level',
+      action: () => {
+        window.dispatchEvent(new KeyboardEvent('keydown', { key: 'r' }));
+        setIsShortcutsOpen(false);
+      }
+    },
+    {
+      key: '?',
+      desc: 'Show / Hide Keyboard Shortcuts Modal',
+      action: () => {
+        setIsShortcutsOpen(false);
+      }
+    },
+    {
+      key: 'ESC',
+      desc: 'Close Any Active Panel or Modal',
+      action: () => {
+        setIsShortcutsOpen(false);
+        setIsManifestoOpen(false);
+        setIsTerminalOpen(false);
+        setIsScannerOpen(false);
+        setIsChatOpen(false);
+        setSelectedCountry(null);
+      }
+    },
+  ], []);
+
+  const filteredShortcuts = useMemo(() => {
+    const q = shortcutsFilter.trim().toLowerCase();
+    if (!q) return allShortcutItems;
+    return allShortcutItems.filter(s => s.desc.toLowerCase().includes(q) || s.key.toLowerCase().includes(q));
+  }, [allShortcutItems, shortcutsFilter]);
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[#010409] text-slate-50 relative overflow-hidden font-sans">
@@ -910,25 +998,47 @@ const App: React.FC = () => {
             aria-label="Keyboard Shortcuts"
             className="w-full max-w-lg bg-slate-900 border border-blue-500/30 rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.15)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 cursor-default"
           >
-            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-slate-950/60">
+            <div className="p-6 border-b border-white/10 flex justify-between items-center bg-slate-950/60 flex-wrap gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 rounded-full bg-blue-500 animate-pulse"></div>
                 <h3 className="font-mono text-sm font-black text-white uppercase tracking-[0.3em]">Keyboard_Shortcuts</h3>
               </div>
               <div className="flex items-center gap-3">
+                <div className="relative flex items-center">
+                  <input
+                    ref={shortcutsFilterInputRef}
+                    type="text"
+                    value={shortcutsFilter}
+                    onChange={(e) => setShortcutsFilter(e.target.value)}
+                    placeholder="Filter shortcuts..."
+                    aria-label="Filter keyboard shortcuts by keyword"
+                    title="Filter keyboard shortcuts"
+                    className="bg-slate-950/90 border border-slate-700/80 rounded-lg py-1 px-3 pr-7 text-xs mono text-white placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 w-32 md:w-44 transition-all"
+                  />
+                  {shortcutsFilter && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShortcutsFilter('');
+                        shortcutsFilterInputRef.current?.focus();
+                      }}
+                      aria-label="Clear shortcut filter"
+                      title="Clear filter"
+                      className="absolute right-2 text-slate-400 hover:text-white text-xs font-mono rounded focus-visible:ring-2 focus-visible:ring-blue-500 outline-none cursor-pointer p-0.5"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+                <span
+                  title={`${filteredShortcuts.length} of ${allShortcutItems.length} shortcuts match filter`}
+                  className="px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg text-[9px] mono font-bold uppercase text-slate-400 shrink-0"
+                >
+                  {filteredShortcuts.length}/{allShortcutItems.length} SHORTCUTS
+                </span>
                 <button
                   onClick={() => {
-                    const shortcutsText = [
-                      { key: 'M', desc: 'Toggle Manifesto & Narrative Modal' },
-                      { key: 'T', desc: 'Toggle Live Node Console (Terminal)' },
-                      { key: 'S', desc: 'Toggle Spatial Privacy Scanner' },
-                      { key: 'C', desc: 'Toggle Impact Analyst Chat' },
-                      { key: '+ / =', desc: 'Tactile World Map Zoom In' },
-                      { key: '- / _', desc: 'Tactile World Map Zoom Out' },
-                      { key: 'R', desc: 'Reset World Map Zoom Level' },
-                      { key: '?', desc: 'Show / Hide Keyboard Shortcuts Modal' },
-                      { key: 'ESC', desc: 'Close Any Active Panel or Modal' },
-                    ].map(s => `${s.key}: ${s.desc}`).join('\n');
+                    const shortcutsText = allShortcutItems.map(s => `${s.key}: ${s.desc}`).join('\n');
                     navigator.clipboard.writeText(shortcutsText);
                     setShortcutsCopied(true);
                     setTimeout(() => setShortcutsCopied(false), 2000);
@@ -959,96 +1069,42 @@ const App: React.FC = () => {
               aria-label="List of available keyboard shortcuts"
               className="p-6 space-y-3 font-mono text-xs overflow-y-auto max-h-[60vh] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-b-2xl"
             >
-              {[
-                {
-                  key: 'M',
-                  desc: 'Toggle Manifesto & Narrative Modal',
-                  action: () => {
-                    setIsManifestoOpen(prev => !prev);
-                    setIsShortcutsOpen(false);
-                  }
-                },
-                {
-                  key: 'T',
-                  desc: 'Toggle Live Node Console (Terminal)',
-                  action: () => {
-                    setIsTerminalOpen(prev => !prev);
-                    setIsShortcutsOpen(false);
-                  }
-                },
-                {
-                  key: 'S',
-                  desc: 'Toggle Spatial Privacy Scanner',
-                  action: () => {
-                    setIsScannerOpen(prev => !prev);
-                    setIsShortcutsOpen(false);
-                  }
-                },
-                {
-                  key: 'C',
-                  desc: 'Toggle Impact Analyst Chat',
-                  action: () => {
-                    setIsChatOpen(prev => !prev);
-                    setIsShortcutsOpen(false);
-                  }
-                },
-                {
-                  key: '+ / =',
-                  desc: 'Tactile World Map Zoom In',
-                  action: () => {
-                    window.dispatchEvent(new KeyboardEvent('keydown', { key: '+' }));
-                    setIsShortcutsOpen(false);
-                  }
-                },
-                {
-                  key: '- / _',
-                  desc: 'Tactile World Map Zoom Out',
-                  action: () => {
-                    window.dispatchEvent(new KeyboardEvent('keydown', { key: '-' }));
-                    setIsShortcutsOpen(false);
-                  }
-                },
-                {
-                  key: 'R',
-                  desc: 'Reset World Map Zoom Level',
-                  action: () => {
-                    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'r' }));
-                    setIsShortcutsOpen(false);
-                  }
-                },
-                {
-                  key: '?',
-                  desc: 'Show / Hide Keyboard Shortcuts Modal',
-                  action: () => {
-                    setIsShortcutsOpen(false);
-                  }
-                },
-                {
-                  key: 'ESC',
-                  desc: 'Close Any Active Panel or Modal',
-                  action: () => {
-                    setIsShortcutsOpen(false);
-                    setIsManifestoOpen(false);
-                    setIsTerminalOpen(false);
-                    setIsScannerOpen(false);
-                    setIsChatOpen(false);
-                    setSelectedCountry(null);
-                  }
-                },
-              ].map((item) => (
-                <button
-                  key={item.key}
-                  onClick={item.action}
-                  aria-label={`Execute shortcut ${item.key}: ${item.desc}`}
-                  title={`Execute ${item.key} shortcut (${item.desc})`}
-                  className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950/60 hover:bg-slate-950 border border-white/5 hover:border-blue-500/40 transition-all active:scale-98 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none cursor-pointer text-left group"
-                >
-                  <span className="text-slate-300 group-hover:text-white font-medium transition-colors">{item.desc}</span>
-                  <kbd className="px-2.5 py-1 bg-slate-800 group-hover:bg-blue-600/20 border border-blue-500/40 rounded-lg text-blue-400 group-hover:text-blue-300 font-black text-[11px] shadow-sm tracking-widest shrink-0 transition-colors">
-                    {item.key}
-                  </kbd>
-                </button>
-              ))}
+              {filteredShortcuts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
+                  <div className="text-slate-500 text-xs font-mono uppercase tracking-[0.2em] font-black">
+                    No shortcuts match filter
+                  </div>
+                  <p className="text-slate-600 text-[10px] font-mono max-w-xs leading-relaxed">
+                    No shortcuts found matching "{shortcutsFilter}". Try a different keyword or clear the search.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setShortcutsFilter('');
+                      shortcutsFilterInputRef.current?.focus();
+                    }}
+                    aria-label="Clear shortcut filter search query"
+                    title="Clear shortcut filter"
+                    className="px-3 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[10px] uppercase tracking-wider rounded-xl border border-blue-500/20 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shadow-md"
+                  >
+                    Clear Filter
+                  </button>
+                </div>
+              ) : (
+                filteredShortcuts.map((item) => (
+                  <button
+                    key={item.key}
+                    onClick={item.action}
+                    aria-label={`Execute shortcut ${item.key}: ${item.desc}`}
+                    title={`Execute ${item.key} shortcut (${item.desc})`}
+                    className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-950/60 hover:bg-slate-950 border border-white/5 hover:border-blue-500/40 transition-all active:scale-98 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none cursor-pointer text-left group"
+                  >
+                    <span className="text-slate-300 group-hover:text-white font-medium transition-colors">{item.desc}</span>
+                    <kbd className="px-2.5 py-1 bg-slate-800 group-hover:bg-blue-600/20 border border-blue-500/40 rounded-lg text-blue-400 group-hover:text-blue-300 font-black text-[11px] shadow-sm tracking-widest shrink-0 transition-colors">
+                      {item.key}
+                    </kbd>
+                  </button>
+                ))
+              )}
             </div>
 
             <div className="p-4 bg-slate-950/80 border-t border-white/5 text-[9px] font-mono text-slate-500 uppercase tracking-widest text-center">

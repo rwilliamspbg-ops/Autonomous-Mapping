@@ -560,6 +560,59 @@ describe('UI Components', () => {
     expect(screen.getByRole('dialog', { name: 'Keyboard Shortcuts' })).toBeInTheDocument();
   });
 
+  it('App Keyboard Shortcuts modal supports search filtering, updates match count badge, and renders empty state fallback', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open Keyboard Shortcuts modal
+    const shortcutsTriggerBtn = screen.getByLabelText('Keyboard Shortcuts (Press ?)');
+    await act(async () => {
+      fireEvent.click(shortcutsTriggerBtn);
+    });
+
+    const filterInput = screen.getByLabelText('Filter keyboard shortcuts by keyword') as HTMLInputElement;
+    expect(filterInput).toBeInTheDocument();
+    expect(filterInput).toHaveAttribute('placeholder', 'Filter shortcuts...');
+
+    // Initially match count badge shows "9/9 SHORTCUTS"
+    expect(screen.getByText('9/9 SHORTCUTS')).toBeInTheDocument();
+
+    // Type "zoom" into filter input
+    act(() => {
+      fireEvent.change(filterInput, { target: { value: 'zoom' } });
+    });
+
+    expect(filterInput.value).toBe('zoom');
+    expect(screen.getByText('3/9 SHORTCUTS')).toBeInTheDocument();
+    expect(screen.getByText('Tactile World Map Zoom In')).toBeInTheDocument();
+    expect(screen.getByText('Tactile World Map Zoom Out')).toBeInTheDocument();
+    expect(screen.getByText('Reset World Map Zoom Level')).toBeInTheDocument();
+    expect(screen.queryByText('Toggle Manifesto & Narrative Modal')).not.toBeInTheDocument();
+
+    const clearInputBtn = screen.getByLabelText('Clear shortcut filter');
+    expect(clearInputBtn).toBeInTheDocument();
+
+    // Type non-matching search string
+    act(() => {
+      fireEvent.change(filterInput, { target: { value: 'nonexistentshortcut123' } });
+    });
+
+    expect(screen.getByText('0/9 SHORTCUTS')).toBeInTheDocument();
+    expect(screen.getByText('No shortcuts match filter')).toBeInTheDocument();
+
+    const clearFilterBtn = screen.getByRole('button', { name: 'Clear shortcut filter search query' });
+    expect(clearFilterBtn).toBeInTheDocument();
+
+    // Click Clear Filter in empty state
+    act(() => {
+      fireEvent.click(clearFilterBtn);
+    });
+
+    expect(filterInput.value).toBe('');
+    expect(screen.getByText('9/9 SHORTCUTS')).toBeInTheDocument();
+    expect(screen.getByText('Toggle Manifesto & Narrative Modal')).toBeInTheDocument();
+  });
+
   it('App Keyboard Shortcuts modal displays Copy Shortcuts button and copies formatted hotkeys to clipboard', async () => {
     const { fireEvent } = require('@testing-library/react');
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);
