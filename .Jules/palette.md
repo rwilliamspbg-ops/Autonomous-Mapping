@@ -83,3 +83,7 @@
 ## 2027-09-01 - Explicit Stop Control for Automated Long-Running Walkthrough Sequences
 **Learning:** Automated walkthrough sequences (like 6-minute protocol demo runs) that lack an in-flight stop or pause mechanism force users to either wait through long sequence timers or execute a full system reset, losing their current dashboard context. Transforming the launch button into a dynamic Stop control (`Stop_Demo ⏹`) while active—with rose styling, updated ARIA labels, and event logging—gives users immediate agency to halt automated sequences without wiping their active state.
 **Action:** Always equip automated long-running walkthrough triggers with a dynamic Stop action that halts timers and updates ARIA labels without resetting active state.
+
+## 2027-09-15 - Searchable Keyboard Shortcut Legend Modals with Empty State Fallbacks
+**Learning:** Dense web applications with multiple hotkeys leave users searching through long modal lists unless paired with an inline search filter. Providing an accessible search input inside keyboard shortcut legends with a dynamic match count badge (`X/Y SHORTCUTS`), clear button (`✕`), and an interactive empty filter fallback state ("No shortcuts match filter") allows users to pinpoint specific hotkeys (such as map zoom or chat) instantaneously.
+**Action:** Always complement keyboard shortcut legend modals with an inline search filter input, match count badge, and accessible empty filter state with a "Clear Filter" action button.
