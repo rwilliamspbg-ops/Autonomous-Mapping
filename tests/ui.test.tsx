@@ -1357,6 +1357,40 @@ describe('UI Components', () => {
     expect(screen.queryByLabelText('Scroll to bottom of chat messages')).not.toBeInTheDocument();
   });
 
+  it('ChatInterface dialog traps focus within the assistant modal when tabbing', () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open chat using hotkey
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const chatDialog = screen.getByRole('dialog', { name: 'Impact Chat Assistant' });
+    expect(chatDialog).toBeInTheDocument();
+
+    const focusableInChat = chatDialog.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    expect(focusableInChat.length).toBeGreaterThan(1);
+
+    const firstFocusable = focusableInChat[0];
+    const lastFocusable = focusableInChat[focusableInChat.length - 1];
+
+    // Focus last focusable element
+    lastFocusable.focus();
+    expect(document.activeElement).toBe(lastFocusable);
+
+    // Press Tab on last element -> wraps to first focusable element
+    fireEvent.keyDown(lastFocusable, { key: 'Tab', shiftKey: false });
+    expect(document.activeElement).toBe(firstFocusable);
+
+    // Press Shift+Tab on first element -> wraps to last focusable element
+    fireEvent.keyDown(firstFocusable, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(lastFocusable);
+  });
+
   it('HardhatTerminal dialog traps focus within the console modal when tabbing', () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);
