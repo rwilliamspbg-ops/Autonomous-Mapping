@@ -3012,4 +3012,63 @@ describe('UI Components', () => {
 
     vi.useRealTimers();
   });
+
+  it('CountryPanel displays and interacts with Copy Grounding Sources button', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Community integration stable.',
+      economicOutlook: 'Positive resource Outlook.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [
+        { title: 'WHO Health Data', uri: 'https://example.org/who' },
+        { title: 'UN Climate Registry', uri: 'https://example.org/un' }
+      ],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Wait for insights loading to finish
+    await screen.findByText('Kenya local pilot insights.');
+
+    vi.useFakeTimers();
+
+    const copySourcesBtn = screen.getByLabelText('Copy Grounding Sources to clipboard');
+    expect(copySourcesBtn).toBeInTheDocument();
+    expect(copySourcesBtn).toHaveAttribute('title', 'Copy Grounding Sources');
+
+    // Click Copy Grounding Sources
+    act(() => {
+      fireEvent.click(copySourcesBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('- WHO Health Data: https://example.org/who\n- UN Climate Registry: https://example.org/un');
+    expect(copySourcesBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements.some(el => el.textContent?.includes('Grounding sources copied to clipboard.'))).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copySourcesBtn.textContent).not.toContain('Copied! ✓');
+    expect(copySourcesBtn.textContent).toContain('Copy Sources');
+
+    vi.useRealTimers();
+  });
 });
