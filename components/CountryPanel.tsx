@@ -36,6 +36,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [briefCopied, setBriefCopied] = useState(false);
   const [fitCopied, setFitCopied] = useState(false);
   const [outlookCopied, setOutlookCopied] = useState(false);
+  const [sourcesCopied, setSourcesCopied] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
@@ -52,6 +53,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
     setBriefCopied(false);
     setFitCopied(false);
     setOutlookCopied(false);
+    setSourcesCopied(false);
     getSovereignInsights(countryName)
       .then((data) => {
         setInsight(data);
@@ -324,6 +326,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 {briefCopied && 'Regional Pilot Brief copied to clipboard.'}
                 {fitCopied && 'Community Fit summary copied to clipboard.'}
                 {outlookCopied && 'Resource Outlook summary copied to clipboard.'}
+                {sourcesCopied && 'Grounding sources copied to clipboard.'}
               </div>
 
               {zkStatus === 'VERIFYING' && (
@@ -546,7 +549,24 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
             </section>
 
             <section className="pb-12 border-t border-white/5 pt-10">
-              <h3 className="text-slate-500 text-[10px] mono font-bold uppercase mb-4 tracking-[0.4em]">Grounding Sources</h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-slate-500 text-[10px] mono font-bold uppercase tracking-[0.4em]">Grounding Sources</h3>
+                {insight.sources && insight.sources.length > 0 && (
+                  <button
+                    onClick={() => {
+                      const formattedSources = insight.sources.map(s => `- ${s.title}: ${s.uri}`).join('\n');
+                      navigator.clipboard.writeText(formattedSources);
+                      setSourcesCopied(true);
+                      setTimeout(() => setSourcesCopied(false), 2000);
+                    }}
+                    aria-label="Copy Grounding Sources to clipboard"
+                    title="Copy Grounding Sources"
+                    className="px-2.5 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                  >
+                    {sourcesCopied ? 'Copied! ✓' : 'Copy Sources'}
+                  </button>
+                )}
+              </div>
               {insight.sources && insight.sources.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {insight.sources.map((source, i) => (
