@@ -5,9 +5,10 @@ interface ManifestoProps {
   isOpen: boolean;
   onClose: () => void;
   onStartDemo?: () => void;
+  onSelectTrack?: (trackIndex: number) => void;
 }
 
-const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo }) => {
+const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo, onSelectTrack }) => {
   const [copied, setCopied] = React.useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const dialogRef = React.useRef<HTMLDivElement>(null);
@@ -159,10 +160,48 @@ const Manifesto: React.FC<ManifestoProps> = ({ isOpen, onClose, onStartDemo }) =
           </div>
 
           <section className="bg-blue-500/5 p-8 rounded-2xl border border-blue-500/20">
-            <h3 className="mono text-blue-500 text-xs font-bold uppercase tracking-widest mb-4">Pilot Lanes</h3>
-            <p className="text-sm text-slate-300 italic">
+            <h3 className="mono text-blue-500 text-xs font-bold uppercase tracking-widest mb-3">Pilot Lanes</h3>
+            <p className="text-sm text-slate-300 italic mb-4">
               "Global Health, Human Rights, and Climate Resilience are the three demo lanes. Each shows the same runtime through a mission lens that funders can understand immediately."
             </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              <button
+                onClick={() => {
+                  onSelectTrack?.(0);
+                  onClose();
+                }}
+                aria-label="Launch Global Health pilot lane in Kenya"
+                title="Launch Global Health pilot lane (Kenya)"
+                className="px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold mono text-xs uppercase tracking-wider rounded-xl border border-emerald-500/30 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none cursor-pointer flex items-center gap-2"
+              >
+                <span>Global Health</span>
+                <span className="text-[10px] text-emerald-500/80 font-normal">(Kenya)</span>
+              </button>
+              <button
+                onClick={() => {
+                  onSelectTrack?.(1);
+                  onClose();
+                }}
+                aria-label="Launch Human Rights pilot lane in Brazil"
+                title="Launch Human Rights pilot lane (Brazil)"
+                className="px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-bold mono text-xs uppercase tracking-wider rounded-xl border border-rose-500/30 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-rose-500 outline-none cursor-pointer flex items-center gap-2"
+              >
+                <span>Human Rights</span>
+                <span className="text-[10px] text-rose-500/80 font-normal">(Brazil)</span>
+              </button>
+              <button
+                onClick={() => {
+                  onSelectTrack?.(2);
+                  onClose();
+                }}
+                aria-label="Launch Climate Resilience pilot lane in South Africa"
+                title="Launch Climate Resilience pilot lane (South Africa)"
+                className="px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold mono text-xs uppercase tracking-wider rounded-xl border border-blue-500/30 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none cursor-pointer flex items-center gap-2"
+              >
+                <span>Climate Resilience</span>
+                <span className="text-[10px] text-blue-500/80 font-normal">(South Africa)</span>
+              </button>
+            </div>
           </section>
         </div>
 

@@ -974,6 +974,10 @@ const App: React.FC = () => {
         isOpen={isManifestoOpen}
         onClose={() => setIsManifestoOpen(false)}
         onStartDemo={runGuidedProtocol}
+        onSelectTrack={(index) => {
+          activateTrack(index);
+          setIsManifestoOpen(false);
+        }}
       />
       <SpatialScanner 
         isOpen={isScannerOpen} 
