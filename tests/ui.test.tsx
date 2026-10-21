@@ -3071,4 +3071,36 @@ describe('UI Components', () => {
 
     vi.useRealTimers();
   });
+
+  it('Manifesto renders interactive pilot lane action chips that execute onSelectTrack and close modal', () => {
+    const handleSelectTrack = vi.fn();
+    const handleClose = vi.fn();
+
+    render(
+      <Manifesto
+        isOpen={true}
+        onClose={handleClose}
+        onSelectTrack={handleSelectTrack}
+      />
+    );
+
+    const healthChip = screen.getByLabelText('Launch Global Health pilot lane in Kenya');
+    const rightsChip = screen.getByLabelText('Launch Human Rights pilot lane in Brazil');
+    const climateChip = screen.getByLabelText('Launch Climate Resilience pilot lane in South Africa');
+
+    expect(healthChip).toBeInTheDocument();
+    expect(rightsChip).toBeInTheDocument();
+    expect(climateChip).toBeInTheDocument();
+
+    expect(healthChip).toHaveAttribute('title', 'Launch Global Health pilot lane (Kenya)');
+    expect(rightsChip).toHaveAttribute('title', 'Launch Human Rights pilot lane (Brazil)');
+    expect(climateChip).toHaveAttribute('title', 'Launch Climate Resilience pilot lane (South Africa)');
+
+    act(() => {
+      healthChip.click();
+    });
+
+    expect(handleSelectTrack).toHaveBeenCalledWith(0);
+    expect(handleClose).toHaveBeenCalledTimes(1);
+  });
 });
