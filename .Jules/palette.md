@@ -87,3 +87,7 @@
 ## 2027-09-15 - Searchable Keyboard Shortcut Legend Modals with Empty State Fallbacks
 **Learning:** Dense web applications with multiple hotkeys leave users searching through long modal lists unless paired with an inline search filter. Providing an accessible search input inside keyboard shortcut legends with a dynamic match count badge (`X/Y SHORTCUTS`), clear button (`✕`), and an interactive empty filter fallback state ("No shortcuts match filter") allows users to pinpoint specific hotkeys (such as map zoom or chat) instantaneously.
 **Action:** Always complement keyboard shortcut legend modals with an inline search filter input, match count badge, and accessible empty filter state with a "Clear Filter" action button.
+
+## 2027-09-30 - Diagnostic Error Message Details inside Assertive Error Boundaries
+**Learning:** Generic fallback text inside global error boundaries leaves users and developers without immediate diagnostic context when unexpected runtime exceptions occur. Displaying `error.message` inside a cyber-styled diagnostic block within an assertive alert container (`role="alert" aria-live="assertive"`) ensures screen readers announce the exact anomaly immediately while giving users readable, actionable details.
+**Action:** Always render explicit diagnostic error details (`error.message`) inside accessible error boundary alert fallbacks.
