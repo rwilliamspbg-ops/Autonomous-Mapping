@@ -40,9 +40,15 @@ class ErrorBoundary extends Component<Props, State> {
                 CRITICAL_ERR
               </span>
             </div>
-            <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+            <p className="text-slate-400 text-sm mb-4 leading-relaxed">
               The Sovereign Map core encountered an unexpected state.
             </p>
+            {this.state.error?.message && (
+              <div className="mb-6 p-3 bg-red-950/40 border border-red-500/20 rounded-xl font-mono text-[11px] text-red-300/90 break-words font-medium">
+                <span className="text-red-500 font-bold mr-1">DETAILS:</span>
+                {this.state.error.message}
+              </div>
+            )}
             <button
               onClick={() => window.location.reload()}
               aria-label="Reinitialize core and reload application"

@@ -34,6 +34,7 @@ describe('UI Components', () => {
     expect(alertContainer).toBeInTheDocument();
     expect(alertContainer).toHaveAttribute('aria-live', 'assertive');
     expect(screen.getByText(/System Anomaly Detected/i)).toBeInTheDocument();
+    expect(screen.getByText(/Test Error/i)).toBeInTheDocument();
 
     const reinitBtn = screen.getByLabelText('Reinitialize core and reload application');
     expect(reinitBtn).toBeInTheDocument();
