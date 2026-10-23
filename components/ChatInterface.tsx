@@ -132,6 +132,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
       setLastAnnouncedMsg(`New message from Impact Analyst: ${errorText}`);
     } finally {
       setIsLoading(false);
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
     }
   };
 
@@ -364,6 +367,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                 ref={inputRef}
                 id="chat-input"
                 type="text"
+                disabled={isLoading}
                 maxLength={charLimit}
                 value={input}
                 onChange={(e) => {
@@ -373,9 +377,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
                   }
                   setInput(val);
                 }}
-                placeholder="Ask about a pilot or funding story..."
+                placeholder={isLoading ? "Analyst is processing query..." : "Ask about a pilot or funding story..."}
                 aria-describedby="chat-char-counter"
-                className="w-full bg-slate-800 border-none rounded-xl py-2 pl-4 pr-24 text-white placeholder-slate-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-slate-800 border-none rounded-xl py-2 pl-4 pr-24 text-white placeholder-slate-500 focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
               />
               <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-2 pr-1 select-none">
                 {input.length > 0 && (
