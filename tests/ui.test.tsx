@@ -703,10 +703,12 @@ describe('UI Components', () => {
       window.dispatchEvent(chatEvent);
     });
 
-    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i);
+    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i) as HTMLInputElement;
     const sendButton = screen.getByLabelText('Send message');
 
     expect(sendButton).toBeInTheDocument();
+    expect(chatInput).not.toBeDisabled();
+    expect(chatInput.placeholder).toBe('Ask about a pilot or funding story...');
 
     // Simulate user typing and submitting
     fireEvent.change(chatInput, { target: { value: 'Is it local first?' } });
@@ -716,6 +718,8 @@ describe('UI Components', () => {
     });
 
     // Check loading state updates
+    expect(chatInput).toBeDisabled();
+    expect(chatInput.placeholder).toBe('Analyst is processing query...');
     expect(screen.getByLabelText('Sending message...')).toBeInTheDocument();
     expect(screen.getByLabelText('Sending message...').querySelector('.animate-spin')).toBeInTheDocument();
   });
