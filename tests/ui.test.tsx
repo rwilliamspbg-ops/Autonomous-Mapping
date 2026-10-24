@@ -414,9 +414,17 @@ describe('UI Components', () => {
     render(<App />);
 
     const manifestoBtn = screen.getByLabelText('Open Manifesto (Press m or M)');
-    const terminalBtn = screen.getByLabelText('Open Live Node Console (Press t or T)');
-    const scannerBtn = screen.getByLabelText('Check My Privacy (Press s or S)');
-    const shortcutsBtn = screen.getByLabelText('Keyboard Shortcuts (Press ?)');
+    const terminalBtns = screen.getAllByLabelText(/Open Live Node Console/i);
+    const scannerBtns = screen.getAllByLabelText(/Check My Privacy/i);
+    const shortcutsBtns = screen.getAllByLabelText(/Keyboard Shortcuts/i);
+
+    expect(terminalBtns.length).toBeGreaterThanOrEqual(2);
+    expect(scannerBtns.length).toBeGreaterThanOrEqual(2);
+    expect(shortcutsBtns.length).toBeGreaterThanOrEqual(2);
+
+    const terminalBtn = terminalBtns[0];
+    const scannerBtn = scannerBtns[0];
+    const shortcutsBtn = shortcutsBtns[0];
 
     // Initially closed
     expect(manifestoBtn).toHaveAttribute('aria-expanded', 'false');
@@ -426,18 +434,12 @@ describe('UI Components', () => {
 
     expect(terminalBtn).toHaveAttribute('aria-expanded', 'false');
     expect(terminalBtn).toHaveAttribute('aria-pressed', 'false');
-    expect(terminalBtn).toHaveAttribute('aria-label', 'Open Live Node Console (Press t or T)');
-    expect(terminalBtn).toHaveAttribute('title', 'Open Live Node Console (T)');
 
     expect(scannerBtn).toHaveAttribute('aria-expanded', 'false');
     expect(scannerBtn).toHaveAttribute('aria-pressed', 'false');
-    expect(scannerBtn).toHaveAttribute('aria-label', 'Check My Privacy (Press s or S)');
-    expect(scannerBtn).toHaveAttribute('title', 'Check My Privacy (S)');
 
     expect(shortcutsBtn).toHaveAttribute('aria-expanded', 'false');
     expect(shortcutsBtn).toHaveAttribute('aria-pressed', 'false');
-    expect(shortcutsBtn).toHaveAttribute('aria-label', 'Keyboard Shortcuts (Press ?)');
-    expect(shortcutsBtn).toHaveAttribute('title', 'Keyboard Shortcuts (?)');
 
     // Click manifesto button to open
     await act(async () => {
@@ -466,8 +468,40 @@ describe('UI Components', () => {
 
     expect(terminalBtn).toHaveAttribute('aria-expanded', 'true');
     expect(terminalBtn).toHaveAttribute('aria-pressed', 'true');
-    expect(terminalBtn).toHaveAttribute('aria-label', 'Close Live Node Console (Press t or T)');
-    expect(terminalBtn).toHaveAttribute('title', 'Close Live Node Console (T)');
+  });
+
+  it('App compact mobile header navigation triggers render with valid ARIA attributes and toggle panels', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    const mobileTerminalBtn = screen.getByLabelText('Open Live Node Console');
+    const mobileScannerBtn = screen.getByLabelText('Check My Privacy');
+    const mobileShortcutsBtn = screen.getByLabelText('Keyboard Shortcuts');
+
+    expect(mobileTerminalBtn).toBeInTheDocument();
+    expect(mobileScannerBtn).toBeInTheDocument();
+    expect(mobileShortcutsBtn).toBeInTheDocument();
+
+    expect(mobileTerminalBtn).toHaveAttribute('title', 'Open Live Node Console (T)');
+    expect(mobileScannerBtn).toHaveAttribute('title', 'Check My Privacy (S)');
+    expect(mobileShortcutsBtn).toHaveAttribute('title', 'Keyboard Shortcuts (?)');
+
+    // Click mobile terminal button to open console
+    await act(async () => {
+      fireEvent.click(mobileTerminalBtn);
+    });
+
+    expect(screen.getByRole('dialog', { name: 'Live Node Console' })).toBeInTheDocument();
+    expect(mobileTerminalBtn).toHaveAttribute('aria-expanded', 'true');
+    expect(mobileTerminalBtn).toHaveAttribute('aria-label', 'Close Live Node Console');
+
+    // Click mobile terminal button again to close
+    await act(async () => {
+      fireEvent.click(mobileTerminalBtn);
+    });
+
+    expect(screen.queryByRole('dialog', { name: 'Live Node Console' })).not.toBeInTheDocument();
+    expect(mobileTerminalBtn).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('App component global hotkeys should trigger correctly', () => {

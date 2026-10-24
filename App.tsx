@@ -519,6 +519,51 @@ const App: React.FC = () => {
           </div>
         </div>
         
+        <nav className="flex lg:hidden items-center gap-2 text-[10px] font-bold mono">
+          <button
+            onClick={() => setIsTerminalOpen(prev => !prev)}
+            aria-expanded={isTerminalOpen}
+            aria-pressed={isTerminalOpen}
+            aria-label={isTerminalOpen ? "Close Live Node Console" : "Open Live Node Console"}
+            title={isTerminalOpen ? "Close Live Node Console (T)" : "Open Live Node Console (T)"}
+            className={`px-2.5 py-2 rounded-xl border ${trackingInfo.bg} ${trackingInfo.border} transition-all active:scale-95 text-slate-300 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center gap-1.5 ${
+              isTerminalOpen ? 'ring-2 ring-emerald-500/60' : ''
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${trackingInfo.dot} ${trackingState === TrackingState.OK ? 'animate-pulse' : ''}`}></span>
+            <span className="text-[9px] font-black tracking-wider text-emerald-400">NODE</span>
+            <kbd aria-hidden="true" className="px-1 py-0.5 bg-slate-900 border border-emerald-500/30 rounded text-[7px] text-emerald-400">T</kbd>
+          </button>
+
+          <button
+            onClick={() => setIsScannerOpen(prev => !prev)}
+            aria-expanded={isScannerOpen}
+            aria-pressed={isScannerOpen}
+            aria-label={isScannerOpen ? "Close Spatial Privacy Scanner" : "Check My Privacy"}
+            title={isScannerOpen ? "Close Spatial Privacy Scanner (S)" : "Check My Privacy (S)"}
+            className={`px-2.5 py-2 bg-blue-700 hover:bg-blue-600 text-white rounded-xl font-black text-[9px] uppercase tracking-wider transition-all border border-blue-400/30 active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center gap-1.5 shadow-md ${
+              isScannerOpen ? 'ring-2 ring-blue-300' : ''
+            }`}
+          >
+            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+            <span>PRIVACY</span>
+            <kbd aria-hidden="true" className="px-1 py-0.5 bg-blue-900 border border-blue-400/40 rounded text-[7px] text-blue-300">S</kbd>
+          </button>
+
+          <button
+            onClick={() => setIsShortcutsOpen(prev => !prev)}
+            aria-expanded={isShortcutsOpen}
+            aria-pressed={isShortcutsOpen}
+            aria-label={isShortcutsOpen ? "Close Keyboard Shortcuts" : "Keyboard Shortcuts"}
+            title={isShortcutsOpen ? "Close Keyboard Shortcuts (?)" : "Keyboard Shortcuts (?)"}
+            className={`p-2 bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-white/10 transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center justify-center ${
+              isShortcutsOpen ? 'ring-2 ring-blue-500/60' : ''
+            }`}
+          >
+            <kbd aria-hidden="true" className="px-1 py-0.5 bg-slate-800 border border-slate-700 rounded text-[9px] text-blue-400 font-mono font-black">?</kbd>
+          </button>
+        </nav>
+
         <nav className="hidden lg:flex items-center gap-6 text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em] mono">
           <button
             onClick={() => setIsTerminalOpen(prev => !prev)}
