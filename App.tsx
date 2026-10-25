@@ -43,6 +43,7 @@ const App: React.FC = () => {
   const [shortcutsFilter, setShortcutsFilter] = useState('');
   const shortcutsCloseRef = useRef<HTMLButtonElement>(null);
   const shortcutsFilterInputRef = useRef<HTMLInputElement>(null);
+  const shortcutsDialogRef = useRef<HTMLDivElement>(null);
   const shortcutsLastActiveRef = useRef<HTMLElement | null>(null);
   const [bootProgress, setBootProgress] = useState(0);
   const [protocolPhase, setProtocolPhase] = useState<ProtocolPhase>('IDLE');
@@ -165,6 +166,29 @@ const App: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsShortcutsOpen(false);
+        return;
+      }
+
+      if (e.key === 'Tab' && shortcutsDialogRef.current) {
+        const focusableElements = shortcutsDialogRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -1041,6 +1065,7 @@ const App: React.FC = () => {
           className="fixed inset-0 z-[80] flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md cursor-pointer"
         >
           <div
+            ref={shortcutsDialogRef}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"

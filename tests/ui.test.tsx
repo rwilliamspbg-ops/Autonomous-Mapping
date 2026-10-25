@@ -595,6 +595,40 @@ describe('UI Components', () => {
     expect(screen.getByRole('dialog', { name: 'Keyboard Shortcuts' })).toBeInTheDocument();
   });
 
+  it('App Keyboard Shortcuts dialog traps focus within the modal when tabbing', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open Keyboard Shortcuts modal using trigger button
+    const shortcutsTriggerBtn = screen.getByLabelText('Keyboard Shortcuts (Press ?)');
+    await act(async () => {
+      fireEvent.click(shortcutsTriggerBtn);
+    });
+
+    const shortcutsDialog = screen.getByRole('dialog', { name: 'Keyboard Shortcuts' });
+    expect(shortcutsDialog).toBeInTheDocument();
+
+    const focusableInShortcuts = shortcutsDialog.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    expect(focusableInShortcuts.length).toBeGreaterThan(1);
+
+    const firstFocusable = focusableInShortcuts[0];
+    const lastFocusable = focusableInShortcuts[focusableInShortcuts.length - 1];
+
+    // Focus last element in modal
+    lastFocusable.focus();
+    expect(document.activeElement).toBe(lastFocusable);
+
+    // Press Tab on last element -> wraps to first focusable element
+    fireEvent.keyDown(lastFocusable, { key: 'Tab', shiftKey: false });
+    expect(document.activeElement).toBe(firstFocusable);
+
+    // Press Shift+Tab on first element -> wraps to last focusable element
+    fireEvent.keyDown(firstFocusable, { key: 'Tab', shiftKey: true });
+    expect(document.activeElement).toBe(lastFocusable);
+  });
+
   it('App Keyboard Shortcuts modal supports search filtering, updates match count badge, and renders empty state fallback', async () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);
