@@ -95,3 +95,7 @@
 ## 2027-10-15 - Responsive Header Navigation for Touch and Mobile Viewports
 **Learning:** Desktop-only header navigation structures hidden on smaller viewports (`hidden lg:flex`) completely prevent touch device and mobile users without physical keyboards from opening modal panels (such as live node consoles, scanners, or keyboard shortcut legends). Providing a compact responsive mobile navbar (`flex lg:hidden`) with touch-friendly action chips, explicit `aria-expanded` and `aria-pressed` states, and hotkey hints preserves panel discoverability across all viewport sizes.
 **Action:** Always complement desktop header navigation controls with a compact responsive mobile navbar (`flex lg:hidden`) containing focus-visible, state-aware action chips.
+
+## 2027-11-01 - Inline Keyword Filtering for Static Narrative Modals
+**Learning:** In narrative or manifesto modals featuring structured multi-topic paragraphs (e.g., Narrative, Privacy, Carbon, Pilot Lanes), users seeking specific information have to scan the entire dialog text manually. Adding an accessible inline search filter in the modal header with a dynamic section match count badge (`X/Y SECTIONS`), quick clear button (`✕`), and accessible empty filter fallback state ("No manifesto sections match filter") enables instant keyword lookup without disrupting focus or reading flow.
+**Action:** Equip narrative and manifesto modals with an inline search filter input, dynamic match count badge, and accessible empty filter fallback view.
