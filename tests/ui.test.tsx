@@ -2197,19 +2197,19 @@ describe('UI Components', () => {
     const { fireEvent } = require('@testing-library/react');
     render(<Manifesto isOpen={true} onClose={() => {}} />);
 
-    const copyBtn = screen.getByLabelText('Copy Sovereign Map Manifesto to clipboard');
+    const filterInput = screen.getByLabelText('Filter manifesto content by keyword');
     const ctaBtn = screen.getByLabelText('Use this demo and start guided walkthrough');
 
     // Focus last focusable element in dialog
     ctaBtn.focus();
     expect(document.activeElement).toBe(ctaBtn);
 
-    // Press Tab on last element -> focus should wrap around to first focusable element (Copy Manifesto button)
+    // Press Tab on last element -> focus should wrap around to first focusable element (filter input)
     fireEvent.keyDown(ctaBtn, { key: 'Tab', shiftKey: false });
-    expect(document.activeElement).toBe(copyBtn);
+    expect(document.activeElement).toBe(filterInput);
 
     // Press Shift+Tab on first element -> focus should wrap around back to last focusable element (Use This Demo button)
-    fireEvent.keyDown(copyBtn, { key: 'Tab', shiftKey: true });
+    fireEvent.keyDown(filterInput, { key: 'Tab', shiftKey: true });
     expect(document.activeElement).toBe(ctaBtn);
   });
 
@@ -3175,5 +3175,50 @@ describe('UI Components', () => {
 
     expect(handleSelectTrack).toHaveBeenCalledWith(0);
     expect(handleClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('Manifesto supports search filtering, updates match count badge, and renders empty filter state', () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<Manifesto isOpen={true} onClose={() => {}} />);
+
+    const filterInput = screen.getByLabelText('Filter manifesto content by keyword') as HTMLInputElement;
+    expect(filterInput).toBeInTheDocument();
+    expect(filterInput).toHaveAttribute('placeholder', 'Filter manifesto...');
+
+    // Match count badge initially displays "4/4 SECTIONS"
+    expect(screen.getByText('4/4 SECTIONS')).toBeInTheDocument();
+
+    // Type "Carbon" into filter input
+    act(() => {
+      fireEvent.change(filterInput, { target: { value: 'Carbon' } });
+    });
+
+    expect(filterInput.value).toBe('Carbon');
+    expect(screen.getByText('1/4 SECTIONS')).toBeInTheDocument();
+    expect(screen.getByText('Carbon & Scale')).toBeInTheDocument();
+    expect(screen.queryByText('The Narrative')).not.toBeInTheDocument();
+
+    const clearInputBtn = screen.getByLabelText('Clear manifesto search filter');
+    expect(clearInputBtn).toBeInTheDocument();
+
+    // Type non-matching search query
+    act(() => {
+      fireEvent.change(filterInput, { target: { value: 'nonexistentmanifestosection123' } });
+    });
+
+    expect(screen.getByText('0/4 SECTIONS')).toBeInTheDocument();
+    expect(screen.getByText('No manifesto sections match filter')).toBeInTheDocument();
+
+    const clearFilterBtn = screen.getByRole('button', { name: 'Clear manifesto search filter query' });
+    expect(clearFilterBtn).toBeInTheDocument();
+
+    // Click Clear Filter button in empty state
+    act(() => {
+      fireEvent.click(clearFilterBtn);
+    });
+
+    expect(filterInput.value).toBe('');
+    expect(screen.getByText('4/4 SECTIONS')).toBeInTheDocument();
+    expect(screen.getByText('The Narrative')).toBeInTheDocument();
   });
 });
