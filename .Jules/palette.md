@@ -99,3 +99,7 @@
 ## 2027-11-01 - Inline Keyword Filtering for Static Narrative Modals
 **Learning:** In narrative or manifesto modals featuring structured multi-topic paragraphs (e.g., Narrative, Privacy, Carbon, Pilot Lanes), users seeking specific information have to scan the entire dialog text manually. Adding an accessible inline search filter in the modal header with a dynamic section match count badge (`X/Y SECTIONS`), quick clear button (`✕`), and accessible empty filter fallback state ("No manifesto sections match filter") enables instant keyword lookup without disrupting focus or reading flow.
 **Action:** Equip narrative and manifesto modals with an inline search filter input, dynamic match count badge, and accessible empty filter fallback view.
+
+## 2027-11-15 - State-Aware Live Region Announcements for Multi-Track Selection Controls
+**Learning:** Selecting or switching sub-topics or tracks within a workflow phase (such as choosing different pilot lanes while in a 'ROUTING' phase) fails to trigger screen reader announcements if the live status string depends solely on phase name transitions. Storing and announcing explicit track state updates (`Pilot track activated: [label] for [country].`) in polite live regions ensures assistive technology users receive real-time feedback on every selection change.
+**Action:** Always maintain dedicated, track-specific live region message state when building multi-option or track selection dashboard widgets.

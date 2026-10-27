@@ -2386,7 +2386,7 @@ describe('UI Components', () => {
     });
 
     expect(rightsCard).toHaveAttribute('aria-pressed', 'true');
-    expect(rightsCard.textContent).toContain('ACTIVE');
+    expect(rightsCard.closest('.group')?.textContent).toContain('ACTIVE');
 
     // Click Climate Resilience card to select South Africa
     await act(async () => {
@@ -2395,7 +2395,7 @@ describe('UI Components', () => {
 
     expect(climateCard).toHaveAttribute('aria-pressed', 'true');
     expect(rightsCard).toHaveAttribute('aria-pressed', 'false');
-    expect(climateCard.textContent).toContain('ACTIVE');
+    expect(climateCard.closest('.group')?.textContent).toContain('ACTIVE');
   });
 
   it('CountryPanel handles insight fetch failure, renders alert role with auto-focused retry button, and allows retrying', async () => {
@@ -3220,5 +3220,57 @@ describe('UI Components', () => {
     expect(filterInput.value).toBe('');
     expect(screen.getByText('4/4 SECTIONS')).toBeInTheDocument();
     expect(screen.getByText('The Narrative')).toBeInTheDocument();
+  });
+
+  it('App Demo_Use_Cases pillar cards display Copy buttons and copy use case details with tactile feedback and live region announcements', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    const copyHealthBtn = screen.getByLabelText('Copy Global Health use case details to clipboard');
+    expect(copyHealthBtn).toBeInTheDocument();
+    expect(copyHealthBtn).toHaveAttribute('title', 'Copy Global Health use case details');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copyHealthBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('[Global Health] (Kenya): Privacy-preserving disease surveillance');
+    expect(copyHealthBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements.some(el => el.textContent?.includes('Use case "Global Health" details copied to clipboard.'))).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyHealthBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyHealthBtn.textContent).toContain('Copy');
+
+    vi.useRealTimers();
+  });
+
+  it('App activating pilot tracks updates screen reader polite live region status text', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    const healthLaneBtn = screen.getByLabelText(/Select Health lane/i);
+    act(() => {
+      fireEvent.click(healthLaneBtn);
+    });
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements.some(el => el.textContent?.includes('Pilot track activated: Health lane for Kenya.'))).toBe(true);
   });
 });
