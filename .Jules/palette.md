@@ -103,3 +103,7 @@
 ## 2027-11-15 - State-Aware Live Region Announcements for Multi-Track Selection Controls
 **Learning:** Selecting or switching sub-topics or tracks within a workflow phase (such as choosing different pilot lanes while in a 'ROUTING' phase) fails to trigger screen reader announcements if the live status string depends solely on phase name transitions. Storing and announcing explicit track state updates (`Pilot track activated: [label] for [country].`) in polite live regions ensures assistive technology users receive real-time feedback on every selection change.
 **Action:** Always maintain dedicated, track-specific live region message state when building multi-option or track selection dashboard widgets.
+
+## 2027-11-20 - Re-verification Triggers for Completed Async Proof & Attestation Workflows
+**Learning:** In async verification panels, locking the interface in a completed/finalized state (`COMMITTED`) without a reset mechanism prevents users from re-running the proof generation animation during live demonstrations or re-testing. Adding a compact, focus-visible "Re-verify" action button in the proof header allows users to smoothly reset state back to `IDLE` with polite screen-reader announcements without reloading the parent view.
+**Action:** Provide focus-visible "Re-verify" or reset action buttons alongside finalized state cards in async verification panels to allow state re-evaluation on demand.
