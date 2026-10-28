@@ -37,6 +37,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [fitCopied, setFitCopied] = useState(false);
   const [outlookCopied, setOutlookCopied] = useState(false);
   const [sourcesCopied, setSourcesCopied] = useState(false);
+  const [reverifyAnnounced, setReverifyAnnounced] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const lastActiveElementRef = React.useRef<HTMLElement | null>(null);
@@ -312,6 +313,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               </div>
 
               <div role="status" aria-live="polite" className="sr-only">
+                {reverifyAnnounced && 'ZK privacy proof status reset to IDLE for re-verification.'}
                 {zkStatus === 'GENERATING' && 'Generating Privacy Proof...'}
                 {zkStatus === 'VERIFYING' && `Verifying Local Contribution: ${
                   verifyStep === 0 ? 'Verification starting' :
@@ -394,7 +396,22 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               {zkStatus === 'COMMITTED' && (
                 <div className="flex flex-col gap-2 p-3.5 rounded-xl border border-emerald-500/30 bg-emerald-500/5 mt-3 animate-in fade-in duration-300">
                   <div className="flex justify-between items-center text-[9px] mono text-emerald-400 uppercase tracking-widest">
-                    <span>ZK_PROOF_HASH</span>
+                    <div className="flex items-center gap-2">
+                      <span>ZK_PROOF_HASH</span>
+                      <button
+                        onClick={() => {
+                          setZkStatus('IDLE');
+                          setVerifyStep(0);
+                          setReverifyAnnounced(true);
+                          setTimeout(() => setReverifyAnnounced(false), 3000);
+                        }}
+                        aria-label="Re-verify ZK privacy proof"
+                        title="Reset and re-verify privacy proof"
+                        className="px-2 py-0.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold mono text-[8px] uppercase tracking-wider rounded border border-emerald-500/20 focus-visible:ring-2 focus-visible:ring-emerald-500 outline-none transition-all active:scale-95 cursor-pointer"
+                      >
+                        Re-verify
+                      </button>
+                    </div>
                     <span className="text-slate-500 font-bold">SHA-256</span>
                   </div>
                   <div className="flex items-center justify-between gap-3 mt-1">

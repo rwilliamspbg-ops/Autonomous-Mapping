@@ -1851,6 +1851,58 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('CountryPanel displays Re-verify button when proof is COMMITTED, and clicking resets status back to IDLE', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    await screen.findByText('Kenya local pilot insights.');
+
+    vi.useFakeTimers();
+
+    const verifyBtn = screen.getByText('⊕ Verify On-Device Contribution');
+    expect(verifyBtn).toBeInTheDocument();
+
+    act(() => {
+      fireEvent.click(verifyBtn);
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(6500);
+    });
+
+    // Proof is COMMITTED
+    const reverifyBtn = screen.getByLabelText('Re-verify ZK privacy proof');
+    expect(reverifyBtn).toBeInTheDocument();
+    expect(reverifyBtn).toHaveAttribute('title', 'Reset and re-verify privacy proof');
+
+    // Click Re-verify button
+    act(() => {
+      fireEvent.click(reverifyBtn);
+    });
+
+    // Button reverts back to IDLE state
+    expect(screen.getByText('⊕ Verify On-Device Contribution')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Re-verify ZK privacy proof')).not.toBeInTheDocument();
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements.some(el => el.textContent?.includes('ZK privacy proof status reset to IDLE for re-verification.'))).toBe(true);
+
+    vi.useRealTimers();
+  });
+
   it('CountryPanel displays and interacts with Copy Local Deployment Summary button', async () => {
     const { getSovereignInsights } = await import('../services/geminiService');
     const mockedGetInsights = vi.mocked(getSovereignInsights);
