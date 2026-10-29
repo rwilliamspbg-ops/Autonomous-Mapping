@@ -476,14 +476,17 @@ describe('UI Components', () => {
 
     const mobileTerminalBtn = screen.getByLabelText('Open Live Node Console');
     const mobileScannerBtn = screen.getByLabelText('Check My Privacy');
+    const mobileChatBtn = screen.getByLabelText('Open Impact Analyst Chat');
     const mobileShortcutsBtn = screen.getByLabelText('Keyboard Shortcuts');
 
     expect(mobileTerminalBtn).toBeInTheDocument();
     expect(mobileScannerBtn).toBeInTheDocument();
+    expect(mobileChatBtn).toBeInTheDocument();
     expect(mobileShortcutsBtn).toBeInTheDocument();
 
     expect(mobileTerminalBtn).toHaveAttribute('title', 'Open Live Node Console (T)');
     expect(mobileScannerBtn).toHaveAttribute('title', 'Check My Privacy (S)');
+    expect(mobileChatBtn).toHaveAttribute('title', 'Open Impact Analyst Chat (C)');
     expect(mobileShortcutsBtn).toHaveAttribute('title', 'Keyboard Shortcuts (?)');
 
     // Click mobile terminal button to open console
@@ -502,6 +505,23 @@ describe('UI Components', () => {
 
     expect(screen.queryByRole('dialog', { name: 'Live Node Console' })).not.toBeInTheDocument();
     expect(mobileTerminalBtn).toHaveAttribute('aria-expanded', 'false');
+
+    // Click mobile chat button to open chat
+    await act(async () => {
+      fireEvent.click(mobileChatBtn);
+    });
+
+    expect(screen.getByRole('dialog', { name: 'Impact Chat Assistant' })).toBeInTheDocument();
+    expect(mobileChatBtn).toHaveAttribute('aria-expanded', 'true');
+    expect(mobileChatBtn).toHaveAttribute('aria-label', 'Close Impact Analyst Chat');
+
+    // Click mobile chat button again to close chat
+    await act(async () => {
+      fireEvent.click(mobileChatBtn);
+    });
+
+    expect(screen.queryByRole('dialog', { name: 'Impact Chat Assistant' })).not.toBeInTheDocument();
+    expect(mobileChatBtn).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('App component global hotkeys should trigger correctly', () => {
