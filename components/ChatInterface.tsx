@@ -432,6 +432,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
       ) : (
         <button 
           onClick={() => setOpen(true)}
+          aria-expanded={isOpen}
           aria-label="Open Impact Chat (Press c or C)"
           title="Open Impact Chat (C)"
           className="relative bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-lg transition-all transform hover:scale-105 active:scale-95 group focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 outline-none"
