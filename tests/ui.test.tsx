@@ -372,8 +372,17 @@ describe('UI Components', () => {
     expect(isYColliding).toBe(true);
   });
 
-  it('WorldMap should render collapsible interactive map legend and toggle content on click', () => {
+  it('WorldMap should render collapsible interactive map legend, toggle content, and copy symbology details to clipboard', async () => {
     const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
     render(<WorldMap onCountrySelect={vi.fn()} />);
 
     const legendToggleBtn = screen.getByLabelText('Collapse map legend');
@@ -381,6 +390,38 @@ describe('UI Components', () => {
     expect(legendToggleBtn).toHaveAttribute('aria-expanded', 'true');
     expect(legendToggleBtn).toHaveAttribute('aria-controls', 'map-legend-content');
     expect(legendToggleBtn).toHaveAttribute('title', 'Collapse Map Legend');
+
+    const copySymbologyBtn = screen.getByLabelText('Copy Map Symbology legend to clipboard');
+    expect(copySymbologyBtn).toBeInTheDocument();
+    expect(copySymbologyBtn).toHaveAttribute('title', 'Copy Symbology Legend');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copySymbologyBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalled();
+    const copiedText = writeTextSpy.mock.calls[0][0];
+    expect(copiedText).toContain('ENGINE SYMBOLOGY LEGEND:');
+    expect(copiedText).toContain('- Active Node:');
+    expect(copiedText).toContain('- Voxel Scanning:');
+    expect(copiedText).toContain('- Heritage Sanctuary:');
+    expect(copiedText).toContain('- Spatial Grid (0.5°):');
+
+    expect(copySymbologyBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements.some(el => el.textContent?.includes('Map symbology legend copied to clipboard.'))).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copySymbologyBtn.textContent).not.toContain('Copied! ✓');
+    expect(copySymbologyBtn.textContent).toContain('Copy');
+
+    vi.useRealTimers();
 
     // Content is initially visible
     expect(screen.getByText('Active Node')).toBeInTheDocument();
@@ -394,6 +435,9 @@ describe('UI Components', () => {
     expect(screen.getByLabelText('Expand map legend')).toBeInTheDocument();
     expect(legendToggleBtn).toHaveAttribute('aria-expanded', 'false');
     expect(legendToggleBtn).toHaveAttribute('title', 'Expand Map Legend');
+
+    // Copy button is hidden when collapsed
+    expect(screen.queryByLabelText('Copy Map Symbology legend to clipboard')).not.toBeInTheDocument();
 
     // Legend content is now hidden/collapsed
     expect(screen.queryByText('Active Node')).not.toBeInTheDocument();

@@ -124,6 +124,7 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
   const [hoveredCountry, setHoveredCountry] = useState<{ name: string; id: string } | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [isLegendOpen, setIsLegendOpen] = useState(true);
+  const [legendCopied, setLegendCopied] = useState(false);
   const hoverTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -503,7 +504,9 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
       <svg ref={svgRef} className="w-full h-full" />
 
       <div role="status" aria-live="polite" className="sr-only">
-        {zoomFeedback === 'IN'
+        {legendCopied
+          ? 'Map symbology legend copied to clipboard.'
+          : zoomFeedback === 'IN'
           ? 'Map zoom increased.'
           : zoomFeedback === 'OUT'
           ? 'Map zoom decreased.'
@@ -605,20 +608,41 @@ const WorldMap: React.FC<WorldMapProps> = ({ onCountrySelect, selectedId, focusC
       )}
 
       {/* Map Legend Overlay */}
-      <div className="absolute bottom-20 right-8 bg-slate-900/80 backdrop-blur-md border border-white/10 p-4 rounded-xl shadow-2xl z-10 pointer-events-auto min-w-[180px] transition-all">
-        <button
-          onClick={() => setIsLegendOpen(prev => !prev)}
-          aria-expanded={isLegendOpen}
-          aria-controls="map-legend-content"
-          aria-label={isLegendOpen ? "Collapse map legend" : "Expand map legend"}
-          title={isLegendOpen ? "Collapse Map Legend" : "Expand Map Legend"}
-          className={`w-full flex items-center justify-between gap-3 mono text-[10px] text-blue-500 font-bold uppercase tracking-[0.2em] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-lg p-1 -m-1 transition-all active:scale-95 ${
-            isLegendOpen ? 'border-b border-white/5 pb-2 mb-3' : ''
-          }`}
-        >
-          <span>Engine_Symbology</span>
-          <span className="text-slate-400 font-mono text-[11px] font-bold shrink-0">{isLegendOpen ? '−' : '+'}</span>
-        </button>
+      <div className="absolute bottom-20 right-8 bg-slate-900/80 backdrop-blur-md border border-white/10 p-4 rounded-xl shadow-2xl z-10 pointer-events-auto min-w-[200px] transition-all">
+        <div className={`flex items-center justify-between gap-3 ${isLegendOpen ? 'border-b border-white/5 pb-2 mb-3' : ''}`}>
+          <button
+            onClick={() => setIsLegendOpen(prev => !prev)}
+            aria-expanded={isLegendOpen}
+            aria-controls="map-legend-content"
+            aria-label={isLegendOpen ? "Collapse map legend" : "Expand map legend"}
+            title={isLegendOpen ? "Collapse Map Legend" : "Expand Map Legend"}
+            className="flex items-center gap-2 mono text-[10px] text-blue-500 font-bold uppercase tracking-[0.2em] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none rounded-lg p-1 -m-1 transition-all active:scale-95 cursor-pointer"
+          >
+            <span>Engine_Symbology</span>
+            <span className="text-slate-400 font-mono text-[11px] font-bold shrink-0">{isLegendOpen ? '−' : '+'}</span>
+          </button>
+          {isLegendOpen && (
+            <button
+              onClick={() => {
+                const symbologyText = [
+                  "ENGINE SYMBOLOGY LEGEND:",
+                  "- Active Node: Region / country node with local spatial telemetry",
+                  "- Voxel Scanning: Real-time 3D spatial mapping in progress",
+                  "- Heritage Sanctuary: Protected historical / cultural site (SGP)",
+                  "- Spatial Grid (0.5°): Local coordinate grid resolution"
+                ].join('\n');
+                navigator.clipboard.writeText(symbologyText);
+                setLegendCopied(true);
+                setTimeout(() => setLegendCopied(false), 2000);
+              }}
+              aria-label="Copy Map Symbology legend to clipboard"
+              title="Copy Symbology Legend"
+              className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0 cursor-pointer"
+            >
+              {legendCopied ? 'Copied! ✓' : 'Copy'}
+            </button>
+          )}
+        </div>
 
         {isLegendOpen && (
           <div id="map-legend-content" className="space-y-3">
