@@ -337,6 +337,20 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                     <span className="text-[9px] text-blue-400 mono font-black uppercase tracking-widest">AggLayer_Verifier</span>
                     <span className="text-[10px] text-white mono font-bold">{Math.round((verifyStep / 3) * 100)}%</span>
                   </div>
+                  <div
+                    role="progressbar"
+                    aria-valuenow={Math.round((verifyStep / 3) * 100)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`AggLayer verification progress: ${Math.round((verifyStep / 3) * 100)}%`}
+                    title={`AggLayer verification progress: ${Math.round((verifyStep / 3) * 100)}%`}
+                    className="w-full h-1 bg-slate-800 rounded-full overflow-hidden my-2"
+                  >
+                    <div
+                      className="h-full bg-blue-500 transition-all duration-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"
+                      style={{ width: `${Math.round((verifyStep / 3) * 100)}%` }}
+                    ></div>
+                  </div>
                   <div className="space-y-1.5">
                     {['ANCHOR_STATE_HASH', 'ZK_SNARK_VALIDATION', 'CROSS_CHAIN_FINALITY'].map((step, idx) => {
                       const isCompleted = verifyStep >= idx + 1;
