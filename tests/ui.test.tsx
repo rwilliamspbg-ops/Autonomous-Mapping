@@ -1182,6 +1182,54 @@ describe('UI Components', () => {
     expect(spinnerSvg).toBeInTheDocument();
   });
 
+  it('CountryPanel AggLayer Verifier renders accessible progressbar with valid ARIA attributes and title tooltip during verification', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    const verifyBtn = await screen.findByText('⊕ Verify On-Device Contribution');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(verifyBtn);
+    });
+
+    // Advance 2000ms past GENERATING to VERIFYING state
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    // Progress bar should be rendered with 0% initially
+    const progressBar = screen.getByRole('progressbar', { name: 'AggLayer verification progress: 0%' });
+    expect(progressBar).toBeInTheDocument();
+    expect(progressBar).toHaveAttribute('aria-valuenow', '0');
+    expect(progressBar).toHaveAttribute('aria-valuemin', '0');
+    expect(progressBar).toHaveAttribute('aria-valuemax', '100');
+    expect(progressBar).toHaveAttribute('title', 'AggLayer verification progress: 0%');
+
+    // Advance 1000ms to step 1 (1/3 = 33%)
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(screen.getByRole('progressbar', { name: 'AggLayer verification progress: 33%' })).toBeInTheDocument();
+
+    vi.useRealTimers();
+  });
+
   it('ChatInterface send button displays descriptive title attributes reflecting active and disabled states', () => {
     render(<App />);
 

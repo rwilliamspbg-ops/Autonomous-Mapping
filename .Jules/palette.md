@@ -107,3 +107,7 @@
 ## 2027-11-20 - Re-verification Triggers for Completed Async Proof & Attestation Workflows
 **Learning:** In async verification panels, locking the interface in a completed/finalized state (`COMMITTED`) without a reset mechanism prevents users from re-running the proof generation animation during live demonstrations or re-testing. Adding a compact, focus-visible "Re-verify" action button in the proof header allows users to smoothly reset state back to `IDLE` with polite screen-reader announcements without reloading the parent view.
 **Action:** Provide focus-visible "Re-verify" or reset action buttons alongside finalized state cards in async verification panels to allow state re-evaluation on demand.
+
+## 2027-12-05 - Semantic Progress Bar Indicators for Multi-Step Cryptographic Verification
+**Learning:** Multi-step asynchronous verification processes (such as AggLayer proof verification) that only show text percentages and sequential checklist items lack a continuous visual pacing indicator and force assistive technology users to parse raw text nodes. Complementing numeric percentage readouts with a semantic `<div role="progressbar">` containing explicit `aria-valuenow`, `aria-valuemin`, `aria-valuemax`, `aria-label`, and `title` attributes provides immediate visual pacing and enables screen readers to track completion progress reliably.
+**Action:** Always complement multi-step asynchronous verification and progress steps with semantic progress bars featuring explicit ARIA attributes and title hover tooltips.
