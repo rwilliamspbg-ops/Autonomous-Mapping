@@ -43,6 +43,58 @@ describe('UI Components', () => {
     consoleSpy.mockRestore();
   });
 
+  it('ErrorBoundary renders accessible Copy Error button and copies diagnostic error details with tactile feedback and live region announcement', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    const ThrowCustomError = () => {
+      throw new Error('Kernel crash: unhandled state mismatch');
+    };
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    render(
+      <ErrorBoundary>
+        <ThrowCustomError />
+      </ErrorBoundary>
+    );
+
+    const copyBtn = screen.getByLabelText('Copy error details to clipboard');
+    expect(copyBtn).toBeInTheDocument();
+    expect(copyBtn).toHaveAttribute('title', 'Copy Error Details');
+    expect(copyBtn.textContent).toContain('Copy_Error');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copyBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('System Anomaly: Error: Kernel crash: unhandled state mismatch');
+    expect(copyBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    const hasCopiedStatus = statusElements.some(el => el.textContent?.includes('Diagnostic error details copied to clipboard.'));
+    expect(hasCopiedStatus).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyBtn.textContent).toContain('Copy_Error');
+
+    vi.useRealTimers();
+    consoleSpy.mockRestore();
+  });
+
   it('CountryPanel should show accessible loading status when loading', () => {
     render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
     expect(screen.getByRole('status')).toBeInTheDocument();

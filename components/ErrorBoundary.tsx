@@ -7,20 +7,42 @@ interface Props {
 interface State {
   hasError: boolean;
   error?: Error;
+  copied?: boolean;
 }
 
 class ErrorBoundary extends Component<Props, State> {
+  private copyTimer: number | null = null;
+
   public state: State = {
-    hasError: false
+    hasError: false,
+    copied: false
   };
 
   public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return { hasError: true, error, copied: false };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
   }
+
+  public componentWillUnmount() {
+    if (this.copyTimer) {
+      window.clearTimeout(this.copyTimer);
+    }
+  }
+
+  private handleCopyError = () => {
+    const errorDetails = this.state.error
+      ? `System Anomaly: ${this.state.error.name || 'Error'}: ${this.state.error.message}`
+      : 'System Anomaly Detected: Unknown runtime error';
+    navigator.clipboard.writeText(errorDetails);
+    this.setState({ copied: true });
+    if (this.copyTimer) window.clearTimeout(this.copyTimer);
+    this.copyTimer = window.setTimeout(() => {
+      this.setState({ copied: false });
+    }, 2000);
+  };
 
   public render() {
     if (this.state.hasError) {
@@ -30,6 +52,9 @@ class ErrorBoundary extends Component<Props, State> {
           aria-live="assertive"
           className="min-h-screen bg-slate-950 flex items-center justify-center p-6 mono text-white"
         >
+          <div role="status" aria-live="polite" className="sr-only">
+            {this.state.copied ? 'Diagnostic error details copied to clipboard.' : ''}
+          </div>
           <div className="max-w-md w-full bg-slate-900 border border-red-500/30 p-8 rounded-2xl shadow-[0_0_50px_rgba(239,68,68,0.15)] relative overflow-hidden">
             <div className="flex items-center justify-between mb-4 border-b border-red-500/20 pb-3">
               <h1 className="text-xl font-black uppercase text-red-500 flex items-center gap-2 tracking-tight">
@@ -49,14 +74,24 @@ class ErrorBoundary extends Component<Props, State> {
                 {this.state.error.message}
               </div>
             )}
-            <button
-              onClick={() => window.location.reload()}
-              aria-label="Reinitialize core and reload application"
-              title="Reinitialize Core (Reload)"
-              className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-red-500 outline-none cursor-pointer"
-            >
-              Reinitialize_Core
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={this.handleCopyError}
+                aria-label="Copy error details to clipboard"
+                title="Copy Error Details"
+                className="flex-1 py-3 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none cursor-pointer"
+              >
+                {this.state.copied ? 'Copied! ✓' : 'Copy_Error'}
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                aria-label="Reinitialize core and reload application"
+                title="Reinitialize Core (Reload)"
+                className="flex-1 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 rounded-xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 focus-visible:ring-2 focus-visible:ring-red-500 outline-none cursor-pointer"
+              >
+                Reinitialize_Core
+              </button>
+            </div>
           </div>
         </div>
       );
