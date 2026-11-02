@@ -550,6 +550,21 @@ const App: React.FC = () => {
         
         <nav className="flex lg:hidden items-center gap-2 text-[10px] font-bold mono">
           <button
+            onClick={() => setIsManifestoOpen(prev => !prev)}
+            aria-expanded={isManifestoOpen}
+            aria-pressed={isManifestoOpen}
+            aria-label={isManifestoOpen ? "Close Manifesto" : "Open Manifesto"}
+            title={isManifestoOpen ? "Close Manifesto (M)" : "Open Manifesto (M)"}
+            className={`px-2.5 py-2 rounded-xl border border-blue-500/30 bg-blue-500/10 transition-all active:scale-95 text-slate-300 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none flex items-center gap-1.5 ${
+              isManifestoOpen ? 'ring-2 ring-blue-500' : ''
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+            <span className="text-[9px] font-black tracking-wider text-blue-400">MANIFESTO</span>
+            <kbd aria-hidden="true" className="px-1 py-0.5 bg-slate-900 border border-blue-500/30 rounded text-[7px] text-blue-400">M</kbd>
+          </button>
+
+          <button
             onClick={() => setIsTerminalOpen(prev => !prev)}
             aria-expanded={isTerminalOpen}
             aria-pressed={isTerminalOpen}
