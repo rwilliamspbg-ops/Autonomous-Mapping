@@ -570,20 +570,40 @@ describe('UI Components', () => {
     const { fireEvent } = require('@testing-library/react');
     render(<App />);
 
+    const mobileManifestoBtn = screen.getByLabelText('Open Manifesto');
     const mobileTerminalBtn = screen.getByLabelText('Open Live Node Console');
     const mobileScannerBtn = screen.getByLabelText('Check My Privacy');
     const mobileChatBtn = screen.getByLabelText('Open Impact Analyst Chat');
     const mobileShortcutsBtn = screen.getByLabelText('Keyboard Shortcuts');
 
+    expect(mobileManifestoBtn).toBeInTheDocument();
     expect(mobileTerminalBtn).toBeInTheDocument();
     expect(mobileScannerBtn).toBeInTheDocument();
     expect(mobileChatBtn).toBeInTheDocument();
     expect(mobileShortcutsBtn).toBeInTheDocument();
 
+    expect(mobileManifestoBtn).toHaveAttribute('title', 'Open Manifesto (M)');
     expect(mobileTerminalBtn).toHaveAttribute('title', 'Open Live Node Console (T)');
     expect(mobileScannerBtn).toHaveAttribute('title', 'Check My Privacy (S)');
     expect(mobileChatBtn).toHaveAttribute('title', 'Open Impact Analyst Chat (C)');
     expect(mobileShortcutsBtn).toHaveAttribute('title', 'Keyboard Shortcuts (?)');
+
+    // Click mobile manifesto button to open manifesto modal
+    await act(async () => {
+      fireEvent.click(mobileManifestoBtn);
+    });
+
+    expect(screen.getByRole('dialog', { name: 'Sovereign Map Manifesto' })).toBeInTheDocument();
+    expect(mobileManifestoBtn).toHaveAttribute('aria-expanded', 'true');
+    expect(mobileManifestoBtn).toHaveAttribute('aria-label', 'Close Manifesto');
+
+    // Click mobile manifesto button again to close
+    await act(async () => {
+      fireEvent.click(mobileManifestoBtn);
+    });
+
+    expect(screen.queryByRole('dialog', { name: 'Sovereign Map Manifesto' })).not.toBeInTheDocument();
+    expect(mobileManifestoBtn).toHaveAttribute('aria-expanded', 'false');
 
     // Click mobile terminal button to open console
     await act(async () => {
