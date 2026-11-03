@@ -963,13 +963,31 @@ const App: React.FC = () => {
               </div>
               <div className="space-y-4">
                 {logs.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/20 p-4 text-center">
-                    <div className="text-[10px] text-slate-500 mono uppercase tracking-[0.25em] font-black mb-1">
-                      Telemetry stream cleared
+                  <div className="rounded-2xl border border-dashed border-slate-800 bg-slate-900/20 p-4 text-center space-y-3">
+                    <div>
+                      <div className="text-[10px] text-slate-500 mono uppercase tracking-[0.25em] font-black mb-1">
+                        Telemetry stream cleared
+                      </div>
+                      <p className="text-[9px] text-slate-600 leading-normal font-medium max-w-[240px] mx-auto uppercase tracking-wider">
+                        Awaiting new telemetry events...
+                      </p>
                     </div>
-                    <p className="text-[9px] text-slate-600 leading-normal font-medium max-w-[240px] mx-auto uppercase tracking-wider">
-                      Awaiting new telemetry events...
-                    </p>
+                    <button
+                      onClick={() => {
+                        setLogs([
+                          'DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD',
+                          'USE_CASE: HEALTH_PRIVACY_PILOT_ARMED',
+                          'USE_CASE: HUMAN_RIGHTS_SIGNAL_ROUTED',
+                          'USE_CASE: CLIMATE_SENSOR_PIPELINE_READY'
+                        ]);
+                        setLastAnnouncedStreamStatus('Impact stream telemetry logs restored.');
+                      }}
+                      aria-label="Restore initial telemetry stream logs"
+                      title="Restore Stream Logs"
+                      className="px-3 py-1.5 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-xl border border-blue-500/20 focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shadow-md cursor-pointer inline-flex items-center gap-1.5"
+                    >
+                      Restore Stream
+                    </button>
                   </div>
                 ) : (
                   logs.map((log, i) => (

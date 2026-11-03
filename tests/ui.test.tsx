@@ -339,6 +339,26 @@ describe('UI Components', () => {
     const hasClearedStatus = statusElements.some(el => el.textContent?.includes('Impact stream logs cleared.'));
     expect(hasClearedStatus).toBe(true);
 
+    // Verify Restore Stream action button is rendered in empty state
+    const restoreStreamBtn = screen.getByLabelText('Restore initial telemetry stream logs');
+    expect(restoreStreamBtn).toBeInTheDocument();
+    expect(restoreStreamBtn).toHaveAttribute('title', 'Restore Stream Logs');
+
+    // Click Restore Stream to re-populate telemetry logs
+    act(() => {
+      fireEvent.click(restoreStreamBtn);
+    });
+
+    // Logs are restored, empty state and Restore Stream button disappear
+    expect(screen.queryByLabelText('Restore initial telemetry stream logs')).not.toBeInTheDocument();
+    expect(screen.getByText('DEMO_INIT: SOUVERIGN_MAP_FOR_GOOD')).toBeInTheDocument();
+    expect(screen.getByText('USE_CASE: CLIMATE_SENSOR_PIPELINE_READY')).toBeInTheDocument();
+
+    // Verify live region announcement for restored logs
+    const updatedStatusElements = screen.getAllByRole('status', { hidden: true });
+    const hasRestoredStatus = updatedStatusElements.some(el => el.textContent?.includes('Impact stream telemetry logs restored.'));
+    expect(hasRestoredStatus).toBe(true);
+
     vi.useRealTimers();
   });
 
