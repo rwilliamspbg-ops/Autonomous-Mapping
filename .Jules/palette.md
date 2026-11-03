@@ -119,3 +119,7 @@
 ## 2028-01-10 - Mobile Navigation Parity for Modal Overlays
 **Learning:** Responsive compact mobile navbars that only include a subset of core features (e.g. omitting the Manifesto while including Node, Privacy, and Chat) force touch/mobile users to guess that the decorative logo symbol (Σ) is a trigger button. Providing explicit, labeled action chips (`MANIFESTO [M]`) with state-aware ARIA attributes (`aria-expanded`, `aria-pressed`, `aria-label`, `title`) ensures complete feature parity, discoverability, and accessibility across all viewports.
 **Action:** Ensure all core tool and modal triggers present on desktop navigation are consistently mirrored with labeled, accessible action chips in compact mobile navbars.
+
+## 2028-02-01 - One-Click Stream Restoration in Cleared Telemetry Empty States
+**Learning:** Telemetry feeds with destructive clear actions (like 'Clear Stream') that empty the log list leave users in an unrecoverable state where they must either wait indefinitely for new mock events or reload the entire web app. Equipping the empty state banner with an accessible 'Restore Stream' action button complete with focus-visible styling, tactile feedback, and polite live-region feedback eliminates dead-ends and allows users to re-seed initial telemetry immediately.
+**Action:** Always complement empty states resulting from clear actions with a focus-visible restore or re-seed button and screen-reader live-region announcement.
