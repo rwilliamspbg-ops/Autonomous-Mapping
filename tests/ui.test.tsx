@@ -215,6 +215,68 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('CountryPanel displays individual copy buttons on risk matrix items and copies risk metric with tactile feedback and live region announcement', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Stable integration.',
+      economicOutlook: 'Positive resources.',
+      keyRisks: [
+        { name: 'Access', severity: 20 },
+        { name: 'Infrastructure', severity: 35 }
+      ],
+      sources: [],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    // Wait for insights loading to finish
+    await screen.findByText('Kenya local pilot insights.');
+
+    const copyAccessRiskBtn = screen.getByLabelText('Copy Access risk metric (20%) to clipboard');
+    const copyInfraRiskBtn = screen.getByLabelText('Copy Infrastructure risk metric (35%) to clipboard');
+
+    expect(copyAccessRiskBtn).toBeInTheDocument();
+    expect(copyAccessRiskBtn).toHaveAttribute('title', 'Copy Access risk metric');
+    expect(copyInfraRiskBtn).toBeInTheDocument();
+    expect(copyInfraRiskBtn).toHaveAttribute('title', 'Copy Infrastructure risk metric');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copyAccessRiskBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('Access: 20%');
+    expect(copyAccessRiskBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements.some(el => el.textContent?.includes('Risk metric "Access: 20%" copied to clipboard.'))).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyAccessRiskBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyAccessRiskBtn.textContent).toContain('Copy');
+
+    vi.useRealTimers();
+  });
+
   it('App Impact Stream log entries render individual Copy buttons and copy log text on click', async () => {
     const { fireEvent } = require('@testing-library/react');
     const writeTextSpy = vi.fn().mockResolvedValue(undefined);

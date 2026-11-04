@@ -37,6 +37,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [fitCopied, setFitCopied] = useState(false);
   const [outlookCopied, setOutlookCopied] = useState(false);
   const [sourcesCopied, setSourcesCopied] = useState(false);
+  const [copiedRiskIdx, setCopiedRiskIdx] = useState<number | null>(null);
   const [reverifyAnnounced, setReverifyAnnounced] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const dialogRef = React.useRef<HTMLDivElement>(null);
@@ -55,6 +56,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
     setFitCopied(false);
     setOutlookCopied(false);
     setSourcesCopied(false);
+    setCopiedRiskIdx(null);
     getSovereignInsights(countryName)
       .then((data) => {
         setInsight(data);
@@ -329,6 +331,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 {fitCopied && 'Community Fit summary copied to clipboard.'}
                 {outlookCopied && 'Resource Outlook summary copied to clipboard.'}
                 {sourcesCopied && 'Grounding sources copied to clipboard.'}
+                {copiedRiskIdx !== null && insight && `Risk metric "${insight.keyRisks?.[copiedRiskIdx]?.name}: ${insight.keyRisks?.[copiedRiskIdx]?.severity}%" copied to clipboard.`}
               </div>
 
               {zkStatus === 'VERIFYING' && (
@@ -529,12 +532,30 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 mt-4">
                 {insight.keyRisks.map((risk, i) => (
-                  <div key={i} className="flex items-center justify-between gap-2 border-b border-white/5 pb-1">
+                  <div key={i} className="flex items-center justify-between gap-2 border-b border-white/5 pb-1 group relative">
                     <div className="flex items-center gap-2 truncate">
                       <div className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)] shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }}></div>
                       <span className="text-[10px] text-slate-300 mono truncate font-medium uppercase tracking-tighter" title={risk.name}>{risk.name}</span>
                     </div>
-                    <span className="text-[10px] text-blue-400 mono font-bold shrink-0">{risk.severity}%</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-[10px] text-blue-400 mono font-bold">{risk.severity}%</span>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${risk.name}: ${risk.severity}%`);
+                          setCopiedRiskIdx(i);
+                          setTimeout(() => setCopiedRiskIdx(null), 2000);
+                        }}
+                        aria-label={`Copy ${risk.name} risk metric (${risk.severity}%) to clipboard`}
+                        title={`Copy ${risk.name} risk metric`}
+                        className={`px-1.5 py-0.5 rounded text-[8px] mono font-bold uppercase tracking-wider transition-all active:scale-95 border focus-visible:ring-2 focus-visible:ring-blue-500 outline-none ${
+                          copiedRiskIdx === i
+                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 opacity-100'
+                            : 'bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border-blue-500/20 opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
+                        }`}
+                      >
+                        {copiedRiskIdx === i ? 'Copied! ✓' : 'Copy'}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
