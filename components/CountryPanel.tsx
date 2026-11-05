@@ -38,6 +38,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
   const [outlookCopied, setOutlookCopied] = useState(false);
   const [sourcesCopied, setSourcesCopied] = useState(false);
   const [copiedRiskIdx, setCopiedRiskIdx] = useState<number | null>(null);
+  const [copiedSourceIdx, setCopiedSourceIdx] = useState<number | null>(null);
   const [reverifyAnnounced, setReverifyAnnounced] = useState(false);
   const closeButtonRef = React.useRef<HTMLButtonElement>(null);
   const dialogRef = React.useRef<HTMLDivElement>(null);
@@ -57,6 +58,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
     setOutlookCopied(false);
     setSourcesCopied(false);
     setCopiedRiskIdx(null);
+    setCopiedSourceIdx(null);
     getSovereignInsights(countryName)
       .then((data) => {
         setInsight(data);
@@ -332,6 +334,7 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
                 {outlookCopied && 'Resource Outlook summary copied to clipboard.'}
                 {sourcesCopied && 'Grounding sources copied to clipboard.'}
                 {copiedRiskIdx !== null && insight && `Risk metric "${insight.keyRisks?.[copiedRiskIdx]?.name}: ${insight.keyRisks?.[copiedRiskIdx]?.severity}%" copied to clipboard.`}
+                {copiedSourceIdx !== null && insight?.sources?.[copiedSourceIdx] && `Grounding source link "${insight.sources[copiedSourceIdx].title}" copied to clipboard.`}
               </div>
 
               {zkStatus === 'VERIFYING' && (
@@ -622,17 +625,34 @@ const CountryPanel: React.FC<CountryPanelProps> = ({ country, onClose }) => {
               {insight.sources && insight.sources.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {insight.sources.map((source, i) => (
-                    <a
-                      key={i}
-                      href={source.uri}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`${source.title} (opens in a new tab)`}
-                      title={source.title}
-                      className="text-[9px] mono bg-blue-500/10 text-blue-400 px-4 py-1.5 rounded-full border border-blue-500/20 hover:bg-blue-500/20 transition-all font-bold uppercase truncate max-w-[200px] focus-visible:ring-2 focus-visible:ring-blue-500 outline-none"
-                    >
-                      {source.title} <span aria-hidden="true">↗</span>
-                    </a>
+                    <div key={i} className="inline-flex items-center gap-1 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1 group hover:border-blue-500/40 transition-all">
+                      <a
+                        href={source.uri}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${source.title} (opens in a new tab)`}
+                        title={source.title}
+                        className="text-[9px] mono text-blue-400 hover:text-blue-300 transition-colors font-bold uppercase truncate max-w-[170px] focus-visible:ring-2 focus-visible:ring-blue-500 rounded outline-none"
+                      >
+                        {source.title} <span aria-hidden="true">↗</span>
+                      </a>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(source.uri);
+                          setCopiedSourceIdx(i);
+                          setTimeout(() => setCopiedSourceIdx(null), 2000);
+                        }}
+                        aria-label={`Copy link for ${source.title} to clipboard`}
+                        title={`Copy link for ${source.title}`}
+                        className={`text-[8px] mono font-bold uppercase tracking-wider px-1.5 py-0.5 rounded transition-all active:scale-95 border focus-visible:ring-2 focus-visible:ring-blue-500 outline-none shrink-0 cursor-pointer ${
+                          copiedSourceIdx === i
+                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 opacity-100'
+                            : 'bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border-blue-500/20 opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
+                        }`}
+                      >
+                        {copiedSourceIdx === i ? 'Copied! ✓' : 'Copy'}
+                      </button>
+                    </div>
                   ))}
                 </div>
               ) : (

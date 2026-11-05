@@ -215,6 +215,68 @@ describe('UI Components', () => {
     vi.useRealTimers();
   });
 
+  it('CountryPanel displays individual copy buttons on Grounding Sources links and copies source URI with tactile feedback and live region announcement', async () => {
+    const { getSovereignInsights } = await import('../services/geminiService');
+    const mockedGetInsights = vi.mocked(getSovereignInsights);
+    mockedGetInsights.mockResolvedValue({
+      summary: 'Kenya local pilot insights.',
+      politicalStatus: 'Community integration stable.',
+      economicOutlook: 'Positive resource Outlook.',
+      keyRisks: [{ name: 'Access', severity: 20 }],
+      sources: [
+        { title: 'WHO Health Data', uri: 'https://example.org/who' },
+        { title: 'UN Climate Registry', uri: 'https://example.org/un' }
+      ],
+      riskScore: 42,
+      threats: [],
+      recommendations: []
+    });
+
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<CountryPanel country={{ id: 'KE', name: 'Kenya' }} onClose={() => {}} />);
+
+    await screen.findByText('Kenya local pilot insights.');
+
+    const copyWhoBtn = screen.getByLabelText('Copy link for WHO Health Data to clipboard');
+    const copyUnBtn = screen.getByLabelText('Copy link for UN Climate Registry to clipboard');
+
+    expect(copyWhoBtn).toBeInTheDocument();
+    expect(copyWhoBtn).toHaveAttribute('title', 'Copy link for WHO Health Data');
+    expect(copyUnBtn).toBeInTheDocument();
+    expect(copyUnBtn).toHaveAttribute('title', 'Copy link for UN Climate Registry');
+
+    vi.useFakeTimers();
+
+    // Click individual source copy button
+    act(() => {
+      fireEvent.click(copyWhoBtn);
+    });
+
+    expect(writeTextSpy).toHaveBeenCalledWith('https://example.org/who');
+    expect(copyWhoBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements.some(el => el.textContent?.includes('Grounding source link "WHO Health Data" copied to clipboard.'))).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyWhoBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyWhoBtn.textContent).toContain('Copy');
+
+    vi.useRealTimers();
+  });
+
   it('CountryPanel displays individual copy buttons on risk matrix items and copies risk metric with tactile feedback and live region announcement', async () => {
     const { getSovereignInsights } = await import('../services/geminiService');
     const mockedGetInsights = vi.mocked(getSovereignInsights);
