@@ -61,6 +61,7 @@ const App: React.FC = () => {
   const [coordsCopied, setCoordsCopied] = useState(false);
   const [shortcutsCopied, setShortcutsCopied] = useState(false);
   const [resetDone, setResetDone] = useState(false);
+  const [useCasesCopied, setUseCasesCopied] = useState(false);
   const [copiedPillarIdx, setCopiedPillarIdx] = useState<number | null>(null);
   const [lastAnnouncedTrack, setLastAnnouncedTrack] = useState<string | null>(null);
   const protocolTimersRef = useRef<number[]>([]);
@@ -402,6 +403,7 @@ const App: React.FC = () => {
     setConfirmClearStream(false);
     setLastAnnouncedStreamStatus(null);
     setCoordsCopied(false);
+    setUseCasesCopied(false);
     setCopiedPillarIdx(null);
     setLastAnnouncedTrack(null);
     demoStartRef.current = null;
@@ -719,6 +721,8 @@ const App: React.FC = () => {
               <div role="status" aria-live="polite" className="sr-only">
                 {resetDone
                   ? 'Walkthrough demo and active panels have been reset.'
+                  : useCasesCopied
+                  ? 'All demo use cases copied to clipboard.'
                   : copiedPillarIdx !== null
                   ? `Use case "${impactPillars[copiedPillarIdx]?.label}" details copied to clipboard.`
                   : lastAnnouncedTrack
@@ -1029,7 +1033,22 @@ const App: React.FC = () => {
             </div>
 
             <div className="bg-slate-950/90 backdrop-blur-3xl p-6 rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto">
-              <h4 className="text-[11px] text-slate-500 mono uppercase mb-4 tracking-[0.4em] font-black border-b border-white/5 pb-3">Demo_Use_Cases</h4>
+              <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
+                <h4 className="text-[11px] text-slate-500 mono uppercase tracking-[0.4em] font-black">Demo_Use_Cases</h4>
+                <button
+                  onClick={() => {
+                    const text = impactPillars.map(p => `[${p.label}] (${p.country}): ${p.value}`).join('\n');
+                    navigator.clipboard.writeText(text);
+                    setUseCasesCopied(true);
+                    setTimeout(() => setUseCasesCopied(false), 2000);
+                  }}
+                  aria-label="Copy all Demo Use Cases to clipboard"
+                  title="Copy Demo Use Cases"
+                  className="px-2 py-1 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 font-bold mono text-[9px] uppercase tracking-wider rounded-lg border border-blue-500/20 shadow-md focus-visible:ring-2 focus-visible:ring-blue-500 outline-none transition-all active:scale-95 shrink-0"
+                >
+                  {useCasesCopied ? 'Copied! ✓' : 'Copy Cases'}
+                </button>
+              </div>
               <div className="space-y-3">
                 {impactPillars.map((pillar, index) => {
                   const isTrackActive = selectedCountry?.name === pillar.country;

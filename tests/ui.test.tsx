@@ -3653,4 +3653,50 @@ describe('UI Components', () => {
     const statusElements = screen.getAllByRole('status', { hidden: true });
     expect(statusElements.some(el => el.textContent?.includes('Pilot track activated: Health lane for Kenya.'))).toBe(true);
   });
+
+  it('App Demo_Use_Cases header displays Copy Cases button and copies all use cases with tactile feedback and live region announcements', async () => {
+    const { fireEvent } = require('@testing-library/react');
+    const writeTextSpy = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', {
+      writable: true,
+      configurable: true,
+      value: {
+        writeText: writeTextSpy
+      }
+    });
+
+    render(<App />);
+
+    const copyCasesBtn = screen.getByLabelText('Copy all Demo Use Cases to clipboard');
+    expect(copyCasesBtn).toBeInTheDocument();
+    expect(copyCasesBtn).toHaveAttribute('title', 'Copy Demo Use Cases');
+    expect(copyCasesBtn.textContent).toContain('Copy Cases');
+
+    vi.useFakeTimers();
+
+    act(() => {
+      fireEvent.click(copyCasesBtn);
+    });
+
+    const expectedText = [
+      '[Global Health] (Kenya): Privacy-preserving disease surveillance',
+      '[Human Rights] (Brazil): Secure reporting from hostile environments',
+      '[Climate Resilience] (South Africa): Community sensor data stays local'
+    ].join('\n');
+
+    expect(writeTextSpy).toHaveBeenCalledWith(expectedText);
+    expect(copyCasesBtn.textContent).toContain('Copied! ✓');
+
+    const statusElements = screen.getAllByRole('status', { hidden: true });
+    expect(statusElements.some(el => el.textContent?.includes('All demo use cases copied to clipboard.'))).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2100);
+    });
+
+    expect(copyCasesBtn.textContent).not.toContain('Copied! ✓');
+    expect(copyCasesBtn.textContent).toContain('Copy Cases');
+
+    vi.useRealTimers();
+  });
 });
