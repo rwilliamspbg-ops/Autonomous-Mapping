@@ -3699,4 +3699,78 @@ describe('UI Components', () => {
 
     vi.useRealTimers();
   });
+
+  it('ChatInterface character counter renders warning pulse styling when 200 character limit is reached', () => {
+    const { fireEvent } = require('@testing-library/react');
+    render(<App />);
+
+    // Open chat
+    act(() => {
+      const chatEvent = new KeyboardEvent('keydown', { key: 'c' });
+      window.dispatchEvent(chatEvent);
+    });
+
+    const chatInput = screen.getByLabelText(/Ask about a pilot or funding story/i) as HTMLInputElement;
+    const counter = screen.getByText('0/200');
+
+    expect(counter).toHaveClass('text-slate-500');
+    expect(counter).not.toHaveClass('animate-pulse');
+
+    // Type 160 characters (approaching limit)
+    act(() => {
+      fireEvent.change(chatInput, { target: { value: 'a'.repeat(160) } });
+    });
+    expect(counter).toHaveClass('text-amber-500');
+
+    // Type 190 characters (nearing limit)
+    act(() => {
+      fireEvent.change(chatInput, { target: { value: 'a'.repeat(190) } });
+    });
+    expect(counter).toHaveClass('text-rose-500');
+
+    // Type 200 characters (max limit reached)
+    act(() => {
+      fireEvent.change(chatInput, { target: { value: 'a'.repeat(200) } });
+    });
+    expect(counter).toHaveClass('animate-pulse');
+    expect(counter).toHaveClass('text-rose-400');
+    expect(counter).toHaveClass('bg-rose-500/20');
+  });
+
+  it('SpatialScanner camera error view action buttons render descriptive title tooltips', async () => {
+    const mockGetUserMedia = vi.fn().mockRejectedValue(new Error('No camera hardware found'));
+    const originalMediaDevices = navigator.mediaDevices;
+
+    Object.defineProperty(navigator, 'mediaDevices', {
+      writable: true,
+      configurable: true,
+      value: {
+        getUserMedia: mockGetUserMedia
+      }
+    });
+
+    render(<SpatialScanner isOpen={true} onClose={() => {}} onScanComplete={() => {}} />);
+
+    // Wait for camera initialization error state
+    await screen.findByText('CAMERA_ERROR');
+
+    const retryBtn = screen.getByLabelText('Retry camera initialization');
+    const simulateBtn = screen.getByLabelText('Simulate stream without camera hardware');
+    const dismissBtn = screen.getByLabelText('Dismiss and close scanner');
+
+    expect(retryBtn).toHaveAttribute('title', 'Retry Camera Initialization');
+    expect(simulateBtn).toHaveAttribute('title', 'Simulate Stream');
+    expect(dismissBtn).toHaveAttribute('title', 'Dismiss Scanner');
+
+    if (originalMediaDevices) {
+      Object.defineProperty(navigator, 'mediaDevices', {
+        writable: true,
+        configurable: true,
+        value: originalMediaDevices
+      });
+    } else {
+      // @ts-ignore
+      delete navigator.mediaDevices;
+    }
+  });
 });
