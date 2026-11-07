@@ -141,8 +141,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ isOpen: controlledOpen, o
   const charLimit = 200;
   const inputLen = input.length;
   const counterColorClass =
+    inputLen >= charLimit ? 'text-rose-400 font-black animate-pulse bg-rose-500/20 px-1 py-0.5 rounded border border-rose-500/40' :
     inputLen > 180 ? 'text-rose-500 font-bold' :
-    inputLen > 150 ? 'text-amber-500' :
+    inputLen > 150 ? 'text-amber-500 font-medium' :
     'text-slate-500';
 
   const handleCopyChatTranscript = () => {

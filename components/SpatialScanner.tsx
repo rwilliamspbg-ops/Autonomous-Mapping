@@ -454,6 +454,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
                   ref={retryButtonRef}
                   onClick={startCamera}
                   aria-label="Retry camera initialization"
+                  title="Retry Camera Initialization"
                   className="px-6 py-3 bg-rose-950/50 hover:bg-rose-900/60 text-rose-400 border border-rose-500/30 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-rose-500 outline-none active:scale-95"
                 >
                   Retry_Sync
@@ -464,6 +465,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
                     setStatus('TRACKING');
                   }}
                   aria-label="Simulate stream without camera hardware"
+                  title="Simulate Stream"
                   className="px-6 py-3 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/40 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none active:scale-95 shadow-md"
                 >
                   Simulate_Stream
@@ -471,6 +473,7 @@ const SpatialScanner: React.FC<SpatialScannerProps> = ({ isOpen, onClose, onScan
                 <button
                   onClick={onClose}
                   aria-label="Dismiss and close scanner"
+                  title="Dismiss Scanner"
                   className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-white/10 rounded-2xl font-black text-xs uppercase tracking-widest transition-all focus-visible:ring-2 focus-visible:ring-blue-500 outline-none active:scale-95"
                 >
                   Dismiss
