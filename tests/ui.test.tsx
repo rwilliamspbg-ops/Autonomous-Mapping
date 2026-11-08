@@ -528,6 +528,25 @@ describe('UI Components', () => {
     const hasClearedStatus = statusElements.some(el => el.textContent?.includes('Evidence trail cleared.'));
     expect(hasClearedStatus).toBe(true);
 
+    // Verify Restore Trail action button is rendered in empty state
+    const restoreTrailBtn = screen.getByLabelText('Restore initial evidence trail events');
+    expect(restoreTrailBtn).toBeInTheDocument();
+    expect(restoreTrailBtn).toHaveAttribute('title', 'Restore Trail Events');
+
+    // Click Restore Trail to re-populate evidence events
+    act(() => {
+      fireEvent.click(restoreTrailBtn);
+    });
+
+    // Trail events are restored, empty state and Restore Trail button disappear
+    expect(screen.queryByLabelText('Restore initial evidence trail events')).not.toBeInTheDocument();
+    expect(screen.getByText('Guided protocol walkthrough initialized')).toBeInTheDocument();
+
+    // Verify live region announcement for restored evidence trail events
+    const updatedStatusElements = screen.getAllByRole('status', { hidden: true });
+    const hasRestoredStatus = updatedStatusElements.some(el => el.textContent?.includes('Evidence trail events restored.'));
+    expect(hasRestoredStatus).toBe(true);
+
     vi.useRealTimers();
   });
 
