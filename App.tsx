@@ -832,6 +832,20 @@ const App: React.FC = () => {
                     {demoClockLabel}
                   </span>
                 </div>
+                <div
+                  role="progressbar"
+                  aria-valuenow={Math.min(100, Math.round((demoElapsedMs / demoDurationMs) * 100))}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Guided walkthrough demo progress: ${Math.min(100, Math.round((demoElapsedMs / demoDurationMs) * 100))}%`}
+                  title={`Walkthrough demo progress: ${Math.min(100, Math.round((demoElapsedMs / demoDurationMs) * 100))}% (${demoClockLabel})`}
+                  className="mt-2 h-1 w-full bg-slate-900 rounded-full overflow-hidden"
+                >
+                  <div
+                    className="h-full bg-blue-500 transition-all duration-500 ease-out shadow-[0_0_8px_#3b82f6]"
+                    style={{ width: `${Math.min(100, (demoElapsedMs / demoDurationMs) * 100)}%` }}
+                  ></div>
+                </div>
               </div>
 
               <div className="mt-4 border-t border-white/5 pt-4">

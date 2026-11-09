@@ -3000,9 +3000,9 @@ describe('UI Components', () => {
 
     // Impact Stream progressbar
     const progressBars = screen.getAllByRole('progressbar');
-    expect(progressBars.length).toBeGreaterThanOrEqual(2);
+    expect(progressBars.length).toBeGreaterThanOrEqual(3);
 
-    const impactProgressBar = progressBars[0];
+    const impactProgressBar = screen.getByRole('progressbar', { name: /Impact Stream sync progress/i });
     expect(impactProgressBar).toHaveAttribute('aria-valuemin', '0');
     expect(impactProgressBar).toHaveAttribute('aria-valuemax', '100');
     expect(impactProgressBar).toHaveAttribute('aria-label', expect.stringContaining('Impact Stream sync progress'));
@@ -3329,6 +3329,14 @@ describe('UI Components', () => {
     const clockSpan = screen.getByLabelText(/Guided walkthrough demo elapsed time: 00:00 \/ 06:30/i);
     expect(clockSpan).toBeInTheDocument();
     expect(clockSpan).toHaveAttribute('title', 'Guided walkthrough demo elapsed time');
+
+    // Verify App walkthrough demo progressbar renders with valid ARIA attributes and title tooltip
+    const demoProgressBar = screen.getByRole('progressbar', { name: 'Guided walkthrough demo progress: 0%' });
+    expect(demoProgressBar).toBeInTheDocument();
+    expect(demoProgressBar).toHaveAttribute('aria-valuenow', '0');
+    expect(demoProgressBar).toHaveAttribute('aria-valuemin', '0');
+    expect(demoProgressBar).toHaveAttribute('aria-valuemax', '100');
+    expect(demoProgressBar).toHaveAttribute('title', 'Walkthrough demo progress: 0% (00:00 / 06:30)');
   });
 
   it('Overlays and drawers render role="dialog", aria-modal="true", and descriptive aria-labels', async () => {
